@@ -2,7 +2,7 @@
     <div class="aside-menu-container__aside-logo flex-column-auto">
         <a href="{{ url('/') }}" class="text-decoration-none sidebar-logo d-flex align-items-center" data-turbo="false" target="_blank">
             <div class="image image-mini me-3">
-                <img src="{{ getSettingData()['logo'] }}"
+                <img src="{{ asset(getSettingData()['logo']) }}"
                      class="img-fluid" alt="profile image">
             </div>
             <span class="text-gray-900 fs-4">{{ getSettingData()['application_name'] }}</span>

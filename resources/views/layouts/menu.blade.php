@@ -110,13 +110,12 @@
         <span class="aside-menu-title">{{ __('messages.events') }}</span>
     </a>
 </li>
-<li class="nav-item {{ (!Request::is('schedules*')) ? 'd-none' : '' }}" href="{{ route('schedules.index') }}">
-    <a class="nav-link d-flex align-items-center py-3" 
-    href="{{ route('schedules.index') }}">
+<li class="nav-item {{ Request::is('schedules*') ? 'active' : '' }}">
+    <a class="nav-link d-flex align-items-center py-3" href="{{ route('schedules.index') }}">
         <span class="aside-menu-icon pe-3">
             <i class="fas fa-clock fs-3"></i>
         </span>
-        <span class="aside-menu-title">{{ __('messages.schedules') }}
+        <span class="aside-menu-title">{{ __('messages.schedules') }}</span>
     </a>
 </li>
 <li class="nav-item {{ Request::is('scheduled-events*') ? 'active' : '' }}">

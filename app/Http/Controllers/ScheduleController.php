@@ -134,21 +134,6 @@ class ScheduleController extends AppBaseController
         return $this->sendSuccess(__('messages.schedule.schedule_deleted_successfully'));
     }
 
-    // public function addScheduleTimeSlot(Request $request): JsonResponse
-    // {
-    //     \Log::info('Time slot submission:', $request->all());
-
-    //     $input = $request->all();
-    //     $result = $this->scheduleRepository->storeScheduleTimeSlot($input);
-
-    //     if (! $result['success']) {
-    //         return $this->sendError($result);
-    //     }
-
-    //     return $this->sendSuccess(__('messages.success_message.event_schedule_create'));
-    // }
-
-
     public function addScheduleTimeSlot(Request $request): JsonResponse
     {
         \Log::info('Time slot submission:', $request->all());
