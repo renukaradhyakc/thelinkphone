@@ -39,6 +39,8 @@ class ScheduleEventController extends AppBaseController
     public function __construct(ScheduleEventRepository $scheduleEventRepository)
     {
         $this->scheduleEventRepo = $scheduleEventRepository;
+
+        $this->middleware('auth');
     }
 
     /**
@@ -62,7 +64,9 @@ class ScheduleEventController extends AppBaseController
     public function store(CreateEventScheduleRequest $request): JsonResponse
     {
         $outData = [];
+        $caller=$request->user();
         $input = $request->all();
+        $input['phone_call']=$caller->phone_number;
         \Log::info('Form Data: ', $input);
         if (isset($input['phone_call'])) {
              $input['phone_call'] =  $input['phone_call'];
