@@ -55,14 +55,14 @@ Route::middleware([
         [ScheduleEventController::class, 'cancelScheduledEvent'])->name('cancel.scheduled.event');
 
     // Transaction Routes
-    Route::get('transactions', [TransactionController::class, 'index'])->name('user.transactions.index');
-    Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('user.transactions.show');
+    Route::get('transactions', [TransactionController::class, 'index'])->name('user.transactions.index')->middleware('disable.transactions');
+    Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('user.transactions.show')->middleware('disable.transactions');
 
     // User Subscription Transactions Routes
     Route::get('subscription-transactions',
-        [SubscriptionTransactionController::class, 'index'])->name('user.subscription.transactions.index');
+        [SubscriptionTransactionController::class, 'index'])->name('user.subscription.transactions.index')->middleware('disable.transactions');
     Route::get('subscription-transactions/{userTransaction}',
-        [SubscriptionTransactionController::class, 'show'])->name('user.subscription.transactions.show');
+        [SubscriptionTransactionController::class, 'show'])->name('user.subscription.transactions.show')->middleware('disable.transactions');
 
     // Remove hold status user route
     Route::get('remove-hold-status-user/{id}',
@@ -80,8 +80,8 @@ Route::middleware([
     // Setting routes
     Route::get('/settings', [UserSettingController::class, 'index'])->name('user.settings');
     Route::post('/settings', [UserSettingController::class, 'store'])->name('user.setting.create.update');
-    Route::post('/settings/create-update',
-        [UserSettingController::class, 'userCredentialUpdate'])->name('user.setting.credential.update');
+    // Route::post('/settings/create-update',
+    //     [UserSettingController::class, 'userCredentialUpdate'])->name('user.setting.credential.update');
 });
 
 Route::middleware(['auth', 'xss', 'role:user', 'verified', 'checkCustomerOnBoard'])->group(function () {
@@ -89,27 +89,27 @@ Route::middleware(['auth', 'xss', 'role:user', 'verified', 'checkCustomerOnBoard
     Route::get('subscription-plans',
         [
             SubscriptionPricingPlanController::class, 'index',
-        ])->name('subscription.pricing.plans.index');
+        ])->name('subscription.pricing.plans.index')->middleware('disable.transactions');
 
     // routes for payment types.
     Route::get('choose-payment-type/{planId}/{context?}/{fromScreen?}',
-        [SubscriptionPricingPlanController::class, 'choosePaymentType'])->name('choose.payment.type');
+        [SubscriptionPricingPlanController::class, 'choosePaymentType'])->name('choose.payment.type')->middleware('disable.transactions');
 
     // stripe subscription transaction for user
     Route::post('purchase-subscription',
-        [SubscriptionController::class, 'purchaseSubscription'])->name('purchase-subscription');
+        [SubscriptionController::class, 'purchaseSubscription'])->name('purchase-subscription')->middleware('disable.transactions');
     Route::get('user-payment-success',
-        [SubscriptionController::class, 'userPaymentSuccess'])->name('user.payment.success');
+        [SubscriptionController::class, 'userPaymentSuccess'])->name('user.payment.success')->middleware('disable.transactions');
     Route::get('user-failed-payment',
-        [SubscriptionController::class, 'userHandleFailedPayment'])->name('user.failed.payment');
+        [SubscriptionController::class, 'userHandleFailedPayment'])->name('user.failed.payment')->middleware('disable.transactions');
 
     // Paypal subscription transaction for user
-    Route::get('user-paypal-onboard', [UserPaypalController::class, 'onBoard'])->name('user.paypal.init');
-    Route::get('user-paypal-payment-success', [UserPaypalController::class, 'success'])->name('user.paypal.success');
-    Route::get('user-paypal-payment-failed', [UserPaypalController::class, 'failed'])->name('user.paypal.failed');
+    Route::get('user-paypal-onboard', [UserPaypalController::class, 'onBoard'])->name('user.paypal.init')->middleware('disable.transactions');
+    Route::get('user-paypal-payment-success', [UserPaypalController::class, 'success'])->name('user.paypal.success')->middleware('disable.transactions');
+    Route::get('user-paypal-payment-failed', [UserPaypalController::class, 'failed'])->name('user.paypal.failed')->middleware('disable.transactions');
 
     // cash payment route
-    Route::post('cash-payments', [CashPaymentController::class, 'cashPay'])->name('cash.pay');
+    Route::post('cash-payments', [CashPaymentController::class, 'cashPay'])->name('cash.pay')->middleware('disable.transactions');
 });
 
 Route::get('feature-availability', [HomeController::class, 'featureAvailability'])->name('feature.available');

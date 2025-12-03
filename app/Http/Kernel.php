@@ -76,5 +76,6 @@ class Kernel extends HttpKernel
         'checkCustomerOnBoard' => CheckCustomerOnBoard::class,
         'check_subscription' => CheckSubscription::class,
         'setCustomCalendarLang' => SetCustomCalendarLang::class,
+        'disable.transactions' => \App\Http\Middleware\DisableTransactions::class,
     ];
 }

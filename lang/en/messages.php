@@ -235,6 +235,10 @@ return [
         'this_admin_can_not_be_deleted' => 'This admin can\'t be deleted',
         'email_verified' => 'Email Verified',
         'email_verified_successfully' => 'Email Verified Successfully.',
+        'delete_account' => 'Delete Account',
+        'delete_account_warning' => 'Once you delete your account, all your data will be permanently removed. This action cannot be undone.',
+        'incorrect_password' => 'The password you entered is incorrect.',
+        'account_deleted_success' => 'Your account has been deleted successfully.',
     ],
 
     'admin' => [

@@ -127,7 +127,7 @@
         <span class="aside-menu-title">{{ __('messages.schedule_events') }}</span>
     </a>
 </li>
-<li class="nav-item menu-search {{ (Request::is('transactions*')) || Request::is('subscription-transactions*') ? 'active' : '' }}">
+<!-- <li class="nav-item menu-search {{ (Request::is('transactions*')) || Request::is('subscription-transactions*') ? 'active' : '' }}">
     <a class="nav-link d-flex align-items-center py-3"
        href="{{ route('user.transactions.index') }}">
         <span class="aside-menu-icon pe-3">
@@ -135,7 +135,7 @@
         </span>
         <span class="aside-menu-title">{{ __('messages.transactions') }}</span>
     </a>
-</li>
+</li> -->
 <li class="nav-item {{ Request::is('connect-google-calendar*') ? 'active' : '' }}">
     <a class="nav-link d-flex align-items-center py-3"
        href="{{ route('google.calendar.index') }}">

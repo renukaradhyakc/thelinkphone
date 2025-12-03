@@ -15,6 +15,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Hash;
 use Laracasts\Flash\Flash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class UserProfileController extends AppBaseController
@@ -66,4 +68,24 @@ class UserProfileController extends AppBaseController
             throw new UnprocessableEntityHttpException($e->getMessage());
         }
     }
+
+
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ], [
+            'password.current_password' => __('messages.user.incorrect_password'),
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+        $user->delete();
+
+        Flash::success(__('messages.user.account_deleted_success'));
+        return redirect('/login');
+    }
+
+
 }

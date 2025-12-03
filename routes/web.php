@@ -104,6 +104,7 @@ Route::middleware(['auth', 'xss', 'verified'])->group(function () {
     Route::put('/profile/update', [UserProfileController::class, 'updateProfile'])->name('update.profile.setting');
     Route::put('/change-user-password', [UserProfileController::class, 'changePassword'])->name('user.changePassword');
     Route::put('update-language', [UserController::class, 'updateLanguage'])->name('update-language');
+    Route::delete('/profile/delete', [UserProfileController::class, 'destroy'])->name('profile.delete');
 
     //impersonate leave
     Route::get('/impersonate-leave', [UserController::class, 'impersonateLeave'])->name('impersonate.leave');
@@ -186,14 +187,14 @@ Route::prefix('admin')->middleware(['auth', 'role:admin', 'verified', 'checkCust
     Route::get('remove-hold-status', [SettingController::class, 'removeHoldStatus'])->name('remove.hold.status');
 
     // Transaction Routes
-    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
-    Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index')->middleware('disable.transactions');
+    Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show')->middleware('disable.transactions');
 
     // Subscription Transactions Routes
     Route::get('subscription-transactions',
-        [SubscriptionTransactionController::class, 'index'])->name('subscription.transactions.index');
+        [SubscriptionTransactionController::class, 'index'])->name('subscription.transactions.index')->middleware('disable.transactions');
     Route::get('subscription-transactions/{userTransaction}',
-        [SubscriptionTransactionController::class, 'show'])->name('subscription.transactions.show');
+        [SubscriptionTransactionController::class, 'show'])->name('subscription.transactions.show')->middleware('disable.transactions');
 
     // Currency routes
     Route::resource('currencies', CurrencyController::class);

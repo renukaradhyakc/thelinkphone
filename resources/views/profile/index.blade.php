@@ -82,6 +82,11 @@
                             {{ Form::submit(__('messages.common.save'),['class' => 'btn btn-primary me-2','id'=>'profileSaveBtn']) }}
                             <a href="{{ url()->previous() }}" type="reset"
                                class="btn btn-secondary">{{__('messages.common.discard')}}</a>
+
+                            <button type="button" class="btn btn-danger ms-auto" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            {{ __('messages.user.delete_account') }}
+                            </button>
+
                         </div>
                     </div>
                     {{ Form::close() }}
@@ -90,3 +95,50 @@
         </div>
     </div>
 @endsection
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="deleteAccountModalLabel">{{ __('messages.user.delete_account') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ __('messages.user.delete_account_warning') }}</p>
+        {{ Form::open(['route' => 'profile.delete', 'method' => 'DELETE', 'id' => 'deleteAccountForm']) }}
+            <div class="mb-3">
+                {{ Form::password('password', ['class' => 'form-control', 'placeholder' => __('messages.user.confirm_password'), 'required']) }}
+                @error('password')
+                    <span class="text-danger fs-small mt-1">{{ $message }}</span>
+                @enderror
+            </div>
+        {{ Form::close() }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.common.cancel') }}</button>
+        <button type="submit" class="btn btn-danger" form="deleteAccountForm">{{ __('messages.user.delete_account') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reopen modal if there are validation errors -->
+@if ($errors->has('password'))
+<script>
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+    deleteModal.show();
+</script>
+@endif
+
+<!-- Close modal if account deleted successfully -->
+@if(Session::has('flash_notification.message') && Session::get('flash_notification.level') === 'success')
+<script>
+    var deleteModalEl = document.getElementById('deleteAccountModal');
+    if (deleteModalEl) {
+        var modal = bootstrap.Modal.getInstance(deleteModalEl);
+        if (modal) modal.hide();
+    }
+</script>
+@endif
+
+
