@@ -94,6 +94,26 @@
             </div>
         </div>
     </div>
+    <style>
+        @media (max-width: 576px) {
+            .card-footer .btn {
+                padding: 6px 12px !important;
+                font-size: 14px !important;
+            }
+
+            /* Keep spacing & layout same */
+            .card-footer {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            /* Ensure Delete button doesn't grow too large */
+            .card-footer .btn-danger {
+                white-space: nowrap;
+            }
+        }
+    </style>
+
 @endsection
 <!-- Delete Account Modal -->
 <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">

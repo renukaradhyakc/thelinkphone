@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\TrialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
  Route::post('/qrscan',[UserController::class, 'qrscan']);
  Route::post('/authlogin',[UserController::class, 'authlogin']);
  Route::post('/check-event',[UserController::class,'checkEvent']);
+
+Route::middleware('auth:api')->group(function () {
+    Route::post('/trial/start', [TrialController::class, 'start']);
+    Route::get('/trial/status', [TrialController::class, 'status']);
+});
