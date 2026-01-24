@@ -26,7 +26,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
  Route::post('/authlogin',[UserController::class, 'authlogin']);
  Route::post('/check-event',[UserController::class,'checkEvent']);
 
-Route::middleware('auth:api')->group(function () {
-    Route::post('/trial/start', [TrialController::class, 'start']);
-    Route::get('/trial/status', [TrialController::class, 'status']);
-});
+Route::post('/trial/start', [TrialController::class, 'start']);
+Route::get('/trial/status', [TrialController::class, 'status']);

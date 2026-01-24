@@ -9,7 +9,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             text-align: center;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4E65FF 0%, #92EFFD 100%);
             color: white;
             margin: 0;
             min-height: 100vh;
@@ -122,25 +122,57 @@
 <body>
     <div class="container">
         <div class="logo">📱</div>
-        <h2><span class="status-indicator"></span>Opening LinkPhone App...</h2>
+        <h2><span class="status-indicator"></span>Opening CallALink App...</h2>
         <div class="spinner"></div>
         <p>Please wait while we redirect you to make a call...</p>
         
         <div id="fallback">
             <h3>App didn't open automatically?</h3>
-            <p>Make sure LinkPhone app is installed on your device.</p>
+            <p>Make sure CallALink app is installed on your device.</p>
             
             <a href="{{ $appDeepLink }}" class="btn" id="retry-btn">
-                📱 Open LinkPhone App
+                📱 Open CallALink App
             </a>
+
+            <div style="margin-top: 30px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                <!-- Google Play Button -->
+                <a href="https://play.google.com/store/apps/details?id=com.thelinkphone.app" 
+                target="_blank"
+                style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff;
+                        padding: 8px 16px; border-radius: 8px; text-decoration: none; 
+                        transition: opacity 0.2s; min-width: 140px;">
+                    <img src="/images/google-play-icon.svg" 
+                         alt="Google Play" 
+                         style="width: 24px; height: 24px; flex-shrink: 0; filter: invert(1) brightness(2); style="width: 24px; height: 24px; object-fit: contain;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
+                        <span style="font-size: 10px; opacity: 0.9;">Download on the</span>
+                        <span style="font-size: 16px; font-weight: 600;">Google Play</span>
+                    </div>
+                </a>
+
+                <!-- App Store Button -->
+                <a href="https://apps.apple.com/us/app/callalink/id6755759920" 
+                target="_blank"
+                style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff;
+                        padding: 8px 16px; border-radius: 8px; text-decoration: none; 
+                        transition: opacity 0.2s; min-width: 140px;">
+                    <img src="/images/app-store-icon.svg" 
+                         alt="App Store" 
+                         style="width: 24px; height: 24px; flex-shrink: 0; filter: invert(1) brightness(2); style="width: 24px; height: 24px; object-fit: contain;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
+                        <span style="font-size: 10px; opacity: 0.9;">Download on the</span>
+                        <span style="font-size: 16px; font-weight: 600;">App Store</span>
+                    </div>
+                </a>
+            </div>
             
-            <div class="instructions">
-                <h4>📋 Instructions:</h4>
-                <ol style="text-align: left; display: inline-block;">
-                    <li>Make sure LinkPhone app is installed</li>
-                    <li>Click the "Open LinkPhone App" button above</li>
-                    <li>Allow the app to open when prompted</li>
-                    <li>The call will be placed automatically</li>
+            <div class="instructions" style="margin-top: 30px; padding: 15px 20px;">
+                <h4 style="margin-bottom: 12px; margin-top: 0;">📋 Instructions:</h4>
+                <ol style="text-align: left; display: inline-block; margin: 0; padding-left: 20px;">
+                    <li style="margin-bottom: 8px;">Make sure CallALink app is installed</li>
+                    <li style="margin-bottom: 8px;">Click the "Open CallALink App" button above</li>
+                    <li style="margin-bottom: 8px;">Allow the app to open when prompted</li>
+                    <li style="margin-bottom: 0;">The call will be placed automatically</li>
                 </ol>
             </div>
             
@@ -148,7 +180,7 @@
                 <strong>User ID:</strong> {{ $userId }}
             </div>
             
-            <p><small>If you don't have the LinkPhone app, please install it from your app store first.</small></p>
+            <p><small>If you don't have the CallALink app, please install it from your app store first.</small></p>
         </div>
     </div>
 

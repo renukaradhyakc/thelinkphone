@@ -4,14 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Carbon;
 
 class UserTrial extends Model
 {
     use HasFactory;
 
+    protected $table = 'user_trials';
+
     protected $fillable = [
-        'user_id', 'started_at', 'expires_at', 'consumed',
+        'user_id',
+        'started_at',
+        'expires_at',
+        'consumed',
     ];
 
     protected $casts = [
@@ -20,9 +24,19 @@ class UserTrial extends Model
         'consumed' => 'boolean',
     ];
 
+    /**
+     * Trial is active only when:
+     * - started
+     * - not expired
+     * - not consumed
+     */
     public function isActive(): bool
     {
-        return $this->expires_at && $this->expires_at->isFuture();
+        return
+            $this->started_at !== null &&
+            $this->expires_at !== null &&
+            $this->expires_at->isFuture() &&
+            $this->consumed === false;
     }
 
     public function user()

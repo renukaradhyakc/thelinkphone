@@ -155,28 +155,38 @@ class UserController extends Controller
         $event = $events->filter(function ($item) use ($now) {
             Log::info('Checking event slot', ['slot_time' => $item->slot_time]);
 
-            $parts = array_map('trim', explode('-', $item->slot_time));
+            $slot = preg_replace('/[–—]/u', '-', $item->slot_time);
+            $parts = array_map('trim', explode('-', $slot));
+
             if (count($parts) !== 2) {
-                Log::warning('Malformed slot_time', ['slot_time' => $item->slot_time]);
+                Log::warning('Invalid slot_time format', ['slot_time' => $item->slot_time]);
                 return false;
             }
 
-            [$start, $end] = $parts;
+            [$startRaw, $endRaw] = $parts;
 
-            try {
-                // Parse start and end times in IST and set same date as $now
-                $startTime = Carbon::createFromFormat('h:i A', $start, 'Asia/Kolkata')
-                    ->setDate($now->year, $now->month, $now->day);
-                $endTime = Carbon::createFromFormat('h:i A', $end, 'Asia/Kolkata')
-                    ->setDate($now->year, $now->month, $now->day);
+            $startTime = $this->parseFlexibleTime($startRaw, $now);
+            $endTime   = $this->parseFlexibleTime($endRaw, $now);
 
-                Log::info('Parsed times', ['start' => $startTime->toTimeString(), 'end' => $endTime->toTimeString()]);
-            } catch (\Exception $e) {
-                Log::error('Error parsing time', ['slot_time' => $item->slot_time, 'error' => $e->getMessage()]);
+            if (!$startTime || !$endTime) {
+                Log::error('Time parsing failed', [
+                    'start' => $startRaw,
+                    'end'   => $endRaw,
+                ]);
                 return false;
             }
 
-            // Inclusive check: now >= start && now <= end
+            // Handle overnight slots (e.g. 10:00 PM - 02:00 AM)
+            if ($endTime->lessThan($startTime)) {
+                $endTime->addDay();
+            }
+
+            Log::info('Parsed slot', [
+                'start' => $startTime->toDateTimeString(),
+                'end'   => $endTime->toDateTimeString(),
+                'now'   => $now->toDateTimeString(),
+            ]);
+
             return $now->between($startTime, $endTime, true);
         })->first();
 
@@ -191,5 +201,32 @@ class UserController extends Controller
         ]);
     }
 
+    private function parseFlexibleTime(string $time, Carbon $now): ?Carbon
+    {
+        $time = strtoupper(trim($time));
+        $time = preg_replace('/\s+/', ' ', $time); // normalize spaces
+
+        $formats = [
+            'h:i A',   // 02:30 PM
+            'g:i A',   // 2:30 PM
+            'h:iA',    // 02:30PM
+            'g:iA',    // 2:30PM
+            'H:i',     // 14:30
+            'G:i',     // 2:30 (24-hour)
+            'h:i',     // 02:30 (12-hour, no AM/PM)
+            'g:i',     // 2:30 (12-hour, no AM/PM)
+        ];
+
+        foreach ($formats as $format) {
+            try {
+                $dt = Carbon::createFromFormat($format, $time, 'Asia/Kolkata');
+                return $dt->setDate($now->year, $now->month, $now->day);
+            } catch (\Exception $e) {
+                // try next format
+            }
+        }
+
+        return null; // unparseable
+    }
 
 }
