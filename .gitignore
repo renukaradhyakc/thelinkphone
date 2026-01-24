@@ -1,0 +1,62 @@
+# Laravel standard ignores
+/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+.env
+.env.*
+/bootstrap/cache/*.php
+
+# IDE / Editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Composer & NPM lock files (optional)
+composer.lock
+package-lock.json
+
+# Log files
+*.log
+*.log.*
+
+# Backups / temporary files
+*.bak
+*.tmp
+*.swp
+applinkbkp.zip
+
+# Local environment / cache
+/.phpunit.result.cache
+/.env.backup
+/storage/debugbar
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/storage/app/public/*
+/storage/app/temp/*
+/storage/app/testing/*
+
+# -------------------------------------------------------
+# 🔒 Sensitive credentials (Google, Firebase, etc.)
+# -------------------------------------------------------
+resources/client_secret_*.json
+storage/service-account-credentials.json
+storage/firebase-credentials.json
+storage/credentials.json
+storage/*.pem
+storage/*.p12
+storage/*.crt
+storage/*.key
+storage/*.json
+
+# Optional custom secrets
+*.credentials.json
+*.secrets.json
+*.key.json

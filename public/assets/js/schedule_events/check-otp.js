@@ -1,0 +1,1 @@
+(()=>{var e=!1;listenSubmit("#checkOTPForm",(function(c){if(e)return!0;c.preventDefault(),e=!0,$("#checkOTPForm")[0].submit(),$("#checkOTP").prop("disabled",!0)}))})();
