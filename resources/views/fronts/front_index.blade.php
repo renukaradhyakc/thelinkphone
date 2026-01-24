@@ -14,10 +14,10 @@
                     <div class="col-lg-6 text-lg-start text-center">
                         <div class="hero-content mt-5 mt-lg-0">
                             <h1 class="mb-3 pb-1">
-                          {{ $frontCMSSettings['title'] }}
+                          {{ $frontCMSSettings['title']?? 'Default Title' }}
                             </h1>
                             <p class="fs-4 mb-lg-5 mb-4 pb-2">
-                              {{$frontCMSSettings['description']}}.</p>
+                              {{$frontCMSSettings['description']?? 'Default Title'}}.</p>
                             @if(!getLogInUser())
                             <form action="{{ route('email.sign.up') }}">
                                 <div class="input-group mb-md-3">
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="col-lg-6 text-lg-end text-center">
-                        <img src="{{ asset($frontCMSSettings['front_image']) }}" alt="img" class="img-fluid" loading="lazy"/>
+                        <img src="{{ asset($frontCMSSettings['front_image']?? 'Default Title') }}" alt="img" class="img-fluid" loading="lazy"/>
                     </div>
                 </div>
             </div>
@@ -47,17 +47,17 @@
         <!-- start services section -->
         <section class="services-section p-t-100 p-b-100">
             <div class="container">
-                <h2 class="m-b-60 max-w-620 text-center mx-auto">{{$data['services']['main_title'] }}</h2>
+                <h2 class="m-b-60 max-w-620 text-center mx-auto">{{$data['services']['main_title'] ?? 'Default Title'}}</h2>
                 <div class="row justify-content-center">
                     <div class="col-xl-4 col-md-6 service-block d-flex align-items-stretch">
                         <div class="card service-inner text-center mx-lg-2 flex-fill">
                             <div class="card-body d-flex flex-column">
                                 <div class="service-icon pb-3 mb-4">
-                                    <img src="{{ $data['services']['service_image_1'] }}" alt="smart-popups" class="img-fluid" loading="lazy">
+                                    <img src="{{ $data['services']['service_image_1']?? 'Default Title' }}" alt="smart-popups" class="img-fluid" loading="lazy">
                                 </div>
-                                <h4 class="mb-3">{{ $data['services']['service_title_1'] }}</h4>
+                                <h4 class="mb-3">{{ $data['services']['service_title_1']?? 'Default Title' }}</h4>
                                 <p class="fs-6 text-secondary fw-light mb-0">
-                                    {{ $data['services']['service_description_1'] }}
+                                    {{ $data['services']['service_description_1']?? 'Default Title' }}
                                 </p>
                             </div>
                         </div>
@@ -66,11 +66,11 @@
                         <div class="card service-inner text-center mx-lg-2 flex-fill">
                             <div class="card-body d-flex flex-column">
                                 <div class="service-icon pb-3 mb-4">
-                                    <img src="{{ $data['services']['service_image_2'] }}" alt="smart-popups" class="img-fluid" loading="lazy">
+                                    <img src="{{ $data['services']['service_image_2']?? 'Default Title' }}" alt="smart-popups" class="img-fluid" loading="lazy">
                                 </div>
-                                <h4 class="mb-3">{{ $data['services']['service_title_2'] }}</h4>
+                                <h4 class="mb-3">{{ $data['services']['service_title_2'] ?? 'Default Title'}}</h4>
                                 <p class="fs-6 text-secondary fw-light mb-0">
-                                    {{ $data['services']['service_description_2'] }}
+                                    {{ $data['services']['service_description_2']?? 'Default Title' }}
                                 </p>
                             </div>
                         </div>
@@ -79,11 +79,11 @@
                         <div class="card service-inner text-center mx-lg-2 flex-fill">
                             <div class="card-body d-flex flex-column">
                                 <div class="service-icon pb-3 mb-4">
-                                    <img src="{{ $data['services']['service_image_3'] }}" alt="smart-popups" class="img-fluid" loading="lazy">
+                                    <img src="{{ $data['services']['service_image_3']?? 'Default Title' }}" alt="smart-popups" class="img-fluid" loading="lazy">
                                 </div>
-                                <h4 class="mb-3">{{ $data['services']['service_title_3'] }}</h4>
+                                <h4 class="mb-3">{{ $data['services']['service_title_3']?? 'Default Title' }}</h4>
                                 <p class="fs-6 text-secondary fw-light mb-0">
-                                    {{ $data['services']['service_description_3'] }}
+                                    {{ $data['services']['service_description_3']?? 'Default Title' }}
                                 </p>
                             </div>
                         </div>

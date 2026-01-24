@@ -29,12 +29,12 @@
         <div class="row">
             <div class="col-lg-4 col-md-6 mb-md-0 mb-3">
                 <a href="{{ route('frontHome') }}">
-                    <img src="{{ asset(getSettingData()['logo']) }}" alt="" class="img-fluid footer-logo" loading="lazy">
+                    <img src="{{ asset(getSettingData()['logo']?? 'Default Title') }}" alt="" class="img-fluid footer-logo" loading="lazy">
                 </a>
                 <ul class="d-flex ps-0 social-list">
                     @if(!empty($frontCMSSettings['facebook_url']))
                         <li class="d-flex align-items-center justify-content-center">
-                            <a href="{{ $frontCMSSettings['twitter_url'] }}"
+                            <a href="{{ $frontCMSSettings['twitter_url'] ?? 'Default Title'}}"
                                class="text-decoration-none d-block text-white" target="_blank">
                                 <i class="fa-brands fa-twitter fs-5"></i>
                             </a>
@@ -42,7 +42,7 @@
                     @endif
                     @if(!empty($frontCMSSettings['facebook_url']))
                         <li class="d-flex align-items-center justify-content-center">
-                            <a href="{{ $frontCMSSettings['facebook_url'] }}"
+                            <a href="{{ $frontCMSSettings['facebook_url'] ?? 'Default Title'}}"
                                class="text-decoration-none d-block text-white" target="_blank">
                                 <i class="fa-brands fa-facebook-f fs-5"></i>
                             </a>
@@ -50,7 +50,7 @@
                     @endif
                     @if(!empty($frontCMSSettings['instagram_url']))
                         <li class="d-flex align-items-center justify-content-center">
-                            <a href="{{ $frontCMSSettings['instagram_url'] }}"
+                            <a href="{{ $frontCMSSettings['instagram_url']?? 'Default Title' }}"
                                class="text-decoration-none d-block text-white" target="_blank">
                                 <i class="fa-brands fa-instagram fs-5"></i>
                             </a>
@@ -90,21 +90,21 @@
                     <div class="footer-info">
                         <div class="d-flex align-items-center footer-info__block mb-3 pb-1">
                             <i class="fa-solid fa-envelope text-primary fs-5 me-3"></i>
-                            <a href="mailto:{{ $frontCMSSettings['email'] }}" class="text-decoration-none text-secondary fs-6">
-                                {{ $frontCMSSettings['email'] }}
+                            <a href="mailto:{{ $frontCMSSettings['email'] ?? 'Default Title'}}" class="text-decoration-none text-secondary fs-6">
+                                {{ $frontCMSSettings['email']?? 'Default Title' }}
                             </a>
                         </div>
                         <div class="d-flex align-items-center footer-info__block mb-3 pb-1">
                             <i class="fa-solid fa-phone text-primary fs-5 me-3"></i>
-                            <a href="tel:+{{ $frontCMSSettings['region_code'] }} {{ $frontCMSSettings['phone'] }}" class="text-decoration-none text-secondary fs-6">
-                                +{{ $frontCMSSettings['region_code'] }} {{ $frontCMSSettings['phone'] }}
+                            <a href="tel:+{{ $frontCMSSettings['region_code']?? 'Default Title' }} {{ $frontCMSSettings['phone']?? 'Default Title'}}" class="text-decoration-none text-secondary fs-6">
+                                +{{ $frontCMSSettings['region_code']?? 'Default Title' }} {{ $frontCMSSettings['phone']?? 'Default Title' }}
                             </a>
                         </div>
                     </div>
 
             </div>
             <div class="col-12 text-center mt-lg-5 mt-4 copy-right">
-                <p class="fw-light py-4 mb-0">{{ __('messages.copyright') }} ©{{ \Carbon\Carbon::now()->year }} {{ getSettingData()['application_name'] }}</p>
+                <p class="fw-light py-4 mb-0">{{ __('messages.copyright') }} ©{{ \Carbon\Carbon::now()->year }} {{ getSettingData()['application_name']?? 'Default Title'}}</p>
             </div>
         </div>
     </div>

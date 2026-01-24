@@ -114,7 +114,8 @@ Route::middleware(['auth', 'xss', 'role:user', 'verified', 'checkCustomerOnBoard
 
 Route::get('feature-availability', [HomeController::class, 'featureAvailability'])->name('feature.available');
 
-Route::middleware(['xss', 'check_subscription', 'setCustomCalendarLang'])->group(function () {
+Route::middleware(['auth','xss', 'check_subscription', 'setCustomCalendarLang'])->group(function () {
+
     Route::get('s/{domain_url}/{event_link}', [EventController::class, 'slotsCalendar'])->name('slots');
 
     Route::get('s/{domain_url}/{event_link}/{slot_date}',

@@ -57,6 +57,32 @@ class Schedules extends SearchableComponent
         return $query->paginate(100);
     }
 
+
+    // public function searchSchdule(): LengthAwarePaginator
+    // {
+    //     $query = $this->getQuery()->where('user_id', getLogInUserId());
+
+    //     $this->getQuery()->when($this->filterSchedule != '', function (Builder $q) {
+    //         $schedule = Schedule::find($this->filterSchedule);
+
+    //         if ($schedule && $schedule->is_default == 1) {
+    //             $userScheduleExist = UserSchedule::where('schedule_id', $this->filterSchedule)->exists();
+
+    //             if ($userScheduleExist) {
+    //                 $q->where('schedule_id', $this->filterSchedule)->whereNull('event_id');
+    //             } else {
+    //                 $q->whereRaw('1 = 0'); 
+    //             }
+    //         } else {
+    //             $q->where('schedule_id', $this->filterSchedule ?: defaultUserSchedule())
+    //             ->whereNull('event_id');
+    //         }
+    //     });
+
+    //     return $query->paginate(100);
+    // }
+
+
     public function filterUserSchedule($scheduleId)
     {
         $this->filterSchedule = $scheduleId;

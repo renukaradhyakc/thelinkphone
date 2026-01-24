@@ -3,7 +3,7 @@
         <div class="row align-items-center">
             <div class="col-lg-1 col-4">
                 <a href="{{ url('/') }}" class="header-logo d-block">
-                    <img src="{{ asset(getSettingData()['logo']) }}" class="logo img-fluid h-100" loading="lazy">
+                    <img src="{{ asset(getSettingData()['logo']?? 'Default Title') }}" class="logo img-fluid h-100" loading="lazy">
                 </a>
             </div>
             <div class="col-lg-11 col-8">

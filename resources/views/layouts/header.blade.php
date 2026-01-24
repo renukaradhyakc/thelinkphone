@@ -51,16 +51,16 @@
                                 {{ __('messages.user.account_setting') }}
                             </a>
                         </li>
-                        <!--@if(getLogInUser()->hasRole('user'))-->
-                        <!--    <li>-->
-                        <!--        <a class="dropdown-item text-gray-900 custom-pointer"-->
-                        <!--           href="{{ route('subscription.pricing.plans.index') }}" data-turbo="false">-->
-                        <!--            <span class="dropdown-icon me-4 text-gray-600">-->
-                        <!--                <i class="fa-solid fa-money-bill"></i>-->
-                        <!--            </span>-->
-                        <!--            {{__('messages.subscription_plan.subscription_plans')}}</a>-->
-                        <!--    </li>-->
-                        <!--@endif-->
+                        <!-- @if(getLogInUser()->hasRole('user'))
+                            <li>
+                                <a class="dropdown-item text-gray-900 custom-pointer"
+                                   href="{{ route('subscription.pricing.plans.index') }}" data-turbo="false">
+                                    <span class="dropdown-icon me-4 text-gray-600">
+                                        <i class="fa-solid fa-money-bill"></i>
+                                    </span>
+                                    {{__('messages.subscription_plan.subscription_plans')}}</a>
+                            </li>
+                        @endif -->
                         @if((is_impersonating() == false))
                             <li>
                                 <a class="dropdown-item text-gray-900 cursor-pointer" id="changePassword">

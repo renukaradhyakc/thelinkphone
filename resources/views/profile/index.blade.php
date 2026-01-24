@@ -111,6 +111,10 @@
             }
         }
     </style>
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 @endsection
 <!-- Delete Account Modal -->
 <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">

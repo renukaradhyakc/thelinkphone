@@ -35,8 +35,9 @@ function getAppName()
     static $appName;
 
     if (empty($appName)) {
-        $appName = Setting::where('key', '=', 'application_name')->first()->value;
-    }
+    $appName = Setting::where('key', 'application_name')->first()?->value ?? 'Default App Name';
+}
+
 
     return $appName;
 }

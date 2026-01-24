@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('front-title') | {{ getSettingData()['application_name'] }}</title>
-    <link rel="icon" type="image/png" sizes="56x56" href="{{ asset(getSettingData()['favicon']) }}">
+    <title>@yield('front-title') | {{ getSettingData()['application_name'] ?? 'Default Title'}}</title>
+    <link rel="icon" type="image/png" sizes="56x56" href="{{ asset(getSettingData()['favicon']?? 'Default Title') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
           integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
