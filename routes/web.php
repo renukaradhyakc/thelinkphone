@@ -25,6 +25,8 @@ use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
+use App\Modules\Loyalty\Controllers\BillController;
+use App\Modules\Loyalty\Controllers\LoyaltyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,11 +52,11 @@ Route::get('/call/{userId}', function ($userId) {
     \Log::info("LinkPhone redirect attempt", ['user_id' => $userId, 'deep_link' => $appDeepLink]);
     
     // Return the redirect view
-    return view('linkphone.redirect', [
+    return view('linkphone.updated_redirect', [
         'userId' => $userId,
         'appDeepLink' => $appDeepLink
     ]);
-})->name('linkphone.redirect');
+})->name('linkphone.updated_redirect');
 
 
 // Fronted routes
@@ -81,11 +83,21 @@ Route::get('/login', function () {
 
 Route::middleware(['xss', 'setLanguage'])->group(function () {
     Route::get('/', [HomeController::class, 'home'])->name('frontHome');
+    // Route::get('/', function () {
+    //      return redirect()->away(config('app.url'), 301);
+    // })->name('frontHome');
     Route::get('pricing', [HomeController::class, 'pricing'])->name('pricing');
     Route::get('about-us', [HomeController::class, 'aboutUs'])->name('about-us');
     Route::get('contact-us', [HomeController::class, 'contactUs'])->name('contact-us');
     Route::get('faqs', [HomeController::class, 'faq'])->name('faq');
     Route::get('how_to_use', [HomeController::class, 'how_to_use'])->name('how_to_use');
+    Route::get('/how-to-use/{userId?}', function ($userId = null) {
+        return view('linkphone.how_to_use', [
+            'appDeepLink' => $userId
+                ? 'linkphone://call?user=' . urlencode($userId)
+                : null,
+        ]);
+    })->name('how.to.use.page');
     Route::post('enquiries', [EnquiryController::class, 'store'])->name('enquiries.store');
     Route::get('terms-conditions', [HomeController::class, 'termCondition'])->name('terms.conditions');
     Route::get('privacy-policy', [HomeController::class, 'privacyPolicy'])->name('privacy.policy');
@@ -108,6 +120,15 @@ Route::middleware(['auth', 'xss', 'verified'])->group(function () {
 
     //impersonate leave
     Route::get('/impersonate-leave', [UserController::class, 'impersonateLeave'])->name('impersonate.leave');
+
+
+    Route::get('/loyalty', [LoyaltyController::class, 'index'])->name('loyalty.dashboard');
+    Route::get('/loyalty/bills', fn() => view('loyalty.bills.index'))->name('loyalty.bills.index');
+    Route::get('/bills/{id}', [BillController::class, 'show']);
+    Route::get('/bills/{id}/items', [BillController::class, 'items']);
+    Route::get('/bills/{id}/file', [BillController::class, 'download']);
+    Route::get('/me/bills', [BillController::class, 'history']);
+    Route::get('/me/points', [BillController::class, 'points']);
 });
 
 /*Route::middleware(['auth.token'])->group(function () {

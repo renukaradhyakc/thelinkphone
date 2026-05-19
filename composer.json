@@ -10,15 +10,16 @@
     "version": "5.3.0-patch-3",
     "require": {
         "php": "^8.1",
-        "barryvdh/laravel-debugbar": "^3.8",
         "barryvdh/laravel-dompdf": "^2.0",
         "dyrynda/laravel-efficient-uuid": "^5.0",
         "google/apiclient": "^2.12",
+        "google/cloud-vision": "^2.2",
         "guzzlehttp/guzzle": "^7.2",
         "lab404/laravel-impersonate": "^1.7",
         "laracasts/flash": "^3.2",
         "laravel/framework": "^10.23",
         "laravel/sanctum": "^3.3",
+        "laravel/socialite": "*",
         "laravel/tinker": "^2.8",
         "laravelcollective/html": "^6.4",
         "league/flysystem-aws-s3-v3": "^3.0",
@@ -27,6 +28,7 @@
         "mews/purifier": "^3.4",
         "opcodesio/log-viewer": "^1.9",
         "rappasoft/laravel-livewire-tables": "^2.11",
+        "socialiteproviders/apple": "*",
         "spatie/calendar-links": "^1.6",
         "spatie/laravel-google-calendar": "^3.5",
         "spatie/laravel-medialibrary": "^10.7",
@@ -36,6 +38,7 @@
         "tightenco/ziggy": "^1.1"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.16",
         "barryvdh/laravel-ide-helper": "^2.13",
         "beyondcode/laravel-query-detector": "^1.7",
         "fakerphp/faker": "^1.9.1",
@@ -82,7 +85,7 @@
         }
     },
     "config": {
-        "optimize-autoloader": true,
+        "optimize-autoloader": false,
         "preferred-install": "dist",
         "sort-packages": true
     },

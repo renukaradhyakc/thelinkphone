@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\TrialController;
+use App\Http\Controllers\ScheduleEventController;
+use App\Modules\Loyalty\Controllers\BillController;
+use App\Modules\Loyalty\Controllers\AdminBillController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +31,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/trial/start', [TrialController::class, 'start']);
 Route::get('/trial/status', [TrialController::class, 'status']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/bills', [BillController::class, 'store']);
+});
+
+Route::prefix('admin/bills')->middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::post('{id}/approve', [AdminBillController::class, 'approve']);
+    Route::post('{id}/reject', [AdminBillController::class, 'reject']);
+});

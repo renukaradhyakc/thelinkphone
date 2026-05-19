@@ -37,4 +37,15 @@ return [
         'webhook_secret_key' => env('STRIPE_WEBHOOK_SECRET_KEY'),
     ],
 
+    'tabscanner' => [
+        'key' => env('TABSCANNER_KEY'),
+    ],
+
+    'veryfi' => [
+        'client_id' => env('VERYFI_CLIENT_ID'),
+        'client_secret' => env('VERYFI_CLIENT_SECRET'),
+        'username' => env('VERYFI_USERNAME'),
+        'api_key' => env('VERYFI_API_KEY'),
+    ],
+
 ];

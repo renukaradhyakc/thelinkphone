@@ -181,6 +181,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Dyrynda\Database\LaravelEfficientUuidServiceProvider::class,
         Mariuzzo\LaravelJsLocalization\LaravelJsLocalizationServiceProvider::class,
+        App\Modules\Loyalty\Providers\LoyaltyServiceProvider::class,
     ])->toArray(),
 
     /*

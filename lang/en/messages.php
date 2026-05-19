@@ -814,6 +814,10 @@ return [
        'short_description'=> 'The short description field is required.',
        'desig_required'=> 'The designation field is required.',
        'profile_size'=> 'Profile size should be less than 2 MB.',
+    ],
+
+    'loyalty_points'=>[
+        'loyalty' => 'Loyalty Points',
     ]
 
 ];

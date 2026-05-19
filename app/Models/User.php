@@ -591,4 +591,9 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     {
         return $this->hasOne(GoogleCalendarIntegration::class, 'user_id');
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin') || $this->is_super_admin === 1;
+    }
 }

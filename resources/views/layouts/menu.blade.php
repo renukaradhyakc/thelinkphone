@@ -136,6 +136,15 @@
         <span class="aside-menu-title">{{ __('messages.transactions') }}</span>
     </a>
 </li> -->
+<li class="nav-item {{ Request::is('loyalty*') ? 'active' : '' }}">
+    <a class="nav-link d-flex align-items-center py-3"
+       href="{{ route('loyalty.dashboard') }}">
+        <span class="aside-menu-icon pe-3">
+            <i class="fa-solid fa-gift fs-3"></i>
+        </span>
+        <span class="aside-menu-title">{{__('messages.loyalty_points.loyalty')}}</span>
+    </a>
+</li>
 <li class="nav-item {{ Request::is('connect-google-calendar*') ? 'active' : '' }}">
     <a class="nav-link d-flex align-items-center py-3"
        href="{{ route('google.calendar.index') }}">
