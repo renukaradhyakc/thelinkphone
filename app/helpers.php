@@ -216,11 +216,19 @@ function getCurrencyIcon(): string
 {
     static $currencyIcon;
 
-    if (empty($currencyIcon)) {
-        $defaultCurrencyCode = Setting::where('key', 'currency')->first()->value;
-
-        $currencyIcon = Currency::whereCurrencyCode($defaultCurrencyCode)->first()->currency_icon;
+    if (!empty($currencyIcon)) {
+        return $currencyIcon;
     }
+
+    $defaultCurrencyCode = Setting::where('key', 'currency')->value('value');
+
+    if (!$defaultCurrencyCode) {
+        return '₹'; // fallback
+    }
+
+    $currency = Currency::whereCurrencyCode($defaultCurrencyCode)->first();
+
+    $currencyIcon = $currency?->currency_icon ?? '₹';
 
     return $currencyIcon;
 }

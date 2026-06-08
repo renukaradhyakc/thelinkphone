@@ -1,0 +1,439 @@
+:root {
+    --lp: #6259ca;
+    --lg: #22c984;
+    --ly: #f6b600;
+    --border: #e8e8f0;
+    --muted: #6c757d;
+    --text: #1a1a2e;
+}
+
+/* ── table head ── */
+.loy-tbl-head {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1fr .7fr 1fr 76px;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #fafafa;
+    border-bottom: 1px solid var(--border);
+}
+
+.loy-tbl-head span {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--muted);
+}
+
+/* ── bill item wrapper: NOT an <a>, so actions sit correctly ── */
+.loy-bill-item {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1fr .7fr 1fr 76px;
+    gap: 8px;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+}
+
+.loy-bill-item:last-child {
+    border-bottom: none;
+}
+
+.loy-bill-item:hover {
+    background: #f8f8fd;
+}
+
+/* the clickable vendor+date+amount+pts+status area */
+.loy-bill-link {
+    display: contents;
+    /* passes grid to children, acts transparent */
+    text-decoration: none;
+    color: inherit;
+}
+
+.loy-bill-link>div {
+    cursor: pointer;
+}
+
+.loy-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.loy-av-purple {
+    background: linear-gradient(135deg, #6259ca, #8b5cf6);
+}
+
+.loy-av-amber {
+    background: linear-gradient(135deg, #f6b600, #f97316);
+}
+
+.loy-av-green {
+    background: linear-gradient(135deg, #22c984, #16a57a);
+}
+
+.loy-av-blue {
+    background: linear-gradient(135deg, #0d6efd, #0ea5e9);
+}
+
+.loy-av-red {
+    background: linear-gradient(135deg, #e74c3c, #ef4444);
+}
+
+.loy-vname {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.loy-vmeta {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.loy-conf-track {
+    width: 48px;
+    height: 4px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.loy-conf-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+
+.badge-done {
+    background: rgba(34, 201, 132, .12);
+    color: #16a57a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.badge-pending {
+    background: rgba(246, 182, 0, .12);
+    color: #c48e00;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.badge-failed {
+    background: rgba(231, 76, 60, .12);
+    color: #e74c3c;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.badge-duplicate,
+.badge-invalid {
+    background: rgba(108, 117, 125, .12);
+    color: #555;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.badge-review {
+    background: rgba(13, 110, 253, .12);
+    color: #0d6efd;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.loy-pts-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ly);
+}
+
+/* ── action buttons always in the same row ── */
+.loy-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.loy-row-actions a {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    transition: all .14s;
+}
+
+.loy-row-actions a:hover {
+    border-color: var(--lp);
+    color: var(--lp);
+    background: rgba(98, 89, 202, .07);
+}
+
+.loy-row-actions a.dl:hover {
+    border-color: var(--lg);
+    color: #16a57a;
+    background: rgba(34, 201, 132, .07);
+}
+
+/* ── filter buttons ── */
+.loy-filter-btn {
+    border: 1px solid var(--border);
+    background: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+    transition: all .14s;
+}
+
+.loy-filter-btn:hover {
+    border-color: var(--lp);
+    color: var(--lp);
+}
+
+.loy-filter-btn.active {
+    border-color: var(--lp);
+    color: #fff;
+    background: var(--lp);
+}
+
+/* ── pagination ── */
+.loy-pag-btn {
+    border: 1px solid var(--border);
+    background: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .14s;
+    color: var(--text);
+}
+
+.loy-pag-btn:hover {
+    border-color: var(--lp);
+    color: var(--lp);
+}
+
+.loy-pag-btn.active {
+    background: var(--text);
+    border-color: var(--text);
+    color: #fff;
+}
+
+.loy-pag-btn:disabled {
+    opacity: .35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.loy-empty {
+    padding: 32px;
+    text-align: center;
+    color: var(--muted);
+    margin: 0 auto 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── upload surface (at bottom) ── */
+.loy-upload-surface {
+    border: 2px dashed #c8c5e8;
+    border-radius: 12px;
+    background: #faf9ff;
+    padding: 24px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .18s, background .18s;
+    margin-top: 20px;
+    position: relative;
+}
+
+.loy-upload-surface:hover,
+.loy-upload-surface.drag {
+    border-color: var(--lp);
+    background: rgba(98, 89, 202, .04);
+}
+
+.loy-upload-surface input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.loy-upload-surface .up-icon {
+    font-size: 26px;
+    color: var(--lp);
+    opacity: .7;
+    display: block;
+    margin: 0 auto 10px auto;
+    text-align: center;
+}
+
+.loy-upload-surface .up-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.loy-upload-surface .up-title span {
+    color: var(--lp);
+    text-decoration: underline;
+}
+
+.loy-upload-surface .up-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.loy-up-chosen {
+    display: none;
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.loy-up-chosen.show {
+    display: flex;
+}
+
+.loy-up-chosen span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.loy-up-progress {
+    height: 5px;
+    background: #eee;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px auto 0;
+    max-width: 260px;
+    display: none;
+}
+
+.loy-up-bar {
+    height: 100%;
+    background: var(--lp);
+    border-radius: 5px;
+    transition: width .3s;
+}
+
+.loy-up-msg {
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.loy-up-submit {
+    margin-top: 12px;
+    position: relative;
+    z-index: 2;
+    display: none;
+}
+
+.loy-up-submit.show {
+    display: block;
+}
+
+/* ── responsive ── */
+@media (max-width:991px) {
+
+    .loy-tbl-head,
+    .loy-bill-item {
+        grid-template-columns: 2.5fr 1fr .7fr 1fr 76px;
+    }
+
+    .loy-tbl-head span:nth-child(2) {
+        display: none;
+    }
+
+    .loy-bill-item .col-date {
+        display: none;
+    }
+}
+
+@media (max-width:767px) {
+    .loy-tbl-head {
+        display: none;
+    }
+
+    .loy-bill-item {
+        grid-template-columns: 1fr auto;
+        gap: 6px;
+        padding: 12px 14px;
+    }
+
+    .loy-bill-item .col-date,
+    .loy-bill-item .col-amount,
+    .loy-bill-item .col-pts {
+        display: none;
+    }
+
+    .loy-bill-item .col-status {
+        grid-column: 1;
+    }
+
+    .loy-bill-item .col-actions {
+        grid-row: 1;
+        grid-column: 2;
+        align-self: center;
+    }
+
+    .loy-row-actions {
+        justify-content: flex-end;
+    }
+}

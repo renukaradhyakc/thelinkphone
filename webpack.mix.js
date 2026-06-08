@@ -172,3 +172,48 @@ mix.copy('node_modules/evo-calendar/evo-calendar/js/evo-calendar.js',
 // front CSS code
 mix.sass('resources/assets/css/front/custom.scss',
     'public/assets/css/front/custom.css').version()
+
+
+// --------------------------------------------------
+// LOYALTY MODULE
+// --------------------------------------------------
+
+// Loyalty JS
+
+// Dashboard
+mix.js(
+  'resources/assets/js/loyalty/dashboard/dashboard.js',
+  'public/assets/js/loyalty/dashboard.js'
+).version()
+
+// Bills list page
+mix.js(
+  'resources/assets/js/loyalty/bills/app.js',
+  'public/assets/js/loyalty/bills.js'
+).version()
+
+// Single bill page
+mix.js(
+  'resources/assets/js/loyalty/bill/app.js',
+  'public/assets/js/loyalty/bill.js'
+).version()
+
+// Loyalty CSS
+
+// Dashboard
+mix.sass(
+  'resources/assets/css/loyalty/dashboard.scss',
+  'public/assets/css/loyalty/dashboard.css'
+).version()
+
+// Bills list page
+mix.sass(
+  'resources/assets/css/loyalty/bills.scss',
+  'public/assets/css/loyalty/bills.css'
+).version()
+
+// Single bill page
+mix.sass(
+  'resources/assets/css/loyalty/bill.scss',
+  'public/assets/css/loyalty/bill.css'
+).version()

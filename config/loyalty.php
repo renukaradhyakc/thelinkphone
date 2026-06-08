@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'ocr_providers' => explode(',', env('OCR_PROVIDERS', 'tabscanner,veryfi')),
+    'ocr_providers' => explode(',', env('OCR_PROVIDERS', 'veryfi,tabscanner')),
 
     'fraud' => [
         'reject_threshold' => 90,

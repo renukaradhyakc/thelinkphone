@@ -45,13 +45,20 @@ class ProcessBillJob implements ShouldQueue
         LineItemService $lineItemService,
     ) {
 
-        Log::info('JOB START', ['bill_id' => $this->billId]);
+        Log::info('JOB START', [
+            'bill_id' => $this->billId,
+            'started_at' => now()->toDateTimeString()
+            ]);
 
         $start = microtime(true);
 
         $this->log($this->billId, 'processing_started');
 
         $bill = Bill::find($this->billId);
+
+        Log::info('AFTER_BILL_FETCH', [
+            'elapsed_ms' => round((microtime(true) - $start) * 1000)
+        ]);
 
         if (!$bill) {
             $this->log($this->billId, 'bill_not_found');
@@ -74,11 +81,24 @@ class ProcessBillJob implements ShouldQueue
             $raw = null;
             $lastError = null;
 
-            Log::info('START OCR');
+            $ocrStart = microtime(true);
+
+            Log::info('START OCR', [
+                'bill_id' => $bill->id
+            ]);
 
             foreach ($chain as $provider) {
+
+                Log::info('TRYING_OCR_PROVIDER', [
+                    'provider' => get_class($provider)
+                ]);
+                
                 try {
                     $raw = $provider->extractText($bill->file_url);
+                    Log::info('OCR_PROVIDER_FINISHED', [
+                        'elapsed_ms' => round((microtime(true) - $ocrStart) * 1000),
+                        'provider' => get_class($provider)
+                    ]);
                     break; // success, stop trying
                 } catch (\Throwable $e) {
                     $lastError = $e;
@@ -92,11 +112,17 @@ class ProcessBillJob implements ShouldQueue
                 return; // all providers exhausted
             }
 
+            $mapperStart = microtime(true);
+
             $mapped = $mapper->map($raw);
+
+            Log::info('MAPPER_FINISHED', [
+                'elapsed_ms' => round((microtime(true) - $mapperStart) * 1000)
+            ]);
 
             Log::info('OCR PROVIDER USED', [
                 'bill_id' => $bill->id,
-                'provider' => $mapped['provider']
+                'provider' => $mapped['provider'],
             ]);
 
             Log::info('MAPPER OUTPUT', ['bill_id' => $bill->id, 'data' => $mapped]);
@@ -141,17 +167,30 @@ class ProcessBillJob implements ShouldQueue
             // -------------------------
             $semanticHash = $this->generateSemanticHash($normalized);
 
+            Log::info('HASH_GENERATED', [
+                'elapsed_ms' => round((microtime(true) - $start) * 1000)
+            ]);
+
             $pointsEarned = $points->calculate((float) $normalized['amount']);
 
             // -------------------------
             // ✅ STEP 3: CRITICAL DB SECTION
             // -------------------------
             $completed = false;
-            DB::transaction(function () use ($bill, $mapped, $normalized, $pointsEarned, $semanticHash, $fraudEngine, $fraudAudit, $lineItemService, $mapper, &$completed) {
+
+            $txnStart = microtime(true);
+
+            Log::info('START_TRANSACTION');
+
+            DB::transaction(function () use ($bill, $mapped, $normalized, $pointsEarned, $semanticHash, $fraudEngine, $fraudAudit, $lineItemService, $mapper, &$completed, $txnStart) {
 
                 $bill = Bill::where('id', $bill->id)
                     ->lockForUpdate()
                     ->first();
+
+                Log::info('LOCK_ACQUIRED', [
+                    'elapsed_ms' => round((microtime(true) - $txnStart) * 1000)
+                ]);
 
                 if (!$bill || $bill->status !== Bill::STATUS_PENDING) {
                     $this->log($this->billId, 'skipped_in_transaction');
@@ -186,7 +225,13 @@ class ProcessBillJob implements ShouldQueue
                 $payload = $normalized ?? [];
                 $payload['is_duplicate'] = $ocrDuplicate;
 
+                $fraudStart = microtime(true);
+
                 $result = $fraudEngine->analyze($payload, $bill);
+
+                Log::info('FRAUD_ENGINE_FINISHED', [
+                    'elapsed_ms' => round((microtime(true) - $fraudStart) * 1000)
+                ]);
 
                 $decision = $fraudAudit->handle($bill, $result);
 
@@ -221,6 +266,8 @@ class ProcessBillJob implements ShouldQueue
                 // -------------------------
 
                 try {
+                    $saveStart = microtime(true);
+
                     $bill->markDone([
                         'invoice_number' => $normalized['invoice'],
                         'amount' => $normalized['amount'],
@@ -232,10 +279,23 @@ class ProcessBillJob implements ShouldQueue
                         'semantic_hash' => $semanticHash,
                     ]);
 
+                    Log::info('MARK_DONE_FINISHED', [
+                        'elapsed_ms' => round((microtime(true) - $saveStart) * 1000)
+                    ]);
+
+                    $itemStart = microtime(true);
+
                     $items = $mapper->extractLineItems(
                         $mapped['raw'],
                         $mapped['provider']
                     );
+
+                    Log::info('LINE_ITEM_EXTRACTION_FINISHED', [
+                        'elapsed_ms' => round((microtime(true) - $itemStart) * 1000),
+                        'count' => count($items)
+                    ]);
+
+                    $prepareStart = microtime(true);
 
                     $prepared = $lineItemService->prepare(
                         $items,
@@ -243,9 +303,21 @@ class ProcessBillJob implements ShouldQueue
                         $mapped['provider']
                     );
 
+                    Log::info('LINE_ITEM_PREPARE_FINISHED', [
+                        'elapsed_ms' => round((microtime(true) - $prepareStart) * 1000),
+                        'count' => count($prepared)
+                    ]);
+
+                    $insertStart = microtime(true);
+
                     foreach (array_chunk($prepared, 100) as $chunk) {
                         BillItem::insert($chunk);
                     }
+
+                    Log::info('LINE_ITEM_INSERT_FINISHED', [
+                        'elapsed_ms' => round((microtime(true) - $insertStart) * 1000)
+                    ]);
+
                 } catch (\Illuminate\Database\QueryException $e) {
                     if (str_contains($e->getMessage(), 'semantic_hash')) {
                         $bill->markDuplicate();
@@ -259,6 +331,8 @@ class ProcessBillJob implements ShouldQueue
                 // ✅ IDEMPOTENT POINTS
                 // -------------------------
 
+                $pointsStart = microtime(true);
+
                 LoyaltyPoint::firstOrCreate(
                     ['bill_id' => $bill->id],
                     [
@@ -266,10 +340,22 @@ class ProcessBillJob implements ShouldQueue
                         'points' => $pointsEarned,
                     ]
                 );
+
+                Log::info('POINTS_CREATED', [
+                    'elapsed_ms' => round((microtime(true) - $pointsStart) * 1000)
+                ]);
                 $completed = true;
             });
+
+            Log::info('TRANSACTION_FINISHED', [
+                'elapsed_ms' => round((microtime(true) - $txnStart) * 1000)
+            ]);
+
             if ($completed) {
-                Log::info('JOB SUCCESS', ['bill_id' => $bill->id]);
+                Log::info('JOB SUCCESS', [
+                    'bill_id' => $bill->id,
+                    'total_elapsed_ms' => round((microtime(true) - $start) * 1000)
+                ]);
                 $this->log($bill->id, 'completed', [
                     'duration_ms' => round((microtime(true) - $start) * 1000)
                 ]);
@@ -291,6 +377,11 @@ class ProcessBillJob implements ShouldQueue
                 'trace' => $e->getTraceAsString()
             ]);
         }
+
+        Log::info('JOB END', [
+            'bill_id' => $this->billId,
+            'total_elapsed_ms' => round((microtime(true) - $start) * 1000)
+        ]);
     }
 
     public function failed(\Throwable $e)
@@ -304,10 +395,17 @@ class ProcessBillJob implements ShouldQueue
 
     private function log($billId, $status, $message = null): void
     {
-        \App\Modules\Loyalty\Models\BillLog::create([
+        $s = microtime(true);
+
+        BillLog::create([
             'bill_id' => $billId,
             'status' => $status,
             'message' => is_array($message) ? json_encode($message) : $message,
+        ]);
+
+        Log::info('BILL_LOG_INSERT', [
+            'status' => $status,
+            'elapsed_ms' => round((microtime(true) - $s) * 1000)
         ]);
     }
 

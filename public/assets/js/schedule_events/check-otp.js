@@ -1,1 +1,19 @@
-(()=>{var e=!1;listenSubmit("#checkOTPForm",(function(c){if(e)return!0;c.preventDefault(),e=!0,$("#checkOTPForm")[0].submit(),$("#checkOTP").prop("disabled",!0)}))})();
+/******/ (() => { // webpackBootstrap
+var __webpack_exports__ = {};
+/*!**********************************************************!*\
+  !*** ./resources/assets/js/schedule_events/check-otp.js ***!
+  \**********************************************************/
+var passed = false;
+listenSubmit('#checkOTPForm', function (e) {
+  if (!passed) {
+    e.preventDefault();
+  } else {
+    return true;
+  }
+
+  passed = true;
+  $('#checkOTPForm')[0].submit();
+  $('#checkOTP').prop('disabled', true);
+});
+/******/ })()
+;

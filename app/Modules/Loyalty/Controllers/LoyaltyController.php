@@ -10,6 +10,6 @@ class LoyaltyController extends Controller
 {
     public function index()
     {
-        return view('loyalty.dashboard1');
+        return view('loyalty.dashboard.dashboard');
     }
 }

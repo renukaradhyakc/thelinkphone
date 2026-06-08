@@ -33,6 +33,7 @@ Route::post('/trial/start', [TrialController::class, 'start']);
 Route::get('/trial/status', [TrialController::class, 'status']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/bills/{id}/status', [BillController::class, 'status']);
     Route::post('/bills', [BillController::class, 'store']);
 });
 

@@ -1,1 +1,809 @@
-(()=>{var __webpack_exports__={};window.listen=function(e,t,n){$(document).on(e,t,n)},window.listenClick=function(e,t){$(document).on("click",e,t)},window.listenSubmit=function(e,t){$(document).on("submit",e,t)},window.listenChange=function(e,t){$(document).on("change",e,t)},window.listenKeyup=function(e,t){$(document).on("keyup",e,t)},window.listenHiddenBsModal=function(e,t){$(document).on("hidden.bs.modal",e,t)},(()=>{document.addEventListener("turbo:load",loadCustomData);var source=null;function initAllComponents(){refreshCsrfToken(),alertInitialize(),modalInputFocus(),inputFocus(),tooltip()}function alertInitialize(){$(".alert").delay(5e3).slideUp(300)}function refreshCsrfToken(){$.ajaxSetup({headers:{"X-CSRF-TOKEN":$('meta[name="csrf-token"]').attr("content")}})}function tooltip(){[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map((function(e){return new bootstrap.Tooltip(e)}))}document.addEventListener("turbo:load",initAllComponents);var inputFocus=function(){$('input:text:not([readonly="readonly"]):not([name="search"])').first().focus()},modalInputFocus=function(){$((function(){$(".modal").on("shown.bs.modal",(function(){$(this).find("input:text")[0]&&$(this).find("input:text")[0].focus()}))}))};function loadCustomData(){$(document).find(".nav-item.dropdown ul li").hasClass("active")&&($(document).find(".nav-item.dropdown ul li.active").parent("ul").css("display","block"),$(document).find(".nav-item.dropdown ul li.active").parent("ul").parent("li").addClass("active"));var e=(new Date).getTimezoneOffset();e=0===e?0:-e,document.cookie="timezone_offset_minutes="+e}function deleteItemAjax(url,header){var callFunction=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null;$.ajax({url,type:"DELETE",dataType:"json",success:function success(obj){obj.success&&(window.livewire.emit("refresh"),window.livewire.emit("resetPageTable")),swal({icon:"success",confirmButtonColor:"#ADB5BD",title:deleteMsg+" !",text:header+" "+hasBeenDeleted,buttons:{confirm:Lang.get("js.ok")},timer:2e3}),callFunction&&eval(callFunction)},error:function(e){swal({title:"Error",icon:"error",text:e.responseJSON.message,type:"error",timer:4e3})}})}window.hideDropdownManually=function(e){e.removeClass("show")},listen("select2:open",(function(){var e=document.querySelectorAll(".select2-container--open .select2-search__field");e[e.length-1].focus()})),listen("focus",".select2.select2-container",(function(e){var t=e.originalEvent,n=$(this).find(".select2-selection--single").length>0;t&&n&&$(this).siblings("select:enabled").select2("open")})),toastr.options={closeButton:!0,debug:!1,newestOnTop:!1,progressBar:!0,positionClass:"toast-top-right",preventDuplicates:!1,onclick:null,showDuration:"300",hideDuration:"1000",timeOut:"5000",extendedTimeOut:"1000",showEasing:"swing",hideEasing:"linear",showMethod:"fadeIn",hideMethod:"fadeOut"},window.resetModalForm=function(e,t){$(e)[0].reset(),$("select.select2Selector").each((function(e,t){var n="#"+$(this).attr("id");$(n).val(""),$(n).trigger("change")})),$(t).hide()},window.printErrorMessage=function(e,t){$(e).show().html(""),$(e).text(t.responseJSON.message)},window.manageAjaxErrors=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"editValidationErrorsBox";404==e.status?toastr.error(e.responseJSON.message):printErrorMessage("#"+t,e)},window.displaySuccessMessage=function(e){toastr.success(e,Lang.get("js.successful"))},window.displayErrorMessage=function(e){toastr.error(e,Lang.get("js.something_went_wrong"))},window.deleteItem=function(e,t){var n=arguments.length>3&&void 0!==arguments[3]?arguments[3]:null;swal({title:Lang.get("js.delete"),text:Lang.get("js.sure_delete")+' "'+t+'"  ?',buttons:{confirm:Lang.get("js.yes"),cancel:Lang.get("js.no")},icon:sweetAlertIcon,reverseButtons:!0}).then((function(o){o&&deleteItemAjax(e,t,n)}))},window.format=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"DD-MMM-YYYY";return moment(e).format(t)},window.processingBtn=function(e,t){var n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null,o=$(e).find(t);"loading"===n?o.button("loading"):o.button("reset")},window.setBtnLoader=function(e){if(e.attr("data-old-text"))return e.html(e.attr("data-old-text")).prop("disabled",!1),void e.removeAttr("data-old-text");e.attr("data-old-text",e.text()),e.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>').prop("disabled",!0)},window.prepareTemplateRender=function(e,t){return jsrender.templates(e).render(t)},window.isValidFile=function(e,t){var n=$(e).val().split(".").pop().toLowerCase();return-1==$.inArray(n,["gif","png","jpg","jpeg"])?($(e).val(""),$(t).removeClass("d-none"),$(t).html("The image must be a file of type: jpeg, jpg, png.").show(),$(t).delay(5e3).slideUp(300),!1):($(t).hide(),!0)},window.displayPhoto=function(e,t){var n=!0;if(e.files&&e.files[0]){var o=new FileReader;o.onload=function(e){var o=new Image;o.src=e.target.result,o.onload=function(){$(t).attr("src",e.target.result),n=!0}},n&&(o.readAsDataURL(e.files[0]),$(t).show())}},window.removeCommas=function(e){return e.replace(/,/g,"")},window.DatetimepickerDefaults=function(e){return $.extend({},{sideBySide:!0,ignoreReadonly:!0,icons:{close:"fa fa-times",time:"fa fa-clock-o",date:"fa fa-calendar",up:"fa fa-arrow-up",down:"fa fa-arrow-down",previous:"fa fa-chevron-left",next:"fa fa-chevron-right",today:"fa fa-clock-o",clear:"fa fa-trash-o"}},e)},window.isEmpty=function(e){return null==e||""===e},window.urlValidation=function(e,t){return!(""!=e&&!e.match(t))},$(window).width()>992&&$(".no-hover").on("click",(function(){$(this).toggleClass("open")})),window.preparedTemplate=function(){source=$("#actionTemplate").html(),window.preparedTemplate=Handlebars.compile(source)},window.ajaxCallInProgress=function(){ajaxCallIsRunning=!0},window.ajaxCallCompleted=function(){ajaxCallIsRunning=!1},window.avoidSpace=function(e){if(32==(e?e.which:window.event.keyCode))return!1},$("input[type=radio][name=gender]").on("change",(function(){var e=$("#profilePicture").val();isEmpty(e)&&(1==this.value?$(".image-input-wrapper").attr("style","background-image:url("+manAvatar+")"):2==this.value&&$(".image-input-wrapper").attr("style","background-image:url("+womanAvatar+")"))})),window.setBtnLoader=function(e){if(e.attr("data-old-text"))return e.html(e.attr("data-old-text")).prop("disabled",!1),void e.removeAttr("data-old-text");e.attr("data-old-text",e.text()),e.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>').prop("disabled",!0)},window.addCommas=function(e){for(var t=(e+="").split("."),n=t[0],o=t.length>1?"."+t[1]:"",a=/(\d+)(\d{3})/;a.test(n);)n=n.replace(a,"$1,$2");return n+o},window.getFormattedPrice=function(e){if(""!=e||e>0)return"number"!=typeof e&&(e=e.replace(/,/g,"")),addCommas(e)},listenClick(".change-type",(function(e){var t=$(this).siblings(),n=t.attr("type");"password"==(isEmpty(n)?"password":n)?($(this).children().addClass("fa-eye"),$(this).children().removeClass("fa-eye-slash"),t.attr("type","text")):($(this).children().removeClass("fa-eye"),$(this).children().addClass("fa-eye-slash"),t.attr("type","password"))})),$(".dropdown-menu a").on("click",(function(){$(this).closest(".dropdown-menu").prev().dropdown("toggle")})),listenClick(".cancel-scheduled-event",(function(){var e=$(this).attr("data-id");$("#scheduleEventId").val(e),$("#cancelScheduleEventModal").modal("show").appendTo("body")})),listenSubmit("#cancelScheduleEventForm",(function(e){if(e.preventDefault(),isEmpty($("#cancelReason").val()))return displayErrorMessage("Cancel reason field is required."),!1;var t=$("#scheduleEventId").val();$.ajax({url:route("cancel.scheduled.event",t),type:"POST",data:$(this).serialize(),success:function(e){e.success&&(window.livewire.emit("refresh"),$("#cancelScheduleEventModal").modal("hide"))},error:function(e){displayErrorMessage(e.responseJSON.message)}})})),listenHiddenBsModal("#cancelScheduleEventModal",(function(){resetModalForm("#cancelScheduleEventForm","#cancelValidationErrorsBox")})),listenClick(".copy-google-meet-link",(function(){var e=$("<input>");$("body").append(e),e.val($(this).attr("data-link")).select(),document.execCommand("copy"),e.remove(),$(this).children().css("color","#8BC34A"),$(this).children().removeClass("fa-copy"),$(this).children().addClass("fa-check"),displaySuccessMessage(Lang.get("js.linked_copy_successfully")),setTimeout((function(){$(".copy-google-meet-link").children().removeClass("fa-check"),$(".copy-google-meet-link").children().addClass("fa-copy"),$(".copy-google-meet-link").children().css("color","#009ef7")}),2e3)}))})(),document.addEventListener("turbo:load",(function(){!function(){if(!$("#phoneNumber").length)return!1;var e=document.querySelector("#phoneNumber"),t=document.querySelector("#error-msg"),n=document.querySelector("#valid-msg");$("#valid-msg").length>0&&setTimeout((function(){$("#valid-msg").addClass("d-none")}),10);var o=[Lang.get("js.invalid_number"),Lang.get("js.invalid_country_code"),Lang.get("js.too_short"),Lang.get("js.too_long"),Lang.get("js.invalid_number")],a=window.intlTelInput(e,{initialCountry:defaultCountryCodeValue,separateDialCode:!0,preferredCountries:!1,geoIpLookup:function(e,t){$.get("https://ipinfo.io",(function(){}),"jsonp").always((function(t){var n=t&&t.country?t.country:"";e(n)}))},utilsScript:"../../public/assets/js/inttel/js/utils.min.js"}),i=function(){e.classList.remove("error"),t.innerHTML="",t.classList.add("d-none"),n.classList.add("d-none")};e.addEventListener("blur",(function(){if(i(),e.value.trim())if(a.isValidNumber())n.classList.remove("d-none");else{e.classList.add("error");var r=a.getValidationError();t.innerHTML=o[r],t.classList.remove("d-none")}})),e.addEventListener("change",i),e.addEventListener("keyup",i),"undefined"!=typeof phoneNo&&""!==phoneNo&&setTimeout((function(){$("#phoneNumber").trigger("change")}),500),$("#phoneNumber").on("blur keyup change countrychange",(function(){"undefined"!=typeof phoneNo&&""!==phoneNo&&(a.setNumber("+"+phoneNo),phoneNo="");var e=a.selectedCountryData.dialCode;$("#prefix_code").val(e)}));var r=a.selectedCountryData.dialCode;$("#prefix_code").val(r);var s=$("#phoneNumber").val().replace(/\s/g,"");$("#phoneNumber").val(s),$("#phoneNumber").focus(),$("#phoneNumber").trigger("blur")}()})),listenClick(".iti__country",(function(){var e=$(".iti__selected-flag>.iti__flag").attr("class");e=e.split(/\s+/)[1];var t=$(".iti__selected-dial-code").text();window.localStorage.setItem("flagClassLocal",e),window.localStorage.setItem("dialCodeValLocal",t)})),document.addEventListener("DOMContentLoaded",(function(){if($("#calendar").length){var e=$("#calendar").evoCalendar({theme:"Royal Navy",format:"yyyy-mm-dd",calendarEvents:eventSchedules});$("#calendar").evoCalendar("selectDate",moment().tz(currentUTCDate).format("LL")),$("#calendar").evoCalendar("selectMonth",months),$("#calendar").evoCalendar("selectYear",year),moment().tz(currentUTCDate).format("Y-M-D");var t=year,n=parseInt(parseInt(months)+1),o=moment(n,"M").format("MMMM");$(e).on("selectMonth",(function(e,n){window.location.href=slotCalendarUrl+"?month="+n+"&year="+t})),$(e).on("selectYear",(function(e,t){window.location.href=slotCalendarUrl+"?month="+o+"&year="+t})),$(e).on("selectDate",(function(e,t){})),$("#calendar").on("selectEvent",(function(e,t){var n=$("#calendar").evoCalendar("getActiveDate"),o=$("#calendar").evoCalendar("getActiveEvents"),a=t.id,i="",r="";$.each(o,(function(e,t){a===t.id&&(i=t.name,r=t.originalTime)})),window.location.href=slotCalendarUrl+"/"+n+"?time="+i+"&originalTime="+r}))}})),(()=>{document.addEventListener("DOMContentLoaded",(function(){if(!$("#phoneNumber").length)return!1;var e=document.querySelector("#phoneNumber"),t=document.querySelector("#error-msg"),n=document.querySelector("#valid-msg");$("#valid-msg").length>0&&setTimeout((function(){$("#valid-msg").addClass("d-none")}),10);var o=[Lang.get("js.invalid_number"),Lang.get("js.invalid_country_code"),Lang.get("js.too_short"),Lang.get("js.too_long"),Lang.get("js.invalid_number")],a=window.intlTelInput(e,{initialCountry:defaultCountryCodeValue,separateDialCode:!0,geoIpLookup:function(e,t){$.get("https://ipinfo.io",(function(){}),"jsonp").always((function(t){var n=t&&t.country?t.country:"";e(n)}))},utilsScript:"../../public/assets/js/inttel/js/utils.min.js"}),i=function(){e.classList.remove("error"),t.innerHTML="",t.classList.add("d-none"),n.classList.add("d-none")};e.addEventListener("blur",(function(){if(i(),e.value.trim())if(a.isValidNumber())n.classList.remove("d-none");else{e.classList.add("error");var r=a.getValidationError();t.innerHTML=o[r],t.classList.remove("d-none")}})),e.addEventListener("change",i),e.addEventListener("keyup",i),"undefined"!=typeof phoneNo&&""!==phoneNo&&setTimeout((function(){$("#phoneNumber").trigger("change")}),500);$("#phoneNumber").on("blur keyup change countrychange",(function(){"undefined"!=typeof phoneNo&&""!==phoneNo&&(a.setNumber("+"+phoneNo),phoneNo="");var e=a.selectedCountryData.dialCode;$("#prefix_code").val(e)}));var r=a.selectedCountryData.dialCode;$("#prefix_code").val(r);var s=$("#phoneNumber").val().replace(/\s/g,"");$("#phoneNumber").val(s),$("#phoneNumber").focus(),$("#phoneNumber").trigger("blur")}));var e="";listenSubmit("#addEventSlotScheduleForm",(function(t){t.preventDefault();var n=[];if(1==locationMeta[1]){if(""==$("#phoneNumber").val())return $("#phoneNumber").focus(),displayErrorMessage(Lang.get("js.phone_required")),!1;n.push(eventLocation),n.push(locationMeta[1]),n.push("+"+$("#prefix_code").val()+$("#phoneNumber").val()),$("#eventLocationPhoneCall").val(JSON.stringify(n))}e=$("#slotPaymentType").val();var o=$(this).find("#slotPaymentSubmitBtn");setBtnLoader(o),$.ajax({url:route("scheduled-events.store"),type:"POST",data:$(this).serialize(),success:function(t){if(t.success){var n=t.data.scheduleEventId,o=t.data.redirectUrl;if(t.data.eventType==Paid)if(1==e){var a=t.data[0].sessionId;stripe.redirectToCheckout({sessionId:a}).then((function(e){manageAjaxErrors(e.message)}))}else 2==e&&$.ajax({type:"GET",url:route("paypal.init"),data:{scheduleEventId:n},success:function(e){if("CREATED"==e.status){var t="";$.each(e.links,(function(e,n){"approve"==n.rel&&(t=n.href)})),location.href=t}else location.href=e.url}});else $("#addEventSlotScheduleForm")[0].reset(),displaySuccessMessage(t.message),window.location.href=o}},error:function(e){displayErrorMessage(e.responseJSON.message)},complete:function(){setBtnLoader(o)}})}))})(),listenClick("#nextMonth",(function(){var e=$(this).attr("data-next-month");window.livewire.emit("changeMonth",e)})),listenClick("#prevMonth",(function(){var e=$(this).attr("data-prev-month");window.livewire.emit("changeMonth",e)})),listenClick(".get-slots",(function(){var e=$(this).attr("date-slot-date");window.livewire.emit("getSlotTime",moment(e).format("YYYY-MM-DD"))}))})();
+/******/ (() => { // webpackBootstrap
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+(() => {
+/*!**********************************************!*\
+  !*** ./resources/assets/js/custom/helper.js ***!
+  \**********************************************/
+window.listen = function (event, selector, callback) {
+  $(document).on(event, selector, callback);
+};
+
+window.listenClick = function (selector, callback) {
+  $(document).on('click', selector, callback);
+};
+
+window.listenSubmit = function (selector, callback) {
+  $(document).on('submit', selector, callback);
+};
+
+window.listenChange = function (selector, callback) {
+  $(document).on('change', selector, callback);
+};
+
+window.listenKeyup = function (selector, callback) {
+  $(document).on('keyup', selector, callback);
+};
+
+window.listenHiddenBsModal = function (selector, callback) {
+  $(document).on('hidden.bs.modal', selector, callback);
+};
+})();
+
+// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+(() => {
+/*!**********************************************!*\
+  !*** ./resources/assets/js/custom/custom.js ***!
+  \**********************************************/
+document.addEventListener('turbo:load', loadCustomData);
+var source = null;
+document.addEventListener('turbo:load', initAllComponents);
+
+function initAllComponents() {
+  refreshCsrfToken();
+  alertInitialize();
+  modalInputFocus();
+  inputFocus();
+  tooltip();
+}
+
+function alertInitialize() {
+  $('.alert').delay(5000).slideUp(300);
+}
+
+function refreshCsrfToken() {
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+}
+
+function tooltip() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+}
+
+var inputFocus = function inputFocus() {
+  $('input:text:not([readonly="readonly"]):not([name="search"])').first().focus();
+};
+
+var modalInputFocus = function modalInputFocus() {
+  $(function () {
+    $('.modal').on('shown.bs.modal', function () {
+      if ($(this).find('input:text')[0]) {
+        $(this).find('input:text')[0].focus();
+      }
+    });
+  });
+};
+
+window.hideDropdownManually = function (dropdownBtnEle) {
+  dropdownBtnEle.removeClass('show');
+};
+
+function loadCustomData() {
+  // script to active parent menu if sub menu has currently active
+  var hasActiveMenu = $(document).find('.nav-item.dropdown ul li').hasClass('active');
+
+  if (hasActiveMenu) {
+    $(document).find('.nav-item.dropdown ul li.active').parent('ul').css('display', 'block');
+    $(document).find('.nav-item.dropdown ul li.active').parent('ul').parent('li').addClass('active');
+  }
+
+  var timezone_offset_minutes = new Date().getTimezoneOffset();
+  timezone_offset_minutes = timezone_offset_minutes === 0 ? 0 : -timezone_offset_minutes;
+  document.cookie = 'timezone_offset_minutes=' + timezone_offset_minutes;
+}
+
+listen('select2:open', function () {
+  var allFound = document.querySelectorAll('.select2-container--open .select2-search__field');
+  allFound[allFound.length - 1].focus();
+});
+listen('focus', '.select2.select2-container', function (e) {
+  var isOriginalEvent = e.originalEvent; // don't re-open on closing focus event
+
+  var isSingleSelect = $(this).find('.select2-selection--single').length > 0; // multi-select will pass focus to input
+
+  if (isOriginalEvent && isSingleSelect) {
+    $(this).siblings('select:enabled').select2('open');
+  }
+});
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": false,
+  "progressBar": true,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+};
+
+window.resetModalForm = function (formId, validationBox) {
+  $(formId)[0].reset();
+  $('select.select2Selector').each(function (index, element) {
+    var drpSelector = '#' + $(this).attr('id');
+    $(drpSelector).val('');
+    $(drpSelector).trigger('change');
+  });
+  $(validationBox).hide();
+};
+
+window.printErrorMessage = function (selector, errorResult) {
+  $(selector).show().html('');
+  $(selector).text(errorResult.responseJSON.message);
+};
+
+window.manageAjaxErrors = function (data) {
+  var errorDivId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'editValidationErrorsBox';
+
+  if (data.status == 404) {
+    toastr.error(data.responseJSON.message);
+  } else {
+    printErrorMessage('#' + errorDivId, data);
+  }
+};
+
+window.displaySuccessMessage = function (message) {
+  toastr.success(message, Lang.get('js.successful'));
+};
+
+window.displayErrorMessage = function (message) {
+  toastr.error(message, Lang.get('js.something_went_wrong'));
+};
+
+window.deleteItem = function (url, header) {
+  var callFunction = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  swal({
+    title: Lang.get('js.delete'),
+    text: Lang.get('js.sure_delete') + ' "' + header + '"  ?',
+    buttons: {
+      confirm: Lang.get('js.yes'),
+      cancel: Lang.get('js.no')
+    },
+    icon: sweetAlertIcon,
+    reverseButtons: true
+  }).then(function (willDelete) {
+    if (willDelete) {
+      deleteItemAjax(url, header, callFunction);
+    }
+  });
+};
+
+function deleteItemAjax(url, header) {
+  var callFunction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  $.ajax({
+    url: url,
+    type: 'DELETE',
+    dataType: 'json',
+    success: function success(obj) {
+      if (obj.success) {
+        window.livewire.emit('refresh');
+        window.livewire.emit('resetPageTable');
+      }
+
+      swal({
+        icon: 'success',
+        confirmButtonColor: '#ADB5BD',
+        title: deleteMsg + ' !',
+        text: header + ' ' + hasBeenDeleted,
+        buttons: {
+          confirm: Lang.get("js.ok")
+        },
+        timer: 2000
+      });
+
+      if (callFunction) {
+        eval(callFunction);
+      }
+    },
+    error: function error(data) {
+      swal({
+        title: 'Error',
+        icon: 'error',
+        text: data.responseJSON.message,
+        type: 'error',
+        timer: 4000
+      });
+    }
+  });
+}
+
+window.format = function (dateTime) {
+  var format = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'DD-MMM-YYYY';
+  return moment(dateTime).format(format);
+};
+
+window.processingBtn = function (selecter, btnId) {
+  var state = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var loadingButton = $(selecter).find(btnId);
+
+  if (state === 'loading') {
+    loadingButton.button('loading');
+  } else {
+    loadingButton.button('reset');
+  }
+};
+
+window.setBtnLoader = function (btnLoader) {
+  if (btnLoader.attr('data-old-text')) {
+    btnLoader.html(btnLoader.attr('data-old-text')).prop('disabled', false);
+    btnLoader.removeAttr('data-old-text');
+    return;
+  }
+
+  btnLoader.attr('data-old-text', btnLoader.text());
+  btnLoader.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>').prop('disabled', true);
+};
+
+window.prepareTemplateRender = function (templateSelector, data) {
+  var template = jsrender.templates(templateSelector);
+  return template.render(data);
+};
+
+window.isValidFile = function (inputSelector, validationMessageSelector) {
+  var ext = $(inputSelector).val().split('.').pop().toLowerCase();
+
+  if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+    $(inputSelector).val('');
+    $(validationMessageSelector).removeClass('d-none');
+    $(validationMessageSelector).html('The image must be a file of type: jpeg, jpg, png.').show();
+    $(validationMessageSelector).delay(5000).slideUp(300);
+    return false;
+  }
+
+  $(validationMessageSelector).hide();
+  return true;
+};
+
+window.displayPhoto = function (input, selector) {
+  var displayPreview = true;
+
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      var image = new Image();
+      image.src = e.target.result;
+
+      image.onload = function () {
+        $(selector).attr('src', e.target.result);
+        displayPreview = true;
+      };
+    };
+
+    if (displayPreview) {
+      reader.readAsDataURL(input.files[0]);
+      $(selector).show();
+    }
+  }
+};
+
+window.removeCommas = function (str) {
+  return str.replace(/,/g, '');
+};
+
+window.DatetimepickerDefaults = function (opts) {
+  return $.extend({}, {
+    sideBySide: true,
+    ignoreReadonly: true,
+    icons: {
+      close: 'fa fa-times',
+      time: 'fa fa-clock-o',
+      date: 'fa fa-calendar',
+      up: 'fa fa-arrow-up',
+      down: 'fa fa-arrow-down',
+      previous: 'fa fa-chevron-left',
+      next: 'fa fa-chevron-right',
+      today: 'fa fa-clock-o',
+      clear: 'fa fa-trash-o'
+    }
+  }, opts);
+};
+
+window.isEmpty = function (value) {
+  return value === undefined || value === null || value === '';
+};
+
+window.urlValidation = function (value, regex) {
+  var urlCheck = value == '' ? true : value.match(regex) ? true : false;
+
+  if (!urlCheck) {
+    return false;
+  }
+
+  return true;
+};
+
+if ($(window).width() > 992) {
+  $('.no-hover').on('click', function () {
+    $(this).toggleClass('open');
+  });
+}
+
+window.preparedTemplate = function () {
+  source = $('#actionTemplate').html();
+  window.preparedTemplate = Handlebars.compile(source);
+};
+
+window.ajaxCallInProgress = function () {
+  ajaxCallIsRunning = true;
+};
+
+window.ajaxCallCompleted = function () {
+  ajaxCallIsRunning = false;
+};
+
+window.avoidSpace = function (event) {
+  var k = event ? event.which : window.event.keyCode;
+
+  if (k == 32) {
+    return false;
+  }
+};
+
+$('input[type=radio][name=gender]').on('change', function () {
+  var file = $('#profilePicture').val();
+
+  if (isEmpty(file)) {
+    if (this.value == 1) {
+      $('.image-input-wrapper').attr('style', 'background-image:url(' + manAvatar + ')');
+    } else if (this.value == 2) {
+      $('.image-input-wrapper').attr('style', 'background-image:url(' + womanAvatar + ')');
+    }
+  }
+});
+
+window.setBtnLoader = function (btnLoader) {
+  if (btnLoader.attr('data-old-text')) {
+    btnLoader.html(btnLoader.attr('data-old-text')).prop('disabled', false);
+    btnLoader.removeAttr('data-old-text');
+    return;
+  }
+
+  btnLoader.attr('data-old-text', btnLoader.text());
+  btnLoader.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>').prop('disabled', true);
+};
+
+window.addCommas = function (nStr) {
+  nStr += '';
+  var x = nStr.split('.');
+  var x1 = x[0];
+  var x2 = x.length > 1 ? '.' + x[1] : '';
+  var rgx = /(\d+)(\d{3})/;
+
+  while (rgx.test(x1)) {
+    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+  }
+
+  return x1 + x2;
+};
+
+window.getFormattedPrice = function (price) {
+  if (price != '' || price > 0) {
+    if (typeof price !== 'number') {
+      price = price.replace(/,/g, '');
+    }
+
+    return addCommas(price);
+  }
+};
+
+listenClick('.change-type', function (e) {
+  var inputField = $(this).siblings();
+  var oldType = inputField.attr('type');
+  var type = !isEmpty(oldType) ? oldType : 'password';
+
+  if (type == 'password') {
+    $(this).children().addClass('fa-eye');
+    $(this).children().removeClass('fa-eye-slash');
+    inputField.attr('type', 'text');
+  } else {
+    $(this).children().removeClass('fa-eye');
+    $(this).children().addClass('fa-eye-slash');
+    inputField.attr('type', 'password');
+  }
+});
+$('.dropdown-menu a').on('click', function () {
+  $(this).closest('.dropdown-menu').prev().dropdown('toggle');
+}); // cancel schedule event modal code
+
+listenClick('.cancel-scheduled-event', function () {
+  var scheduledEventId = $(this).attr('data-id');
+  $('#scheduleEventId').val(scheduledEventId);
+  $('#cancelScheduleEventModal').modal('show').appendTo('body');
+}); // cancel schedule event code
+
+listenSubmit('#cancelScheduleEventForm', function (e) {
+  e.preventDefault();
+
+  if (isEmpty($('#cancelReason').val())) {
+    displayErrorMessage('Cancel reason field is required.');
+    return false;
+  }
+
+  var scheduledEventId = $('#scheduleEventId').val();
+  $.ajax({
+    url: route('cancel.scheduled.event', scheduledEventId),
+    type: 'POST',
+    data: $(this).serialize(),
+    success: function success(result) {
+      if (result.success) {
+        window.livewire.emit('refresh');
+        $('#cancelScheduleEventModal').modal('hide');
+      }
+    },
+    error: function error(result) {
+      displayErrorMessage(result.responseJSON.message);
+    }
+  });
+}); // cancel modal reset data code
+
+listenHiddenBsModal('#cancelScheduleEventModal', function () {
+  resetModalForm('#cancelScheduleEventForm', '#cancelValidationErrorsBox');
+});
+listenClick('.copy-google-meet-link', function () {
+  var $temp = $('<input>');
+  $('body').append($temp);
+  $temp.val($(this).attr('data-link')).select();
+  document.execCommand('copy');
+  $temp.remove();
+  $(this).children().css('color', '#8BC34A');
+  $(this).children().removeClass('fa-copy');
+  $(this).children().addClass('fa-check');
+  displaySuccessMessage(Lang.get('js.linked_copy_successfully'));
+  setTimeout(function () {
+    $('.copy-google-meet-link').children().removeClass('fa-check');
+    $('.copy-google-meet-link').children().addClass('fa-copy');
+    $('.copy-google-meet-link').children().css('color', '#009ef7');
+  }, 2000);
+});
+})();
+
+// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+(() => {
+/*!*****************************************************************!*\
+  !*** ./resources/assets/js/custom/phone-number-country-code.js ***!
+  \*****************************************************************/
+document.addEventListener('turbo:load', loadPhoneNumberCountryCodeData);
+
+function loadPhoneNumberCountryCodeData() {
+  loadPhoneNumberCountryCode();
+}
+
+function loadPhoneNumberCountryCode() {
+  if (!$('#phoneNumber').length) {
+    return false;
+  }
+
+  var input = document.querySelector('#phoneNumber'),
+      errorMsg = document.querySelector('#error-msg'),
+      validMsg = document.querySelector('#valid-msg');
+
+  if ($('#valid-msg').length > 0) {
+    setTimeout(function () {
+      $('#valid-msg').addClass('d-none');
+    }, 10);
+  }
+
+  var errorMap = [Lang.get('js.invalid_number'), Lang.get('js.invalid_country_code'), Lang.get('js.too_short'), Lang.get('js.too_long'), Lang.get('js.invalid_number')]; // initialise plugin
+
+  var intl = window.intlTelInput(input, {
+    initialCountry: defaultCountryCodeValue,
+    separateDialCode: true,
+    preferredCountries: false,
+    geoIpLookup: function geoIpLookup(success, failure) {
+      $.get('https://ipinfo.io', function () {}, 'jsonp').always(function (resp) {
+        var countryCode = resp && resp.country ? resp.country : '';
+        success(countryCode);
+      });
+    },
+    utilsScript: '../../public/assets/js/inttel/js/utils.min.js'
+  });
+
+  var reset = function reset() {
+    input.classList.remove('error');
+    errorMsg.innerHTML = '';
+    errorMsg.classList.add('d-none');
+    validMsg.classList.add('d-none');
+  };
+
+  input.addEventListener('blur', function () {
+    reset();
+
+    if (input.value.trim()) {
+      if (intl.isValidNumber()) {
+        validMsg.classList.remove('d-none');
+      } else {
+        input.classList.add('error');
+        var errorCode = intl.getValidationError();
+        errorMsg.innerHTML = errorMap[errorCode];
+        errorMsg.classList.remove('d-none');
+      }
+    }
+  }); // on keyup / change flag: reset
+
+  input.addEventListener('change', reset);
+  input.addEventListener('keyup', reset);
+
+  if (typeof phoneNo != 'undefined' && phoneNo !== '') {
+    setTimeout(function () {
+      $('#phoneNumber').trigger('change');
+    }, 500);
+  }
+
+  $('#phoneNumber').on('blur keyup change countrychange', function () {
+    if (typeof phoneNo != 'undefined' && phoneNo !== '') {
+      intl.setNumber('+' + phoneNo);
+      phoneNo = '';
+    }
+
+    var getCode = intl.selectedCountryData['dialCode'];
+    $('#prefix_code').val(getCode);
+  });
+  var getCode = intl.selectedCountryData['dialCode'];
+  $('#prefix_code').val(getCode);
+  var getPhoneNumber = $('#phoneNumber').val();
+  var removeSpacePhoneNumber = getPhoneNumber.replace(/\s/g, '');
+  $('#phoneNumber').val(removeSpacePhoneNumber);
+  $('#phoneNumber').focus();
+  $('#phoneNumber').trigger('blur');
+}
+
+listenClick('.iti__country', function () {
+  var flagClass = $('.iti__selected-flag>.iti__flag').attr('class');
+  flagClass = flagClass.split(/\s+/)[1];
+  var dialCodeVal = $('.iti__selected-dial-code').text();
+  window.localStorage.setItem('flagClassLocal', flagClass);
+  window.localStorage.setItem('dialCodeValLocal', dialCodeVal);
+});
+})();
+
+// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+(() => {
+/*!************************************************************!*\
+  !*** ./resources/assets/js/slot_calendar/slot-calendar.js ***!
+  \************************************************************/
+document.addEventListener('DOMContentLoaded', loadSlotCalendarData);
+
+function loadSlotCalendarData() {
+  if (!$('#calendar').length) {
+    return;
+  }
+
+  var slotCalendar = $('#calendar').evoCalendar({
+    theme: 'Royal Navy',
+    format: 'yyyy-mm-dd',
+    calendarEvents: eventSchedules
+  });
+  $('#calendar').evoCalendar('selectDate', moment().tz(currentUTCDate).format('LL'));
+  $('#calendar').evoCalendar('selectMonth', months);
+  $('#calendar').evoCalendar('selectYear', year);
+  var selectedDate = moment().tz(currentUTCDate).format('Y-M-D');
+  var selectedYear = year;
+  var month = parseInt(parseInt(months) + 1);
+  var selectedMonth = moment(month, 'M').format('MMMM');
+  $(slotCalendar).on('selectMonth', function (event, activeEvent) {
+    window.location.href = slotCalendarUrl + '?month=' + activeEvent + '&year=' + selectedYear;
+  });
+  $(slotCalendar).on('selectYear', function (event, activeEvent) {
+    window.location.href = slotCalendarUrl + '?month=' + selectedMonth + '&year=' + activeEvent;
+  });
+  $(slotCalendar).on('selectDate', function (event, activeEvent) {
+    selectedDate = activeEvent;
+  });
+  $('#calendar').on('selectEvent', function (event, activeEvent) {
+    var activeDate = $('#calendar').evoCalendar('getActiveDate');
+    var activeEvents = $('#calendar').evoCalendar('getActiveEvents');
+    var id = activeEvent.id;
+    var selectedTime = '';
+    var originalTime = '';
+    $.each(activeEvents, function (i, v) {
+      if (id === v.id) {
+        selectedTime = v.name;
+        originalTime = v.originalTime;
+      }
+    });
+    window.location.href = slotCalendarUrl + '/' + activeDate + '?time=' + selectedTime + '&originalTime=' + originalTime;
+  });
+}
+})();
+
+// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+(() => {
+/*!********************************************************************!*\
+  !*** ./resources/assets/js/event_schedules/event-slot-schedule.js ***!
+  \********************************************************************/
+document.addEventListener('DOMContentLoaded', loadPhoneNumberCountryCode2);
+
+function loadPhoneNumberCountryCode2() {
+  if (!$('#phoneNumber').length) {
+    return false;
+  }
+
+  var input = document.querySelector('#phoneNumber'),
+      errorMsg = document.querySelector('#error-msg'),
+      validMsg = document.querySelector('#valid-msg');
+
+  if ($('#valid-msg').length > 0) {
+    setTimeout(function () {
+      $('#valid-msg').addClass('d-none');
+    }, 10);
+  }
+
+  var errorMap = [Lang.get('js.invalid_number'), Lang.get('js.invalid_country_code'), Lang.get('js.too_short'), Lang.get('js.too_long'), Lang.get('js.invalid_number')]; // initialise plugin
+
+  var intl2 = window.intlTelInput(input, {
+    initialCountry: defaultCountryCodeValue,
+    separateDialCode: true,
+    geoIpLookup: function geoIpLookup(success, failure) {
+      $.get('https://ipinfo.io', function () {}, 'jsonp').always(function (resp) {
+        var countryCode = resp && resp.country ? resp.country : '';
+        success(countryCode);
+      });
+    },
+    utilsScript: '../../public/assets/js/inttel/js/utils.min.js'
+  });
+
+  var reset = function reset() {
+    input.classList.remove('error');
+    errorMsg.innerHTML = '';
+    errorMsg.classList.add('d-none');
+    validMsg.classList.add('d-none');
+  };
+
+  input.addEventListener('blur', function () {
+    reset();
+
+    if (input.value.trim()) {
+      if (intl2.isValidNumber()) {
+        validMsg.classList.remove('d-none');
+      } else {
+        input.classList.add('error');
+        var errorCode = intl2.getValidationError();
+        errorMsg.innerHTML = errorMap[errorCode];
+        errorMsg.classList.remove('d-none');
+      }
+    }
+  }); // on keyup / change flag: reset
+
+  input.addEventListener('change', reset);
+  input.addEventListener('keyup', reset);
+
+  if (typeof phoneNo != 'undefined' && phoneNo !== '') {
+    setTimeout(function () {
+      $('#phoneNumber').trigger('change');
+    }, 500);
+  }
+
+  $('#phoneNumber').on('blur keyup change countrychange', function () {
+    if (typeof phoneNo != 'undefined' && phoneNo !== '') {
+      intl2.setNumber('+' + phoneNo);
+      phoneNo = '';
+    }
+
+    var getCode = intl2.selectedCountryData['dialCode'];
+    $('#prefix_code').val(getCode);
+  });
+  var getCode = intl2.selectedCountryData['dialCode'];
+  $('#prefix_code').val(getCode);
+  var getPhoneNumber = $('#phoneNumber').val();
+  var removeSpacePhoneNumber = getPhoneNumber.replace(/\s/g, '');
+  $('#phoneNumber').val(removeSpacePhoneNumber);
+  $('#phoneNumber').focus();
+  $('#phoneNumber').trigger('blur');
+}
+
+var paymentType = '';
+listenSubmit('#addEventSlotScheduleForm', function (e) {
+  e.preventDefault();
+  var eventLocationArr = [];
+
+  if (locationMeta[1] == 1) {
+    if ($('#phoneNumber').val() == '') {
+      $('#phoneNumber').focus();
+      displayErrorMessage(Lang.get('js.phone_required'));
+      return false;
+    }
+
+    eventLocationArr.push(eventLocation);
+    eventLocationArr.push(locationMeta[1]);
+    eventLocationArr.push('+' + $('#prefix_code').val() + $('#phoneNumber').val());
+    $('#eventLocationPhoneCall').val(JSON.stringify(eventLocationArr));
+  }
+
+  paymentType = $('#slotPaymentType').val();
+  var btnSubmitEle = $(this).find('#slotPaymentSubmitBtn');
+  setBtnLoader(btnSubmitEle);
+  $.ajax({
+    url: route('scheduled-events.store'),
+    type: 'POST',
+    data: $(this).serialize(),
+    success: function success(result) {
+      if (result.success) {
+        var scheduleEventId = result.data.scheduleEventId;
+        var confirmPageUrl = result.data.redirectUrl;
+
+        if (result.data.eventType == Paid) {
+          if (paymentType == 1) {
+            // stripe payment gateway
+            var sessionId = result.data[0].sessionId;
+            stripe.redirectToCheckout({
+              sessionId: sessionId
+            }).then(function (result) {
+              manageAjaxErrors(result.message);
+            });
+          } else if (paymentType == 2) {
+            // Paypal payment gateway
+            $.ajax({
+              type: 'GET',
+              url: route('paypal.init'),
+              data: {
+                'scheduleEventId': scheduleEventId
+              },
+              success: function success(result) {
+                if (result.status == 'CREATED') {
+                  var redirectTo = '';
+                  $.each(result.links, function (key, val) {
+                    if (val.rel == 'approve') {
+                      redirectTo = val.href;
+                    }
+                  });
+                  location.href = redirectTo;
+                } else {
+                  location.href = result.url;
+                }
+              }
+            });
+          }
+        } else {
+          $('#addEventSlotScheduleForm')[0].reset();
+          displaySuccessMessage(result.message);
+          window.location.href = confirmPageUrl;
+        }
+      }
+    },
+    error: function error(result) {
+      displayErrorMessage(result.responseJSON.message);
+    },
+    complete: function complete() {
+      setBtnLoader(btnSubmitEle);
+    }
+  });
+});
+})();
+
+// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+(() => {
+/*!**********************************************************************************!*\
+  !*** ./resources/assets/js/custom-livewire-calendar/custom-livewire-calendar.js ***!
+  \**********************************************************************************/
+// for next month calendar 
+listenClick('#nextMonth', function () {
+  var nextMonth = $(this).attr('data-next-month');
+  window.livewire.emit('changeMonth', nextMonth);
+}); // for previous month calendar 
+
+listenClick('#prevMonth', function () {
+  var prevMonth = $(this).attr('data-prev-month');
+  window.livewire.emit('changeMonth', prevMonth);
+}); // get task related date
+
+listenClick('.get-slots', function () {
+  var slotDate = $(this).attr('date-slot-date');
+  window.livewire.emit('getSlotTime', moment(slotDate).format('YYYY-MM-DD'));
+});
+})();
+
+/******/ })()
+;

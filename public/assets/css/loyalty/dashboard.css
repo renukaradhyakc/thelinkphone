@@ -1,0 +1,358 @@
+@charset "UTF-8";
+:root {
+  --lp: #6259ca;
+  --lp2: #8b5cf6;
+  --lg: #22c984;
+  --ly: #f6b600;
+  --border: #e8e8f0;
+  --muted: #6c757d;
+  --text: #1a1a2e;
+}
+
+/* ── hero ── */
+.loy-hero {
+  background: #0f0f1a;
+  border-radius: 12px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 24px;
+}
+
+.loy-hero-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.loy-hero-pts {
+  font-size: 56px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.loy-hero-pts small {
+  font-size: 20px;
+  font-weight: 500;
+  color: #888;
+}
+
+.loy-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1e1e30;
+  border: 1px solid #333;
+  color: var(--ly);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-top: 14px;
+}
+
+.loy-hero-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.loy-hero-right .spent-box {
+  background: var(--ly);
+  border-radius: 10px;
+  padding: 14px 20px;
+  min-width: 130px;
+}
+
+.loy-hero-right .spent-val {
+  font-size: 26px;
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.loy-hero-right .spent-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 2px;
+}
+
+.loy-hero-bills {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* ── stat cards ── */
+.loy-stat {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--lp);
+  border-radius: 10px;
+  padding: 20px 22px;
+  height: 100%;
+}
+
+.loy-stat.t-green {
+  border-top-color: var(--lg);
+}
+
+.loy-stat.t-yellow {
+  border-top-color: var(--ly);
+}
+
+.loy-stat.t-purple {
+  border-top-color: var(--lp2);
+}
+
+.loy-stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.loy-stat-val {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+}
+
+.loy-stat-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* ── recent bills table ── */
+.loy-section-hd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.loy-section-hd h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.loy-section-hd p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.loy-tbl-wrap {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.loy-tbl-head {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 0.7fr 1fr;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #fafafa;
+  border-bottom: 1px solid var(--border);
+}
+
+.loy-tbl-head span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--muted);
+}
+
+.loy-tbl-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 0.7fr 1fr;
+  gap: 8px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.1s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.loy-tbl-row:last-child {
+  border-bottom: none;
+}
+
+.loy-tbl-row:hover {
+  background: #f8f8fd;
+  text-decoration: none;
+  color: inherit;
+}
+
+.loy-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.loy-av-purple {
+  background: linear-gradient(135deg, var(--lp), var(--lp2));
+}
+
+.loy-av-amber {
+  background: linear-gradient(135deg, #f6b600, #f97316);
+}
+
+.loy-av-green {
+  background: linear-gradient(135deg, #22c984, #16a57a);
+}
+
+.loy-av-blue {
+  background: linear-gradient(135deg, #0d6efd, #0ea5e9);
+}
+
+.loy-av-red {
+  background: linear-gradient(135deg, #e74c3c, #ef4444);
+}
+
+.loy-vendor-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.loy-vendor-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+  display: flex;
+  gap: 8px;
+}
+
+.badge-done {
+  background: rgba(34, 201, 132, 0.12);
+  color: #16a57a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.badge-pending {
+  background: rgba(246, 182, 0, 0.12);
+  color: #c48e00;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.badge-failed {
+  background: rgba(231, 76, 60, 0.12);
+  color: #e74c3c;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.badge-duplicate,
+.badge-invalid {
+  background: rgba(108, 117, 125, 0.12);
+  color: #555;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.badge-review {
+  background: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.loy-pts-pill {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ly);
+}
+
+/* ── upload modal ── */
+.loy-upload-drop {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.loy-upload-drop:hover,
+.loy-upload-drop.drag {
+  border-color: var(--lp);
+  background: rgba(98, 89, 202, 0.04);
+}
+
+.loy-upload-drop i {
+  font-size: 32px;
+  color: var(--lp);
+  opacity: 0.6;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.loy-progress {
+  height: 6px;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 12px;
+  display: none;
+}
+
+.loy-progress-bar {
+  height: 100%;
+  background: var(--lp);
+  border-radius: 6px;
+  transition: width 0.3s;
+}
+
+.loy-empty-row {
+  padding: 32px;
+  text-align: center;
+  color: var(--muted);
+  border-top: 1px dashed var(--border);
+}
+
+.loy-empty-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+}

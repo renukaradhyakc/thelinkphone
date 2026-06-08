@@ -1,0 +1,1 @@
+<div class="d-flex justify-content-center gap-1 mt-3 mb-2" id="loy-pagination"></div>

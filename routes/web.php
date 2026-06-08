@@ -129,6 +129,9 @@ Route::middleware(['auth', 'xss', 'verified'])->group(function () {
     Route::get('/bills/{id}/file', [BillController::class, 'download']);
     Route::get('/me/bills', [BillController::class, 'history']);
     Route::get('/me/points', [BillController::class, 'points']);
+
+    Route::post('/loyalty/bills', [BillController::class, 'store'])->name('loyalty.bills.store');
+
 });
 
 /*Route::middleware(['auth.token'])->group(function () {

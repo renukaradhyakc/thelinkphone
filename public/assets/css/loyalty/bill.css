@@ -1,0 +1,289 @@
+:root {
+  --lp: #6259ca;
+  --lp2: #8b5cf6;
+  --lg: #22c984;
+  --ly: #f6b600;
+  --border: #e8e8f0;
+  --muted: #6c757d;
+  --text: #1a1a2e;
+}
+
+/* receipt card */
+.loy-receipt {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.loy-rh {
+  background: #0f0f1a;
+  color: #fff;
+  padding: 24px 28px 36px;
+  position: relative;
+}
+
+.loy-rh::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background: #fff;
+  -webkit-clip-path: polygon(0 100%, 2% 0, 4% 100%, 6% 0, 8% 100%, 10% 0, 12% 100%, 14% 0, 16% 100%, 18% 0, 20% 100%, 22% 0, 24% 100%, 26% 0, 28% 100%, 30% 0, 32% 100%, 34% 0, 36% 100%, 38% 0, 40% 100%, 42% 0, 44% 100%, 46% 0, 48% 100%, 50% 0, 52% 100%, 54% 0, 56% 100%, 58% 0, 60% 100%, 62% 0, 64% 100%, 66% 0, 68% 100%, 70% 0, 72% 100%, 74% 0, 76% 100%, 78% 0, 80% 100%, 82% 0, 84% 100%, 86% 0, 88% 100%, 90% 0, 92% 100%, 94% 0, 96% 100%, 98% 0, 100% 100%);
+          clip-path: polygon(0 100%, 2% 0, 4% 100%, 6% 0, 8% 100%, 10% 0, 12% 100%, 14% 0, 16% 100%, 18% 0, 20% 100%, 22% 0, 24% 100%, 26% 0, 28% 100%, 30% 0, 32% 100%, 34% 0, 36% 100%, 38% 0, 40% 100%, 42% 0, 44% 100%, 46% 0, 48% 100%, 50% 0, 52% 100%, 54% 0, 56% 100%, 58% 0, 60% 100%, 62% 0, 64% 100%, 66% 0, 68% 100%, 70% 0, 72% 100%, 74% 0, 76% 100%, 78% 0, 80% 100%, 82% 0, 84% 100%, 86% 0, 88% 100%, 90% 0, 92% 100%, 94% 0, 96% 100%, 98% 0, 100% 100%);
+}
+
+.loy-rh-store {
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.loy-rh-meta {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.loy-inv-badge {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: #f6b600;
+  color: #1a1a1a;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 8px;
+}
+
+.loy-inv-badge small {
+  font-size: 9px;
+  font-weight: 600;
+  display: block;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.loy-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+  padding: 24px 28px 0;
+}
+
+.loy-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.loy-info-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.loy-items-section {
+  padding: 20px 28px 0;
+}
+
+.loy-items-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.loy-items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.loy-items-table th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.loy-items-table th:last-child,
+.loy-items-table td:last-child {
+  text-align: right;
+}
+
+.loy-items-table td {
+  padding: 11px 0;
+  font-size: 13px;
+  color: var(--text);
+  border-bottom: 1px solid #f4f4f8;
+}
+
+.loy-items-table tr:last-child td {
+  border-bottom: none;
+}
+
+.loy-item-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.loy-item-cat {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.loy-totals {
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.loy-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 3px 0;
+}
+
+.loy-total-grand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 2px solid var(--text);
+}
+
+.loy-total-grand span:first-child {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.loy-total-grand span:last-child {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+/* side cards */
+.loy-side-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.loy-side-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.loy-pts-big {
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--ly);
+  line-height: 1;
+}
+
+.loy-status-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.loy-status-block.done {
+  background: rgba(34, 201, 132, 0.08);
+}
+
+.loy-status-block.pending {
+  background: rgba(246, 182, 0, 0.08);
+}
+
+.loy-status-block.failed,
+.loy-status-block.invalid {
+  background: rgba(231, 76, 60, 0.08);
+}
+
+.loy-status-block.duplicate {
+  background: rgba(108, 117, 125, 0.08);
+}
+
+.loy-status-block.review {
+  background: rgba(13, 110, 253, 0.08);
+}
+
+.loy-conf-bar-track {
+  height: 6px;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.loy-conf-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+}
+
+/* skeleton */
+.loy-sk {
+  background: linear-gradient(90deg, #f0f0f8 25%, #e8e8f4 50%, #f0f0f8 75%);
+  background-size: 200% 100%;
+  -webkit-animation: sk 1.4s infinite;
+          animation: sk 1.4s infinite;
+  border-radius: 6px;
+}
+
+@-webkit-keyframes sk {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes sk {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+@media (max-width: 992px) {
+  .loy-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
