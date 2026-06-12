@@ -304,6 +304,7 @@ class BillController extends Controller
     {
         $bill = Bill::where('id', $id)
             ->where('user_id', auth()->id())
+            ->with('loyaltyPoint')
             ->firstOrFail();
 
         return response()->json([
@@ -311,6 +312,7 @@ class BillController extends Controller
             'data' => [
                 'bill_id' => $bill->id,
                 'status' => $bill->status,
+                'points'  => $bill->loyaltyPoint?->points ?? 0,
             ]
         ]);
     }
