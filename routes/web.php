@@ -121,7 +121,7 @@ Route::middleware(['auth', 'xss', 'verified'])->group(function () {
     //impersonate leave
     Route::get('/impersonate-leave', [UserController::class, 'impersonateLeave'])->name('impersonate.leave');
 
-
+    //Loyalty Points
     Route::get('/loyalty', [LoyaltyController::class, 'index'])->name('loyalty.dashboard');
     Route::get('/loyalty/bills', fn() => view('loyalty.bills.index'))->name('loyalty.bills.index');
     Route::get('/bills/{id}', [BillController::class, 'show']);

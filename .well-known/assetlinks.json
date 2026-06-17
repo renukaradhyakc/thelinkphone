@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.thelinkphone.app",
+      "sha256_cert_fingerprints":
+        ["9E:1B:3E:6D:E8:04:4D:9B:15:9D:77:3F:AB:87:C2:14:F8:83:37:AD:59:CC:39:17:78:F9:4A:D3:D8:D7:C7:CE"]
+    }
+  }
+]

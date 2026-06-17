@@ -4,7 +4,7 @@
 
 @section('page_css')
 <meta name="turbo-cache-control" content="no-cache">
-<link rel="stylesheet" href="{{ asset('assets/css/loyalty/bills.css') }}">
+<link rel="stylesheet" href="{{ asset('css/loyalty/bills.css') }}">
 @endsection
 
 @section('content')

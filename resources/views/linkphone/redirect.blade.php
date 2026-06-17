@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opening LinkPhone App...</title>
+    <meta name="apple-itunes-app"content="app-id=6755759920, app-argument=https://app.callalink.com/call/{{ $userId }}">
+    <title>Opening CallALink App...</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -300,7 +301,7 @@
                     
                     setTimeout(function() {
                         retryBtn.style.background = '#4CAF50';
-                        retryBtn.innerHTML = '📱 Open LinkPhone App';
+                        retryBtn.innerHTML = '📱 Open CallALink App';
                     }, 2000);
                 });
             }

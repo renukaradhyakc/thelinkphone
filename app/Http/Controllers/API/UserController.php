@@ -20,36 +20,36 @@ class UserController extends Controller
      
 
     public function authlogin(Request $request) {
-    $validator = Validator::make($request->all(), [
-        'email' => 'required|string|email|max:255',
-        'password' => 'required|string|min:6',
-    ]);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:6',
+        ]);
 
-    if ($validator->fails()) {
-        return response(['errors' => $validator->errors()->all()], 422);
-    }
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
 
-    $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-    if ($user) {
-        if (Hash::check($request->password, $user->password)) {
-            $token = $user->createToken('Email Access');
-            
-            $response = [
-                'token' => $token->plainTextToken,
-                'domain_url' => $user->domain_url,
-                'phone_number' => $user->phone_number
-            ];
-            return response($response, 200);
+        if ($user) {
+            if (Hash::check($request->password, $user->password)) {
+                $token = $user->createToken('Email Access');
+                
+                $response = [
+                    'token' => $token->plainTextToken,
+                    'domain_url' => $user->domain_url,
+                    'phone_number' => $user->phone_number
+                ];
+                return response($response, 200);
+            } else {
+                $response = ["message" => "Password mismatch"];
+                return response($response, 422);
+            }
         } else {
-            $response = ["message" => "Password mismatch"];
+            $response = ["message" => 'User does not exist'];
             return response($response, 422);
         }
-    } else {
-        $response = ["message" => 'User does not exist'];
-        return response($response, 422);
     }
-}
 
     
     public function login(Request $request){
@@ -151,6 +151,14 @@ class UserController extends Controller
         $events = EventSchedule::where('phone_call', 'LIKE', "%{$callerNumber}%")
             ->where('schedule_date', $now->toDateString())
             ->get();
+
+        Log::info('Events query result', [
+            'count' => $events->count(),
+            'date_checked' => $now->toDateString(),
+            'phone_checked' => $callerNumber,
+            // Raw DB check without date filter to isolate the issue:
+            'phone_only_count' => EventSchedule::where('phone_call', 'LIKE', "%{$callerNumber}%")->count(),
+        ]);
 
         $event = $events->filter(function ($item) use ($now) {
             Log::info('Checking event slot', ['slot_time' => $item->slot_time]);
