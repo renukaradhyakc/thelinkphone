@@ -37,17 +37,17 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
         });
 
-        RateLimiter::for('qrscan', function ($request) {
-            $userId = optional($request->user())->id;
+        // RateLimiter::for('qrscan', function ($request) {
+        //     $userId = optional($request->user())->id;
 
-            return [
-                Limit::perMinute(1000)->by("user:$userId"),
-                Limit::perSeconds(1, 20)->by("user:$userId") // burst control
-            ];
-        });
+        //     return [
+        //         Limit::perMinute(1000)->by("user:$userId"),
+        //         Limit::perSeconds(1, 20)->by("user:$userId") // burst control
+        //     ];
+        // });
 
-        RateLimiter::for('qrscan_ip', function ($request) {
-            return Limit::perMinute(2000)->by("ip:".$request->ip());
-        });
+        // RateLimiter::for('qrscan_ip', function ($request) {
+        //     return Limit::perMinute(2000)->by("ip:".$request->ip());
+        // });
     }
 }

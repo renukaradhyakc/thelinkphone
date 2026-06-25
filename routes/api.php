@@ -25,7 +25,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
  Route::get('/events',[ScheduleEventController::class, 'index']);
  Route::post('/login',[UserController::class, 'login']);
- Route::middleware(['auth:sanctum','throttle:qrscan','throttle:qrscan_ip'])->group(function () {
+ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/qrscan',[UserController::class, 'qrscan']);
 });
  Route::post('/authlogin',[UserController::class, 'authlogin']);
