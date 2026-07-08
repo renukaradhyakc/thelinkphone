@@ -24,6 +24,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\User
@@ -595,5 +596,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->hasRole('admin') || $this->is_super_admin === 1;
+    }
+
+    public function phoneSchedules(): HasMany
+    {
+        return $this->hasMany(PhoneSchedule::class, 'user_id');
     }
 }

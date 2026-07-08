@@ -93,4 +93,9 @@ class Schedule extends Model
     {
         $query->where('user_id', getLogInUserId());
     }
+
+    public function phoneSchedules(): HasMany
+    {
+        return $this->hasMany(PhoneSchedule::class, 'schedule_id');
+    }
 }

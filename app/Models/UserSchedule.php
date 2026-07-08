@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\UserSchedule
@@ -69,6 +70,7 @@ class UserSchedule extends Model
         'day_of_week',
         'schedule_id',
         'event_id',
+        'phone_schedule_id',
         'check_tab',
         'check_default',
     ];
@@ -83,6 +85,7 @@ class UserSchedule extends Model
         'day_of_week' => 'integer',
         'schedule_id' => 'integer',
         'event_id' => 'integer',
+        'phone_schedule_id' => 'integer',
         'check_tab' => 'boolean',
         'check_default' => 'boolean',
     ];
@@ -159,5 +162,10 @@ class UserSchedule extends Model
     public function scopeUser($query)
     {
         $query->where('user_id', getLogInUserId());
+    }
+
+    public function phoneSchedule(): BelongsTo
+    {
+        return $this->belongsTo(PhoneSchedule::class, 'phone_schedule_id');
     }
 }

@@ -120,4 +120,33 @@ class ScheduleRepository
         $schedule->update($input);
         return $schedule;
     }
+
+    /**
+     * Get a schedule with its time slots.
+     *
+     * @param int $scheduleId
+     * @return array
+     */
+    public function getScheduleWithSlots(int $scheduleId): array
+    {
+        $schedule = Schedule::where('user_id', getLogInUserId())
+            ->findOrFail($scheduleId);
+
+        $slots = UserSchedule::where('user_id', getLogInUserId())
+            ->where('schedule_id', $scheduleId)
+            ->whereNull('event_id')
+            ->orderBy('day_of_week')
+            ->orderBy('from_time')
+            ->get([
+                'day_of_week',
+                'from_time',
+                'to_time',
+            ]);
+
+        return [
+            'id' => $schedule->id,
+            'schedule_name' => $schedule->schedule_name,
+            'slots' => $slots,
+        ];
+    }
 }
