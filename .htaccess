@@ -1,10 +1,18 @@
 <IfModule mod_rewrite.c>
+
+    # --- Serve AASA file correctly ---
+    <Files "apple-app-site-association">
+        ForceType application/json
+        Header set Content-Type application/json
+        RewriteEngine Off
+    </Files>
+
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
     
     RewriteEngine On
-
+    RewriteRule ^\.well-known/assetlinks\.json$ - [L]
     # Redirect homepage to /dashboard
     RewriteCond %{HTTP_HOST} ^app\.thelinkphone\.com$ [NC]
     RewriteCond %{REQUEST_URI} ^/$

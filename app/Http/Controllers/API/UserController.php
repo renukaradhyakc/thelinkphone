@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\EventSchedule;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-use App\Services\CallPermissionEngine;
+use App\Http\Controllers\Controller;
+use App\Models\EventSchedule;
+use App\Models\User;
 use App\Rules\PhoneNumberRule;
+use App\Services\CallPermissionEngine;
 use App\Services\PhoneNumberNormalizer;
 
 //use Illuminate\Support\Facades\Auth;
