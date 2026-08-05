@@ -40,11 +40,16 @@ class CallPermissionEngine
         Log::info('CP_ENGINE_USER_LOOKUP', [
             'found' => $caller !== null,
             'user_id' => $caller?->id,
-            'name' => $caller?->first_name,
+            'first_name' => $caller?->first_name,
+            'last_name' => $caller?->last_name,
+            'domain_url' => $caller?->domain_url,
         ]);
 
         $isCallalinkUser = $caller !== null;
-        $callerName = $caller?->first_name;
+        $callerId = $caller?->id;
+        $callerFirstName = $caller?->first_name;
+        $callerLastName = $caller?->last_name;
+        $callerDomainUrl = $caller?->domain_url;
 
         /*
          * Highest priority:
@@ -74,7 +79,10 @@ class CallPermissionEngine
                 'eventname' => $event->name,
                 'slot_time' => $event->slot_time,
                 'is_callalink_user' => $isCallalinkUser,
-                'username' => $callerName,
+                'id' => $callerId,
+                'username' => $callerFirstName,
+                'last_name' => $callerLastName,
+                'domain_url' => $callerDomainUrl,
             ];
         }
 
@@ -106,7 +114,10 @@ class CallPermissionEngine
                 'eventname' => null,
                 'slot_time' => "{$phoneSlot->from_time} - {$phoneSlot->to_time}",
                 'is_callalink_user' => $isCallalinkUser,
-                'username' => $callerName,
+                'id' => $callerId,
+                'username' => $callerFirstName,
+                'last_name' => $callerLastName,
+                'domain_url' => $callerDomainUrl,
             ];
         }
 
@@ -132,7 +143,10 @@ class CallPermissionEngine
                 'eventname' => null,
                 'slot_time' => "{$defaultSlot->from_time} - {$defaultSlot->to_time}",
                 'is_callalink_user' => $isCallalinkUser,
-                'username' => $callerName,
+                'id' => $callerId,
+                'username' => $callerFirstName,
+                'last_name' => $callerLastName,
+                'domain_url' => $callerDomainUrl,
             ];
         }
 
@@ -152,7 +166,10 @@ class CallPermissionEngine
             'eventname' => null,
             'slot_time' => null,
             'is_callalink_user' => $isCallalinkUser,
-            'username' => $callerName,
+            'id' => $callerId,
+            'username' => $callerFirstName,
+            'last_name' => $callerLastName,
+            'domain_url' => $callerDomainUrl,
         ];
     }
 }
