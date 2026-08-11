@@ -10,6 +10,7 @@ use App\Modules\Loyalty\Controllers\AdminBillController;
 use App\Http\Controllers\API\PhoneScheduleController;
 use App\Http\Controllers\API\TimeZoneController;
 use App\Http\Controllers\API\ScheduleController;
+use App\Http\Controllers\API\UnifiedScheduleController;
 use App\Http\Controllers\API\ContactLookupController;
 
 /*
@@ -80,4 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/callalink/lookup', [ContactLookupController::class, 'lookup']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/unified-schedules', [UnifiedScheduleController::class, 'index']);
 });
