@@ -16,8 +16,14 @@
                     <i class="fa fa-clock fs-1"></i><span class="justify-content-center align-content-center ms-3">{{ $event->slot_time }} min</span>
                 </div>
                 <div class="d-flex mt-3">
-                    <i class="fa fa-video fs-1"></i><span
-                            class="justify-content-center align-content-center ms-3">{!! $event->description !!}</span>
+                    @if ($event->event_location == \App\Models\Event::IN_PERSON_MEETING)
+                        <i class="fas fa-map-marker-alt fs-1"></i>
+                    @elseif($event->event_location == \App\Models\Event::PHONE_CALL)
+                        <i class="fa-solid fa-phone fs-1"></i>
+                    @elseif($event->event_location == \App\Models\Event::GOOGLE_MEET)
+                        <i class="fa-solid fa-video fs-1"></i>
+                    @endif
+                    <span class="justify-content-center align-content-center ms-3">{!! $event->description !!}</span>
                 </div>
             </div>
         </div>

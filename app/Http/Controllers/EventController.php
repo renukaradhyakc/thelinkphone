@@ -62,14 +62,13 @@ class EventController extends AppBaseController
      */
     public function store(CreateEventRequest $request): RedirectResponse
     {
-        $input = $request->all();
         if (assignPlanFeatures(getLogInUserId())->events <= getActiveEventsCount()) {
             Flash::error(__('messages.success_message.upgrade_plan'));
 
             return redirect()->back();
         }
 
-        $event = $this->eventRepository->store($input);
+        $event = $this->eventRepository->store($request->validated());
 
         Flash::success(__('messages.success_message.event_created'));
 
@@ -159,7 +158,11 @@ class EventController extends AppBaseController
      */
     public function update(UpdateEventRequest $request, Event $event): RedirectResponse
     {
-        $event = $this->eventRepository->update($request->all(), $event->id);
+        if ((int) getLogInUserId() !== (int) $event->user_id) {
+            abort(403);
+        }
+
+        $this->eventRepository->update($request->validated(), $event->id);
 
         Flash::success(__('messages.success_message.event_update'));
 
@@ -168,7 +171,13 @@ class EventController extends AppBaseController
 
     public function changeStatus($id): JsonResponse
     {
-        $event = Event::findOrFail($id);
+        $event = Event::where('id', $id)
+            ->where('user_id', getLogInUserId())
+            ->first();
+
+        if (! $event) {
+            return $this->sendError('Unauthorized.', 403);
+        }
 
         $event->update(['status' => ! $event->status]);
 

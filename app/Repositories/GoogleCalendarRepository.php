@@ -59,6 +59,11 @@ class GoogleCalendarRepository
             $this->client->setAccessToken($accessToken);
             $service = new Google_Service_Calendar($this->client);
 
+            $sharedConferenceId = null;
+            $sharedEntryPoints = null;
+            $sharedConferenceSolution = null;
+            $sharedMeetLink = null;
+
             foreach ($meta['lists'] as $calendarId) {
                 $event = new Google_Service_Calendar_Event([
                     'summary' => $meta['name'],
@@ -69,17 +74,41 @@ class GoogleCalendarRepository
                 ]);
 
                 if ($eventSchedule->event->event_location == Event::GOOGLE_MEET) {
-                    $data = $service->events->insert($calendarId, $event, ['conferenceDataVersion' => 1]);
+                    if (is_null($sharedConferenceId)) {
+                        $data = $service->events->insert($calendarId, $event, ['conferenceDataVersion' => 1]);
 
-                    $conference = new \Google_Service_Calendar_ConferenceData();
-                    $conferenceRequest = new \Google_Service_Calendar_CreateConferenceRequest();
-                    $conferenceRequest->setRequestId('randomString123');
-                    $conference->setCreateRequest($conferenceRequest);
-                    $data->setConferenceData($conference);
+                        $conference = new \Google_Service_Calendar_ConferenceData();
+                        $conferenceRequest = new \Google_Service_Calendar_CreateConferenceRequest();
+                        $conferenceRequest->setRequestId('randomString123');
+                        $conference->setCreateRequest($conferenceRequest);
+                        $data->setConferenceData($conference);
 
-                    $data = $service->events->patch($calendarId, $data->id, $data, ['conferenceDataVersion' => 1]);
+                        $data = $service->events->patch($calendarId, $data->id, $data, ['conferenceDataVersion' => 1]);
 
-                    $data['google_meet_link'] = $data->hangoutLink;
+                        $attempts = 0;
+                        while (empty($data->hangoutLink) && $attempts < 5) {
+                            sleep(1);
+                            $data = $service->events->get($calendarId, $data->id);
+                            $attempts++;
+                        }
+
+                        $conferenceData = $data->getConferenceData();
+                        $sharedConferenceId = $conferenceData ? $conferenceData->getConferenceId() : null;
+                        $sharedConferenceSolution = $conferenceData ? $conferenceData->getConferenceSolution() : null;
+                        $sharedEntryPoints = $conferenceData ? $conferenceData->getEntryPoints() : null;
+                        $sharedMeetLink = $data->hangoutLink;
+                    } else {
+                        $conference = new \Google_Service_Calendar_ConferenceData();
+                        $conference->setConferenceId($sharedConferenceId);
+                        $conference->setConferenceSolution($sharedConferenceSolution);
+                        if ($sharedEntryPoints) {
+                            $conference->setEntryPoints($sharedEntryPoints);
+                        }
+                        $event->setConferenceData($conference);
+
+                        $data = $service->events->insert($calendarId, $event, ['conferenceDataVersion' => 1]);
+                    }
+                    $data['google_meet_link'] = $sharedMeetLink;
                 } else {
                     $data = $service->events->insert($calendarId, $event);
                 }
@@ -137,6 +166,11 @@ class GoogleCalendarRepository
     public function getAccessToken($userId): mixed
     {
         $user = User::with('gCredentials')->find($userId);
+
+        if (! $user || ! $user->gCredentials) {
+            throw new UnprocessableEntityHttpException('Google Calendar is not connected for this user.');
+        }
+
         $accessToken = json_decode($user->gCredentials->meta, true);
 
         if (is_array($accessToken) && count($accessToken) == 0) {
@@ -193,13 +227,28 @@ class GoogleCalendarRepository
     public function destroy($eventSchedules)
     {
         foreach ($eventSchedules as $eventSchedule) {
-            $accessToken = $this->getAccessToken($eventSchedule->user->id);
+            try {
+                $accessToken = $this->getAccessToken($eventSchedule->user->id);
+            } catch (\Exception $exception) {
+                continue;
+            }
 
             if ($accessToken) {
                 $this->client->setAccessToken($accessToken);
                 $service = new Google_Service_Calendar($this->client);
 
-                $service->events->delete($eventSchedule->google_calendar_id, $eventSchedule->google_event_id);
+                try {
+                    $service->events->delete($eventSchedule->google_calendar_id, $eventSchedule->google_event_id);
+                } catch (\Exception $exception) {
+                    $isAlreadyGone = str_contains($exception->getMessage(), '"code": 404')
+                        || str_contains($exception->getMessage(), '"reason": "notFound"')
+                        || str_contains($exception->getMessage(), '"code": 410')
+                        || str_contains($exception->getMessage(), '"reason": "deleted"');
+
+                    if (! $isAlreadyGone) {
+                        throw $exception; 
+                    }
+                }
             } else {
                 return redirect()->route('oauthCallback');
             }

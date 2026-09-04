@@ -2698,6 +2698,7 @@ progress {
 }
 
 .table-responsive {
+  padding-right: 30px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -16689,6 +16690,18 @@ html ::-webkit-scrollbar-resizer:vertical, html ::-webkit-scrollbar-resizer:hori
   background-size: 18px 20px;
 }
 
+.form-select.data-sorting {
+  font-size: 0.85rem;
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.d-flex.align-items-center.flex-xxl-row .text-gray-600.fs-4,
+.text-gray-600.fs-4 {
+  font-size: 0.85rem !important;
+}
+
+
 @font-face {
   font-family: "Poppins";
   font-style: normal;
@@ -16738,14 +16751,17 @@ html ::-webkit-scrollbar-resizer:vertical, html ::-webkit-scrollbar-resizer:hori
 .table.table-striped > thead > tr > th:first-child {
     border-top-left-radius: 0.625rem;
 }
-.table.table-striped > thead > tr > th:last-child {
-    padding-left: 0;
-    padding-right: 1.875rem;
-    border-top-right-radius: 0.625rem;
-}
 .table.table-striped > :not(caption) > * > * {
     padding: 0.625rem 0.25rem 0.625rem 1.875rem !important;
     vertical-align: middle;
+}
+.table.table-striped > thead > tr > th:last-child {
+    padding-left: 0;
+    padding-right: 1.875rem !important;
+    border-top-right-radius: 0.625rem;
+}
+.table.table-striped > tbody > tr > td:last-child {
+    padding-right: 1.875rem !important;
 }
 .table.table-striped tbody {
     background-color: #1D1F28;
@@ -17270,7 +17286,6 @@ tbody tr:last-child td {
 }
 @media (min-width: 1500px) {
   .pagination .page-item .page-link {
-    font-size: 1rem;
   }
 }
 @media (max-width: 1499px) {
@@ -17288,6 +17303,21 @@ tbody tr:last-child td {
 }
 .pagination .page-item:last-child .page-link {
   min-width: unset;
+}
+
+@media (max-width: 767.98px) {
+    .pagination-center {
+        display: flex;
+        justify-content: center;
+    }
+    .pagination-center nav ul.pagination {
+        justify-content: center;
+    }
+}
+
+.paged-pagination-results,
+.total-pagination-results {
+  font-size: 0.875rem;
 }
 
 @font-face {

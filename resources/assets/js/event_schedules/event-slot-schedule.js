@@ -120,6 +120,15 @@ listenSubmit('#addEventSlotScheduleForm', function (e) {
         data: $(this).serialize(),
         success: function (result) {
             if (result.success) {
+                if (result.data.needsGoogleAuth) {
+                    window.location.href = result.data.authUrl
+                    return
+                }
+                if (result.data.needsCalendarSelection) {
+                    displayErrorMessage(result.message)
+                    window.location.href = result.data.settingsUrl
+                    return
+                }
                 let scheduleEventId = result.data.scheduleEventId
                 let confirmPageUrl = result.data.redirectUrl
                 if (result.data.eventType == Paid) {

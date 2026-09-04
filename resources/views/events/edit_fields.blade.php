@@ -18,14 +18,18 @@
                     <div class="input-group mb-5">
                         <select name="event_location" class="form-select fw-bold event-location" required>
                             @foreach ($locationArr as $key => $value)
-                                @if($key != \App\Models\Event::PHONE_CALL)
-                                    <option value="{{ $key }}" class="update-location"
-                                        {{ $event->event_location == $key ? 'selected' : '' }}>{{ $key == \App\Models\Event::GOOGLE_MEET ? 'Phone Call' : $value }}
-                                    </option>
-                                @endif
+                                <option value="{{ $key }}" class="update-location"
+                                    {{ $event->event_location == $key ? 'selected' : '' }}>{{$value }}
+                                </option>
                             @endforeach
                         </select>
                         {{ Form::hidden('location_meta', null, ['id' => 'locationAddData']) }}
+                        {{ Form::hidden('new_location_type', null, ['id' => 'newLocationType']) }}
+                        {{ Form::hidden('new_location_latitude', null, ['id' => 'newLocationLatitude']) }}
+                        {{ Form::hidden('new_location_longitude', null, ['id' => 'newLocationLongitude']) }}
+                        {{ Form::hidden('new_location_accuracy', null, ['id' => 'newLocationAccuracy']) }}
+                        {{ Form::hidden('new_location_address', null, ['id' => 'newLocationAddress']) }}
+                        {{ Form::hidden('new_location_is_live_sharing_active', null, ['id' => 'newLocationIsLiveSharingActive']) }}
                     </div>
                 </div>
                 <div class="col-sm-8">

@@ -187,6 +187,8 @@ return [
         'dec' => 'Dec',
         'default_country_code' => 'Default Country Code',
         'unlimited' => 'Unlimited',
+        'email' => 'Email',
+        'link' => 'Link',
     ],
 
     'cash_payment' => [
@@ -356,6 +358,18 @@ return [
         'infycal_will_provide_your_number_after_the_call_has_been_scheduled' => getAppName().' will provide your number after the call has been scheduled',
         'this_event_can_not_be_deleted' => 'This event can\'t be deleted',
         'google_meet_link' => 'Google Meet Link',
+        'custom_hours' => 'Custom Hours',
+        'phone_schedules' => 'Phone Schedules',
+        'phone_schedule_name' => 'Schedule Name',
+        'event_schedules' => 'Event Schedules',
+        'location_type' => 'Location Type',
+        'fixed_location' => 'Fixed Location',
+        'fixed_location_desc' => 'Use one location for the event.',
+        'live_location' => 'Live Location',
+        'live_location_desc' => 'Automatically update your location while the event is active.',
+        'live_sharing_active' => 'Share live location now',
+        'live_sharing_status' => 'Live Location Status',
+        'meeting_type' => 'Meeting Type'
     ],
 
     'schedule' => [
@@ -377,6 +391,7 @@ return [
         'this_schedule_can_not_be_deleted' => 'This schedule can\'t be deleted.',
         'this_schedule_can_not_be_updated' => 'This schedule can\'t be updated.',
         'this_schedule_used_somewhere' => 'This schedule used somewhere else.',
+        'no_more_slots_today' => 'No more slots today',
     ],
 
     'schedule_event' => [
@@ -397,6 +412,8 @@ return [
         'paypal' => 'Paypal',
         'verify_your_otp_for_cancel_schedule_event' => 'Verify Your OTP For Cancel Schedule Event',
         'this_schedule_event_can_not_be_cancelled' => 'This schedule event can\'t be cancelled',
+        'given_by_me' => 'My Schedules',
+        'given_to_me' => 'Assigned to Me',
     ],
 
     'user_dashboard' => [
@@ -791,6 +808,8 @@ return [
         'set_frequency' => 'Set the frequency of available time slots for invitees.',
         'select_one_schedule' => 'Select one of your schedules or define custom hours specific to this type of event.',
         'best_resolution' => 'Best resolution for this image will be ',
+        'location_type' => 'Fixed Location uses a single address for the whole event. Live Location shares your real-time location with the invitee while the event is active.',
+        'live_sharing_status' => 'Turn this on anytime to share your live location manually. If left off, sharing will start automatically when the event begins and stop when it ends. Live Sharing turns off every 24 hours, so for multi-day events you can turn it back on once a day if you want it to continue.',
     ],
 
     'currency' => [

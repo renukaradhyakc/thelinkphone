@@ -1,0 +1,1 @@
+{{ optional($row->schedule)->schedule_name ?? __('messages.event.custom_hours') }}

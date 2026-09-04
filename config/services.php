@@ -48,4 +48,8 @@ return [
         'api_key' => env('VERYFI_API_KEY'),
     ],
 
+    'google_maps' => [
+        'key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
+
 ];

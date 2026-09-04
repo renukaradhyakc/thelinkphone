@@ -28,12 +28,53 @@
                     </div>
                     <div class="d-none" id="locationData">
                         <div class="col-sm-12">
-                            <div class="input-group mb-5">
-                            <span class="input-group-text" id="basic-addon1">
-                               <i class="fas fa-map-marker-alt fs-3"></i>
-                            </span>
-                                {{ Form::text('short_description_location', null,['class' => 'form-control','id' => 'shortDescLoc','placeholder' => __('messages.web.location')]) }}
+                            <div class="mb-5">
+                                <label class="form-label mb-2">{{ __('messages.event.location_type') ?? 'Location Type' }}:</label>
+
+                                <span data-bs-toggle="tooltip" data-placement="top"
+                                    data-bs-original-title="{{ __('messages.tooltip.location_type') ?? 'Fixed Location uses a single address for the whole event. Live Location shares your real-time location with the invitee while the event is active.' }}">
+                                    <i class="fa fa-question-circle ms-1 fs-7"></i>
+                                </span>
+
+                                <div class="d-flex mt-2">
+                                    <div class="form-check me-10">
+                                        <input class="form-check-input" type="radio" name="location_type" id="locationTypeFixed" value="fixed" checked>
+                                        <label class="form-check-label" for="locationTypeFixed">
+                                            {{ __('messages.event.fixed_location') ?? 'Fixed Location' }}
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="location_type" id="locationTypeLive" value="live">
+                                        <label class="form-check-label" for="locationTypeLive">
+                                            {{ __('messages.event.live_location') ?? 'Live Location' }}
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 d-none" id="liveSharingToggleWrap">
+                                    <label class="form-label">{{ __('messages.event.live_sharing_status') ?? 'Live Location Status' }}:</label>
+                                    <span data-bs-toggle="tooltip" data-placement="top"
+                                        data-bs-original-title="{{ __('messages.tooltip.live_sharing_status') ?? 'Turn this on anytime to share your live location manually. If left off, sharing will start automatically when the event begins and stop when it ends. Live Sharing turns off every 24 hours, so for multi-day events you can turn it back on once a day if you want it to continue.' }}">
+                                        <i class="fa fa-question-circle ms-1 fs-7"></i>
+                                    </span>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="is_live_sharing_active" id="liveSharingToggle" value="1">
+                                        <label class="form-check-label" for="liveSharingToggle">
+                                            {{ __('messages.event.live_sharing_active') ?? 'Share live location now' }}
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="input-group mb-5">
+                                {{ Form::text('short_description_location', null, ['class' => 'form-control', 'id' => 'shortDescLoc', 'placeholder' => __('messages.web.location')]) }}
+                                <button type="button" class="btn btn-outline-secondary" id="useMyLocationBtn" title="Use my current location">
+                                    <i class="fas fa-location-crosshairs"></i>
+                                </button>
+                            </div>
+                            <div id="locationFetchStatus" class="text-muted fs-6 d-none"></div>
                         </div>
                         @php
                             $styleCss = 'style';

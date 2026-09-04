@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * App\Models\EventSchedule
@@ -190,5 +192,15 @@ class EventSchedule extends Model
     public function transaction(): HasOne
     {
         return $this->hasOne(Transaction::class, 'schedule_event_id');
+    }
+
+    public function otherPartyByPhone(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(User::class, 'phone_number', 'phone_call');
+    }
+
+    public function location(): MorphOne
+    {
+        return $this->morphOne(Location::class, 'locationable');
     }
 }

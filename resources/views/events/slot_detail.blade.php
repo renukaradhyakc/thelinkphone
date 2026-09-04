@@ -35,29 +35,13 @@
                                                     <i class="fas fa-map-marker-alt me-2 fs-2 text-primary"></i>
                                                     <span class="fs-4 text-primary fw-bold">{{ $location[1] }}</span>
                                                 @elseif($event->event_location == \App\Models\Event::PHONE_CALL)
-                                                    @php($phoneCallNumber = json_decode($event->location_meta))
-                                                    @if (count($phoneCallNumber) > 0 && !empty($phoneCallNumber[1]))
-                                                        @if (!empty($phoneCallNumber[2]) && $phoneCallNumber[1] == 2)
-                                                            <i class="fa-solid fa-phone me-2 fs-2 text-primary"></i>
-                                                            <span
-                                                                class="fs-4 text-primary fw-bold">{{ $phoneCallNumber[2] }}</span>
-                                                        @else
-                                                            <i class="fa-solid fa-phone  me-2 fs-2 text-primary"></i>
-                                                            <span
-                                                                class="fs-4 text-primary fw-bold">{{ \App\Models\Event::LOCATION_ARRAY[$event->event_location] }}</span>
-                                                        @endif
-                                                    @endif
+                                                    <i class="fa-solid fa-phone  me-2 fs-2 text-primary"></i>
+                                                    <span class="fs-4 text-primary fw-bold">{{ \App\Models\Event::LOCATION_ARRAY[$event->event_location] }}</span>
+                                                @elseif($event->event_location == \App\Models\Event::GOOGLE_MEET)
+                                                    <i class="fa-solid fa-video me-2 fs-2 text-primary"></i>
+                                                    <span class="fs-4 text-primary fw-bold ms-2">Google Meet</span>
                                                 @else
-                                                    @php($location = json_decode($event->location_meta))
-                                                    @if (!empty($location))
-                                                        @if (count($location) > 0 && $location[0] == 3)
-                                                            <i class="fa-solid fa-phone me-2 fs-2 text-primary"></i>
-                                                            <span
-                                                                class="fs-4 text-primary fw-bold ms-2">Phone Call</span>
-                                                        @else
-                                                            {{ __('messages.common.n/a') }}
-                                                        @endif
-                                                    @endif
+                                                    {{ __('messages.common.n/a') }}
                                                 @endif
                                             </div>
                                             <div class="d-flex align-items-start mb-4">

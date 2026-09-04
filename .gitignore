@@ -47,6 +47,7 @@ applinkbkp.zip
 # 🔒 Sensitive credentials (Google, Firebase, etc.)
 # -------------------------------------------------------
 resources/client_secret_*.json
+resources/google-credentials.json
 storage/service-account-credentials.json
 storage/firebase-credentials.json
 storage/credentials.json

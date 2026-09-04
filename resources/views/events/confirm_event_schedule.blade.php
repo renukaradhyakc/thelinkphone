@@ -42,14 +42,14 @@
                                                 <div class="mt-10 border border-start-0 border-end-0 border-bottom-0 py-5"
                                                     {{ $styleCss }}="max-width: 500px;width: 100%;margin: 0 auto;display: block;
                                             ">
-                                                    <div class="d-flex align-items-center">
+                                                    <div class="d-flex align-items-center justify-content-center ">
                                                         <i class="fa fa-circle fs-2"
                                                             {{ $styleCss }}="color: #8247f5;"></i>
                                                         <span class="ms-3 fs-4 ">
                                                             {{ $eventSchedule->event->name }}
                                                         </span>
                                                     </div>
-                                                    <div class="d-flex align-items-center mt-4">
+                                                    <div class="d-flex align-items-center justify-content-center mt-4">
                                                         <i class="fa fa-calendar fs-2 text-warning"></i>
                                                         {{--                                                <span class="ms-3 fs-4 "> --}}
                                                         {{--                                                           {{ $eventSchedule->slot_time  }}, {{ \Carbon\Carbon::parse($eventSchedule->schedule_date)->translatedFormat('l') }}, {{ \Carbon\Carbon::parse($eventSchedule->schedule_date)->translatedFormat('F j, Y') }} --}}
@@ -63,13 +63,13 @@
                                                             {{ \Carbon\Carbon::parse($eventSchedule->schedule_date)->translatedFormat('F j, Y') }}
                                                         </span>
                                                     </div>
-                                                    <div class="d-flex align-items-center mt-4">
+                                                    <div class="d-flex align-items-center justify-content-center  mt-4">
                                                         <i class="fa fa-globe-asia fs-2 text-danger"></i>
                                                         <span class="ms-3 fs-4 ">
                                                             {{ \App\Models\User::TIME_ZONE_ARRAY[$eventSchedule->event->user->timezone] }}
                                                         </span>
                                                     </div>
-                                                    <div class="d-flex align-items-center mt-4">
+                                                    <div class="d-flex align-items-center justify-content-center  mt-4">
                                                         @if ($eventSchedule->event->event_location == \App\Models\Event::IN_PERSON_MEETING)
                                                             <i class="fa fa-map-marker-alt fs-2 text-success"></i>
                                                             @php($location = json_decode($eventSchedule->event->location_meta))

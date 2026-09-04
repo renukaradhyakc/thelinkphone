@@ -16,6 +16,7 @@ use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UserPaypalController;
 use App\Http\Controllers\UserSettingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventLocationController;
 
 Route::get('google-auth', [GoogleCalendarController::class, 'oauth'])->name('googleAuth');
 Route::get('sync-google-calendar-list',
@@ -82,6 +83,20 @@ Route::middleware([
     Route::post('/settings', [UserSettingController::class, 'store'])->name('user.setting.create.update');
     // Route::post('/settings/create-update',
     //     [UserSettingController::class, 'userCredentialUpdate'])->name('user.setting.credential.update');
+
+    Route::post('events/{event}/location/live/start', [EventLocationController::class, 'startSharing'])
+        ->name('events.location.live.start');
+    Route::post('events/{event}/location/live/stop', [EventLocationController::class, 'stopSharing'])
+        ->name('events.location.live.stop');
+
+    Route::post('events/{event}/location/live/update', [EventLocationController::class, 'updateLive'])
+        ->name('events.location.live.update');
+    
+    Route::get('location/live-session', [EventLocationController::class, 'activeSession'])
+        ->name('location.live.session');
+
+    Route::get('events/{event}/location/address', [EventLocationController::class, 'resolveAddress'])
+        ->name('events.location.address');
 });
 
 Route::middleware(['auth', 'xss', 'role:user', 'verified', 'checkCustomerOnBoard'])->group(function () {

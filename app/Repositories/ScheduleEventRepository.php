@@ -93,10 +93,13 @@ class ScheduleEventRepository extends BaseRepository
         }
         $data['loginUserName'] = $eventSchedule->user->full_name;
         $loginUserEmail = $eventSchedule->user->email;
-        CreateGoogleEvent::dispatch($eventSchedule->id);
+        if ($eventSchedule->event->event_location == Event::GOOGLE_MEET) {
+            CreateGoogleEvent::dispatch($eventSchedule->id);
+        }
 
-       $googleUserEventSchedule = UserGoogleEventSchedule::whereUserId($eventSchedule->user_id)->whereEventScheduleId($eventSchedule->id)->first();
-        if (($eventSchedule->event->event_location == Event::GOOGLE_MEET || $eventSchedule->event->event_location == Event::PHONE_CALL) && ! empty($googleUserEventSchedule->google_meet_link)) {
+        $booker = $eventSchedule->otherPartyByPhone;
+        $googleUserEventSchedule = UserGoogleEventSchedule::whereUserId($booker->id ?? null)->whereEventScheduleId($eventSchedule->id)->first();
+        if ($eventSchedule->event->event_location == Event::GOOGLE_MEET && ! empty($googleUserEventSchedule->google_meet_link)) {
             $data['googleMeetLink'] = $googleUserEventSchedule->google_meet_link;
         } else {
             $data['googleMeetLink'] = '';

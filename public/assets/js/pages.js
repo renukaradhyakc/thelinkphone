@@ -4645,6 +4645,18 @@ function loadEventData() {
     if (locationMeta[0] == 1) {
       $("#shortDescLoc").val(locationMeta[1] ? locationMeta[1] : "");
       $("#longDescLoc").val(locationMeta[2] ? locationMeta[2] : "");
+      console.log('[CallaLink][UI] restoring location_type:', eventLocationType, 'liveSharingActive:', eventIsLiveSharingActive);
+
+      if (eventLocationType == 2) {
+        $("input[name='location_type'][value='live']").prop("checked", true);
+        $("#liveSharingToggleWrap").removeClass("d-none");
+        $("#liveSharingToggle").prop("checked", eventIsLiveSharingActive == 1);
+      } else {
+        $("input[name='location_type'][value='fixed']").prop("checked", true);
+        $("#liveSharingToggleWrap").addClass("d-none");
+        $("#liveSharingToggle").prop("checked", false);
+      }
+
       var shortName = $("#shortDescLoc").val();
       var longDesLoc = $("#longDescLoc").val();
       prepareLocationData.push(id);
@@ -4956,6 +4968,7 @@ listenClick(".add-location-modal", function () {
 listenSubmit("#addLocationInfo", function (e) {
   e.preventDefault();
   var id = $(".add-location").val();
+  console.log('[CallaLink][UI] addLocationInfo submit, add-location id =', id);
   var prepareLocationData = [];
   var radio = $("#phoneCallOption").val();
 
@@ -4964,20 +4977,30 @@ listenSubmit("#addLocationInfo", function (e) {
   }
 
   if (id == 1) {
+    var radioIsLive = $("input[name='location_type']:checked").val() === "live";
+    var liveChecked = $("#liveSharingToggle").is(":checked");
+    var addressRequired = !radioIsLive || radioIsLive && liveChecked;
     var shortName = $("#shortDescLoc").val();
     var empty = shortName.trim().replace(/ \r\n\t/g, "") === "";
 
-    if (shortName == "") {
-      $("#shortDescLoc").focus();
-      displayErrorMessage(Lang.get("js.location"));
-      return false;
+    if (addressRequired) {
+      if (shortName == "") {
+        $("#shortDescLoc").focus();
+        displayErrorMessage(Lang.get("js.location"));
+        return false;
+      }
+
+      if (empty) {
+        displayErrorMessage(Lang.get("js.location_white"));
+        return false;
+      }
     }
 
-    if (empty) {
-      displayErrorMessage(Lang.get("js.location_white"));
-      return false;
-    }
-
+    $("#newLocationType").val($("input[name='location_type']:checked").val() === "live" ? 2 : 1);
+    console.log('[CallaLink][UI] at submit — radioIsLive:', radioIsLive, 'liveChecked:', liveChecked);
+    $("#newLocationIsLiveSharingActive").val($("input[name='location_type']:checked").val() === "live" && $("#liveSharingToggle").is(":checked") ? 1 : 0);
+    console.log('[CallaLink][UI] newLocationIsLiveSharingActive set to:', $("#newLocationIsLiveSharingActive").val());
+    $("#newLocationAddress").val($("#shortDescLoc").val());
     prepareLocationData.push(id);
     prepareLocationData.push($("#shortDescLoc").val());
 
@@ -5011,6 +5034,123 @@ listenSubmit("#addLocationInfo", function (e) {
   $("#locationAddData").val(JSON.stringify(prepareLocationData));
   $("#updateLocation").modal("hide");
   $(".event-location").val($(".add-location").val()).trigger("change");
+});
+
+function fetchAndFillLocation() {
+  var statusEl = $("#locationFetchStatus");
+  statusEl.removeClass("d-none text-danger").addClass("text-muted").text("Fetching your location...");
+
+  if (!navigator.geolocation) {
+    statusEl.removeClass("text-muted").addClass("text-danger").text("Geolocation isn't supported by this browser.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(function (position) {
+    var lat = position.coords.latitude;
+    var lng = position.coords.longitude;
+    var accuracy = position.coords.accuracy;
+    $("#newLocationLatitude").val(lat);
+    $("#newLocationLongitude").val(lng);
+    $("#newLocationAccuracy").val(accuracy);
+    fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat=".concat(lat, "&lon=").concat(lng)).then(function (res) {
+      return res.json();
+    }).then(function (data) {
+      if (data && data.display_name) {
+        $("#shortDescLoc").val(data.display_name).trigger("change");
+        $("#newLocationAddress").val(data.display_name);
+        statusEl.addClass("d-none");
+      } else {
+        statusEl.removeClass("text-muted").addClass("text-danger").text("Couldn't resolve an address for that location.");
+      }
+    })["catch"](function () {
+      statusEl.removeClass("text-muted").addClass("text-danger").text("Couldn't resolve an address for that location.");
+    });
+  }, function (error) {
+    var msg = "Couldn't get your location.";
+
+    if (error.code === error.PERMISSION_DENIED) {
+      msg = "Location permission denied. You can still type the address manually.";
+    }
+
+    statusEl.removeClass("text-muted").addClass("text-danger").text(msg);
+  }, {
+    enableHighAccuracy: true,
+    timeout: 10000
+  });
+}
+
+$(document).on("click", "#useMyLocationBtn", function () {
+  fetchAndFillLocation();
+});
+$(document).on('mouseenter', '.live-location-icon', function () {
+  var $icon = $(this);
+  if ($icon.data('resolved')) return;
+  var locationType = parseInt($icon.data('location-type'), 10);
+
+  if (locationType === 1) {
+    var fixedAddress = $icon.data('address');
+    $icon.attr('title', fixedAddress || 'Address unavailable').data('resolved', true);
+    return;
+  }
+
+  var eventId = $icon.data('event-id');
+  if (!eventId) return;
+  $.get("/events/".concat(eventId, "/location/address")).done(function (res) {
+    var payload = res.data || res;
+    var title;
+
+    switch (payload.status) {
+      case 'not_started':
+        title = "Location sharing hasn't started yet";
+        break;
+
+      case 'stopped':
+        title = payload.address || 'Location sharing has stopped';
+        break;
+
+      default:
+        title = payload.address || 'Address unavailable';
+    }
+
+    $icon.attr('title', title).data('resolved', true);
+  }).fail(function (xhr) {
+    console.error('[CallaLink] address resolve failed:', xhr.status, xhr.responseText);
+  });
+});
+listenClick("input[name='location_type']", function () {
+  console.log('[CallaLink][UI] location_type radio clicked:', $(this).val());
+
+  if ($(this).val() === "live") {
+    $("#liveSharingToggleWrap").removeClass("d-none");
+    console.log('[CallaLink][UI] liveSharingToggleWrap shown');
+  } else {
+    $("#liveSharingToggleWrap").addClass("d-none");
+    $("#liveSharingToggle").prop("checked", false);
+    console.log('[CallaLink][UI] liveSharingToggleWrap hidden, toggle force-unchecked');
+  }
+});
+listenClick("#liveSharingToggle", function () {
+  var isChecked = $(this).is(':checked');
+  console.log('[CallaLink][UI] liveSharingToggle changed, checked =', $(this).is(':checked'));
+
+  if (isChecked && conflictingLiveEventName) {
+    $(this).prop('checked', false); // revert immediately
+
+    displayErrorMessage("Live location is already running for \"".concat(conflictingLiveEventName, "\"."));
+    return;
+  }
+
+  if (isChecked) {
+    fetchAndFillLocation();
+  } else {
+    $("#shortDescLoc").val("");
+    $("#newLocationLatitude").val("");
+    $("#newLocationLongitude").val("");
+    $("#newLocationAccuracy").val("");
+    $("#newLocationAddress").val("");
+    $("#locationFetchStatus").addClass("d-none");
+    console.log('[CallaLink][UI] liveSharingToggle off — cleared location fields');
+  }
 });
 var picked = false;
 listenClick("#color", function () {
@@ -5091,6 +5231,8 @@ listenSubmit("#eventStoreForm", function () {
   $("#btnSave").attr("disabled", true);
 });
 listenSubmit("#eventEditForm", function () {
+  console.log('[CallaLink][UI] eventEditForm submitting with newLocationType=%s, newLocationIsLiveSharingActive=%s', $("#newLocationType").val(), $("#newLocationIsLiveSharingActive").val());
+
   if ($('[name="event_location"]').val() == 1 && $("#locationAddData").val() == "") {
     displayErrorMessage(Lang.get("js.location"));
     return false;
@@ -5107,9 +5249,12 @@ listenHiddenBsModal("#addScheduleNameModal", function () {
 
 if (currentRouteName == "events.create") {
   listenHiddenBsModal("#updateLocation", function () {
+    console.log('[CallaLink][UI] updateLocation modal hidden — resetting toggle & radio state');
     $("#phoneNumber").val("");
     $("#valid-msg").addClass("hide");
     $("#error-msg").addClass("hide");
+    $("#liveSharingToggle").prop("checked", false);
+    $("#liveSharingToggleWrap").addClass("d-none");
     resetModalForm("#addLocationInfo", "#updateLocationValidationErrorsBox");
   });
 }
@@ -7034,6 +7179,202 @@ listenClick('.currency-delete-btn', function () {
   var currencyRecordId = $(this).attr('data-id');
   deleteItem(route('currencies.destroy', currencyRecordId), Lang.get('js.currency'));
 });
+})();
+
+// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+(() => {
+/*!*******************************************************!*\
+  !*** ./resources/assets/js/location/live-location.js ***!
+  \*******************************************************/
+(function (window, $) {
+  var START_URL_TEMPLATE = '/events/__EVENT_ID__/location/live/start';
+  var STOP_URL_TEMPLATE = '/events/__EVENT_ID__/location/live/stop';
+  var UPDATE_URL_TEMPLATE = '/events/__EVENT_ID__/location/live/update';
+  var SESSION_CHECK_URL = '/location/live-session';
+  var DISTANCE_THRESHOLD_METERS = 150;
+  var HEARTBEAT_INTERVAL_MS = 1 * 60 * 1000;
+  var STORAGE_ACTIVE_KEY = 'callalink_live_location_active';
+  var STORAGE_EVENT_KEY = 'callalink_live_location_event_id';
+  var watchId = null;
+  var updateTimer = null;
+  var latestPosition = null;
+  var activeEventId = null;
+  var lastSentPosition = null;
+
+  function buildUrl(template, eventId) {
+    return template.replace('__EVENT_ID__', eventId);
+  }
+
+  function csrfToken() {
+    return $('meta[name="csrf-token"]').attr('content');
+  }
+
+  function postJson(url, data) {
+    return $.ajax({
+      url: url,
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken()
+      },
+      data: data
+    });
+  }
+
+  function sendUpdate() {
+    if (!latestPosition || !activeEventId) {
+      console.log('[CallaLink] sendUpdate skipped — no position or no active event');
+      return;
+    }
+
+    var coords = latestPosition.coords;
+    console.log('[CallaLink] sending update:', coords.latitude, coords.longitude, coords.accuracy);
+    postJson(buildUrl(UPDATE_URL_TEMPLATE, activeEventId), {
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      accuracy: coords.accuracy
+    }).done(function (res) {
+      console.log('[CallaLink] update ACK:', res);
+    }).fail(function (xhr) {
+      console.error('[CallaLink] update FAILED:', xhr.status, xhr.responseText);
+
+      if (xhr.status === 409 || xhr.status === 404) {
+        deactivateTracking();
+      }
+    });
+  }
+
+  function fetchAndSendImmediate() {
+    if (!navigator.geolocation) {
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(function (position) {
+      latestPosition = position;
+      sendUpdate();
+    }, function () {}, {
+      enableHighAccuracy: true,
+      maximumAge: 0
+    });
+  }
+
+  function beginWatching() {
+    if (!navigator.geolocation || watchId !== null) {
+      console.log('[CallaLink] beginWatching skipped — already watching or no geolocation');
+      return;
+    }
+
+    console.log('[CallaLink] beginWatching: starting watch + timer');
+    watchId = navigator.geolocation.watchPosition(function (position) {
+      maybeSend(position);
+      console.log('[CallaLink] position updated:', position.coords.latitude, position.coords.longitude, position.coords.accuracy);
+    }, function (err) {
+      console.error('[CallaLink] watchPosition ERROR:', err.code, err.message);
+    }, {
+      enableHighAccuracy: true,
+      maximumAge: 0
+    });
+    updateTimer = setInterval(function () {
+      console.log('[CallaLink] heartbeat interval fired');
+      sendUpdate();
+    }, HEARTBEAT_INTERVAL_MS);
+  }
+
+  function stopWatching() {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+
+    if (updateTimer !== null) {
+      clearInterval(updateTimer);
+      updateTimer = null;
+    }
+
+    latestPosition = null;
+    lastSentPosition = null;
+  }
+
+  function deactivateTracking() {
+    stopWatching();
+    activeEventId = null;
+    localStorage.removeItem(STORAGE_ACTIVE_KEY);
+    localStorage.removeItem(STORAGE_EVENT_KEY);
+  }
+
+  function startSharing(eventId) {
+    return postJson(buildUrl(START_URL_TEMPLATE, eventId), {}).done(function () {
+      activeEventId = eventId;
+      localStorage.setItem(STORAGE_ACTIVE_KEY, '1');
+      localStorage.setItem(STORAGE_EVENT_KEY, String(eventId));
+      fetchAndSendImmediate();
+      beginWatching();
+    });
+  }
+
+  function stopSharing(eventId) {
+    return postJson(buildUrl(STOP_URL_TEMPLATE, eventId), {}).done(function () {
+      deactivateTracking();
+    });
+  }
+
+  function restoreSessionIfActive() {
+    $.get(SESSION_CHECK_URL).done(function (response) {
+      var data = response.data || response;
+      console.log('[CallaLink] session check:', data);
+
+      if (data.active) {
+        var previousEventId = localStorage.getItem(STORAGE_EVENT_KEY);
+        var isNewActivation = String(previousEventId) !== String(data.event_id);
+        console.log('[CallaLink] session active, isNewActivation:', isNewActivation);
+        activeEventId = data.event_id;
+        localStorage.setItem(STORAGE_ACTIVE_KEY, '1');
+        localStorage.setItem(STORAGE_EVENT_KEY, String(data.event_id));
+
+        if (isNewActivation) {
+          fetchAndSendImmediate();
+        }
+
+        beginWatching();
+      } else {
+        console.log('[CallaLink] session inactive, deactivating');
+        deactivateTracking();
+      }
+    }).fail(function (xhr) {
+      console.error('[CallaLink] session check FAILED:', xhr.status, xhr.responseText);
+    });
+  }
+
+  function distanceInMeters(lat1, lon1, lat2, lon2) {
+    var R = 6371000;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.pow(Math.sin(dLon / 2), 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function maybeSend(position) {
+    latestPosition = position;
+
+    if (!lastSentPosition) {
+      sendUpdate();
+      lastSentPosition = position;
+      return;
+    }
+
+    var moved = distanceInMeters(lastSentPosition.coords.latitude, lastSentPosition.coords.longitude, position.coords.latitude, position.coords.longitude);
+
+    if (moved >= DISTANCE_THRESHOLD_METERS) {
+      sendUpdate();
+      lastSentPosition = position;
+    }
+  }
+
+  document.addEventListener('turbo:load', restoreSessionIfActive);
+  window.CallaLinkLiveLocation = {
+    startSharing: startSharing,
+    stopSharing: stopSharing
+  };
+})(window, jQuery);
 })();
 
 /******/ })()

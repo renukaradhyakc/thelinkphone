@@ -731,6 +731,17 @@ listenSubmit('#addEventSlotScheduleForm', function (e) {
     data: $(this).serialize(),
     success: function success(result) {
       if (result.success) {
+        if (result.data.needsGoogleAuth) {
+          window.location.href = result.data.authUrl;
+          return;
+        }
+
+        if (result.data.needsCalendarSelection) {
+          displayErrorMessage(result.message);
+          window.location.href = result.data.settingsUrl;
+          return;
+        }
+
         var scheduleEventId = result.data.scheduleEventId;
         var confirmPageUrl = result.data.redirectUrl;
 

@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PhoneSchedule extends Model
 {
     use HasFactory;
 
     protected $table = 'phone_schedules';
+
+    protected $with = ['user'];
 
     protected $fillable = [
         'user_id',
@@ -47,5 +50,10 @@ class PhoneSchedule extends Model
     public function userSchedules(): HasMany
     {
         return $this->hasMany(UserSchedule::class, 'phone_schedule_id');
+    }
+
+    public function otherPartyByPhone(): HasOne
+    {
+        return $this->hasOne(User::class, 'phone_number', 'phone_number_normalized');
     }
 }

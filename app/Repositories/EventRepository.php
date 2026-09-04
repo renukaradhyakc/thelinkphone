@@ -6,11 +6,13 @@ use App\Models\Event;
 use App\Models\EventSchedule;
 use App\Models\User;
 use App\Models\UserSchedule;
+use App\Models\Location;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use DateTime;
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;  
 
 /**
  * Class EventRepository
@@ -44,18 +46,40 @@ class EventRepository extends BaseRepository
 
     public function store($input)
     {
-        $input['user_id'] = getLogInUserId();
-        $event = Event::create($input);
+        return DB::transaction(function () use ($input) {
+            $attributes = $this->eventFormAttributes($input);
+            $attributes['user_id'] = getLogInUserId();
+            $event = Event::create($attributes);
 
-        return $event;
+            if ($event->event_location == Event::IN_PERSON_MEETING && !empty($input['location_meta'])) {
+                $this->saveEventLocation($event, $input);
+            }
+
+            return $event;
+        });
     }
 
     public function update($input, $id)
     {
-        $event = Event::find($id);
-        $event->update($input);
+        return DB::transaction(function () use ($input, $id) {
+            $event = Event::where('id', $id)->where('user_id', getLogInUserId())->first();
 
-        return $event;
+            if (! $event) {
+                abort(403);
+            }
+
+            $event->update($this->eventFormAttributes($input));
+
+            if ((int) $event->event_location === Event::IN_PERSON_MEETING) {
+                if (! empty($input['location_meta'])) {
+                    $this->saveEventLocation($event, $input);
+                }
+            } else {
+                $event->location()->delete();
+            }
+
+            return $event;
+        });
     }
 
     public function storeEventSchedule($input): array
@@ -485,5 +509,93 @@ class EventRepository extends BaseRepository
         $period = CarbonPeriod::create($startOfMonth, $endOfMonth);
 
         return $period;
+    }
+
+    private function eventFormAttributes(array $input): array
+    {
+        $attributes = Arr::only($input, [
+            'name',
+            'event_location',
+            'description',
+            'event_link',
+            'event_color',
+            'location_meta',
+            'event_type',
+            'payable_amount',
+        ]);
+
+        if (! isset($attributes['event_type']) || (int) $attributes['event_type'] !== Event::PAID) {
+            $attributes['payable_amount'] = null;
+        }
+
+        return $attributes;
+    }
+
+    private function saveEventLocation(Event $event, array $input): void
+    {
+        \Log::info('[CallaLink] saveEventLocation input', ['event_id' => $event?->id, 'input' => $input]);
+        if ((int) $event->user_id !== (int) getLogInUserId()) {
+            abort(403);
+        }
+
+        if ((int) $event->event_location !== Event::IN_PERSON_MEETING) {
+            return;
+        }
+
+        $requestedType = isset($input['new_location_type']) ? (int) $input['new_location_type'] : Location::FIXED;
+        $locationType = in_array($requestedType, [Location::FIXED, Location::LIVE], true)
+            ? $requestedType
+            : Location::FIXED;
+
+        $existingLocation = $event->location;
+
+        $latitude = isset($input['new_location_latitude']) && $input['new_location_latitude'] !== ''
+            ? (float) $input['new_location_latitude']
+            : optional($existingLocation)->latitude;
+
+        $longitude = isset($input['new_location_longitude']) && $input['new_location_longitude'] !== ''
+            ? (float) $input['new_location_longitude']
+            : optional($existingLocation)->longitude;
+
+        $accuracy = isset($input['new_location_accuracy']) && $input['new_location_accuracy'] !== ''
+            ? (float) $input['new_location_accuracy']
+            : optional($existingLocation)->accuracy;
+
+        $address = $locationType === Location::LIVE ? null : ($input['new_location_address'] ?? optional($existingLocation)->address);            
+
+        $requestedSharingActive = $locationType === Location::LIVE && ! empty($input['new_location_is_live_sharing_active']) && (int) $input['new_location_is_live_sharing_active'] === 1;
+
+        $wasAlreadyActive = (bool) optional($existingLocation)->is_live_sharing_active;
+
+        $isLiveSharingActive = $requestedSharingActive;
+
+        $liveStartedAt = $isLiveSharingActive ? ($wasAlreadyActive ? optional($existingLocation)->live_started_at : now()) : null;
+
+        \Log::info('[CallaLink] saveEventLocation resolved', [ 
+            'event_id' => optional($event)->id,
+            'locationType' => $locationType,
+            'requestedSharingActive' => $requestedSharingActive,
+            'wasAlreadyActive' => $wasAlreadyActive,
+            'isLiveSharingActive' => $isLiveSharingActive,
+            'liveStartedAt' => $liveStartedAt,
+        ]);
+
+        $event->location()->updateOrCreate(
+            [],
+            [
+                'location_type' => $locationType,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'accuracy' => $accuracy,
+                'address' => $address,
+                'is_live_sharing_active' => $isLiveSharingActive,
+                'live_started_at' => $liveStartedAt,
+            ]
+        );
+
+        \Log::info('[CallaLink] saveEventLocation persisted', [
+            'event_id' => $event?->id,
+            'location_id' => $event?->location?->id,
+        ]);
     }
 }

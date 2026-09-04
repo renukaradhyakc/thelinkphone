@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laracasts\Flash\Flash;
+use App\Models\EventSchedule;
 
 /**
  * Class GoogleCalendarController
@@ -79,6 +80,13 @@ class GoogleCalendarController extends AppBaseController
     public function redirect(Request $request): RedirectResponse
     {
         try {
+            \Log::info('redirect() hit', ['session_id' => session()->getId(), 'has_pending' => session()->has('pending_booking')]);
+            if ($request->get('error')) {
+                $returnUrl = session()->pull('pending_booking_return_url', route('events.index'));
+                session()->forget('pending_booking');
+                Flash::error('Booking requires Google Calendar access to continue.');
+                return redirect($returnUrl);
+            }
             $accessToken = $this->client->fetchAccessTokenWithAuthCode($request->get('code'));
             $exists = GoogleCalendarIntegration::whereUserId(getLogInUserId())->exists();
 
@@ -96,6 +104,36 @@ class GoogleCalendarController extends AppBaseController
 
             $this->client->setAccessToken($accessToken);
             $calendarLists = $this->fetchCalendarListAndSyncToDB();
+
+            $this->ensureDefaultCalendarSelected();
+
+            if (session()->has('pending_booking')) {
+                $pendingBooking = session()->pull('pending_booking');
+                $returnUrl = session()->pull('pending_booking_return_url', route('events.index'));
+
+                if (assignPlanFeatures($pendingBooking['user_id'])->schedule_events <= getActiveScheduleEventsCount($pendingBooking['user_id'])) {
+                    Flash::error(__('messages.success_message.schedule_events_upgrade'));
+                    return redirect($returnUrl);
+                }
+
+                $bookedSlots = EventSchedule::whereEventId($pendingBooking['event_id'])
+                    ->whereDate('schedule_date', '=', $pendingBooking['schedule_date'])
+                    ->where('slot_time', '=', $pendingBooking['slot_time'])
+                    ->where('status', '!=', EventSchedule::CANCELLED)
+                    ->pluck('slot_time')->toArray();
+
+                if ($bookedSlots) {
+                    Flash::error('Sorry, this slot was just booked by someone else. Please pick another.');
+                    return redirect($returnUrl);
+                }
+
+                $scheduleEventRepo = App::make(\App\Repositories\ScheduleEventRepository::class);
+                $eventSchedule = $scheduleEventRepo->store($pendingBooking);
+
+                Flash::success(__('messages.success_message.google_calender_connected'));
+
+                return redirect(url(getSlotConfirmPageUrl($eventSchedule)));
+            }
         } catch (Exception $exception) {
             Log::error($exception->getMessage());
         }
@@ -247,22 +285,32 @@ class GoogleCalendarController extends AppBaseController
 
     public function eventGoogleCalendarStore(Request $request): JsonResponse
     {
-        $eventGoogleCalendars = EventGoogleCalendar::whereUserId(getLogInUserId())->get();
-        foreach ($eventGoogleCalendars as $eventGoogleCalendar) {
-            $eventGoogleCalendar->delete();
-        }
         $input = $request->all();
+        $submittedIds = $input['google_calendar'] ?? [];
 
-        $googleCalendarIds = $input['google_calendar'];
-        foreach ($googleCalendarIds as $googleCalendarId) {
-            $googleCalendarListId = GoogleCalendarList::find($googleCalendarId)->google_calendar_id;
-            $data = [
+        $existing = EventGoogleCalendar::whereUserId(getLogInUserId())
+            ->pluck('google_calendar_list_id')
+            ->toArray();
+
+        $toRemove = array_diff($existing, $submittedIds);
+        $toAdd = array_diff($submittedIds, $existing);
+
+        if (! empty($toRemove)) {
+            EventGoogleCalendar::whereUserId(getLogInUserId())
+                ->whereIn('google_calendar_list_id', $toRemove)
+                ->delete();
+        }
+
+        foreach ($toAdd as $googleCalendarId) {
+            $googleCalendarList = GoogleCalendarList::find($googleCalendarId);
+            if (! $googleCalendarList) {
+                continue;
+            }
+            EventGoogleCalendar::create([
                 'user_id' => getLogInUserId(),
                 'google_calendar_list_id' => $googleCalendarId,
-                'google_calendar_id' => $googleCalendarListId,
-            ];
-
-            EventGoogleCalendar::create($data);
+                'google_calendar_id' => $googleCalendarList->google_calendar_id,
+            ]);
         }
 
         return $this->sendSuccess(__('messages.success_message.calendar_added_successfully'));
@@ -289,6 +337,42 @@ class GoogleCalendarController extends AppBaseController
 
         $repo->syncCalendarList(getLogInUser());
 
+        $this->ensureDefaultCalendarSelected();
+
         return $this->sendSuccess(__('messages.success_message.google_calender_updated'));
+    }
+
+    private function ensureDefaultCalendarSelected(): void
+    {
+        if (EventGoogleCalendar::whereUserId(getLogInUserId())->exists()) {
+            return;
+        }
+
+        $candidates = GoogleCalendarList::whereUserId(getLogInUserId())->get();
+
+        if ($candidates->isEmpty()) {
+            return;
+        }
+
+        $primaryCalendar = $candidates->first(function ($calendar) {
+            $meta = json_decode($calendar->meta, true);
+            return ! empty($meta['primary']);
+        });
+
+        if (! $primaryCalendar) {
+            $primaryCalendar = $candidates->firstWhere('google_calendar_id', getLogInUser()->email);
+        }
+
+        if (! $primaryCalendar) {
+            $primaryCalendar = $candidates->first();
+        }
+
+        if ($primaryCalendar) {
+            EventGoogleCalendar::create([
+                'user_id' => getLogInUserId(),
+                'google_calendar_list_id' => $primaryCalendar->id,
+                'google_calendar_id' => $primaryCalendar->google_calendar_id,
+            ]);
+        }
     }
 }

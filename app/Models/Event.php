@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use App\Models\Location;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * Class Event
@@ -195,5 +197,17 @@ class Event extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function location(): MorphOne
+    {
+        return $this->morphOne(Location::class, 'locationable');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function (Event $event) {
+            $event->location()->delete();
+        });
     }
 }

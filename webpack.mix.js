@@ -124,6 +124,7 @@ mix.js([
     'resources/assets/js/google_calendar/google_calendar.js',
     'resources/assets/js/sidebar-menu-search/sidebar-menu-search.js',
     'resources/assets/js/currencies/currencies.js',
+    'resources/assets/js/location/live-location.js',
 ], 'public/assets/js/pages.js')
 
 // front page JS 

@@ -73,6 +73,8 @@ class ScheduleEventController extends AppBaseController
              \Log::info('Combined Phone Number: ', ['phone_call' => $input['phone_call']]);
         }
 
+        $event = Event::findOrFail($input['event_id']);
+
         if (assignPlanFeatures($input['user_id'])->schedule_events <= getActiveScheduleEventsCount($input['user_id'])) {
             return $this->sendError(__('messages.success_message.schedule_events_upgrade'));
         }
@@ -85,6 +87,28 @@ class ScheduleEventController extends AppBaseController
 
         if ($bookedSlots) {
             return $this->sendError('This Event schedule is already booked.');
+        }
+
+        if ($event->event_location == Event::GOOGLE_MEET) {
+            if(! \App\Models\GoogleCalendarIntegration::whereUserId($caller->id)->exists()) {
+                session(['pending_booking' => $input, 'pending_booking_return_url' => url()->previous()]);
+                \Log::info('pending_booking written', ['session_id' => session()->getId(), 'data' => $input]);
+
+                return $this->sendResponse([
+                    'needsGoogleAuth' => true,
+                    'authUrl' => route('googleAuth'),
+                ], 'Google Calendar connection required.');
+            }
+
+            $hasUsableCalendar = \App\Models\EventGoogleCalendar::whereUserId($caller->id)->exists()
+                || \App\Models\GoogleCalendarList::whereUserId($caller->id)->exists();
+            
+            if (! $hasUsableCalendar) {
+                return $this->sendResponse([
+                    'needsCalendarSelection' => true,
+                    'settingsUrl' => route('google.calendar.index'),
+                ], 'Please select a Google Calendar to continue.');
+            }
         }
 
         $eventSchedule = $this->scheduleEventRepo->store($input);
@@ -123,7 +147,10 @@ class ScheduleEventController extends AppBaseController
     public function show($id)
     {
         $eventSchedule = EventSchedule::findOrFail($id);
-        if (getLogInUserId() !== $eventSchedule->user_id) {
+        $isOwner = getLogInUserId() === $eventSchedule->user_id;
+        $isRecipient = $eventSchedule->phone_call === (getLoginUser()->phone_number ?? null);
+
+        if (! $isOwner && ! $isRecipient) {
             return redirect()->back();
         }
 

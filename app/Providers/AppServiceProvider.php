@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Mariuzzo\LaravelJsLocalization\Commands\LangJsCommand;
 use Mariuzzo\LaravelJsLocalization\Generators\LangJsGenerator;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +40,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        if ($this->app->environment('local') && (str_contains(request()->server('HTTP_HOST', ''), 'ngrok') || str_contains(request()->server('HTTP_HOST', ''), 'zrok.io') || str_contains(request()->server('HTTP_HOST', ''), 'pinggy-free.link'))) {
+            URL::forceScheme('https');
+        }
+
         app()->useLangPath(base_path('lang'));
         Schema::defaultStringLength(191);
     }
