@@ -736,6 +736,11 @@ listenSubmit('#addEventSlotScheduleForm', function (e) {
           return;
         }
 
+        if (result.data.needsZoomAuth) {
+          window.location.href = result.data.authUrl;
+          return;
+        }
+
         if (result.data.needsCalendarSelection) {
           displayErrorMessage(result.message);
           window.location.href = result.data.settingsUrl;

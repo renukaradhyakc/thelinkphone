@@ -33,10 +33,22 @@
 
     $callalinkUrl = $party && !empty($party->domain_url) ? rtrim(config('app.url'), '/') . '/call/' . ltrim($party->domain_url, '/') : null;
 
-    $isGoogleMeet = $eventLocation === \App\Models\Event::GOOGLE_MEET;
-    $googleUserEventSchedule = \App\Models\UserGoogleEventSchedule::whereUserId($row->otherPartyByPhone->id ?? null)->whereEventScheduleId($row->id)->first();
+    $isVideoCall = $eventLocation === \App\Models\Event::VIDEO_CALL;
+    $isGoogleMeet = $isVideoCall && $row->video_provider === 'google_meet';
+    $isZoom = $isVideoCall && $row->video_provider === 'zoom';
 
-    $showMeetLink = $isGoogleMeet && $row->status != \App\Models\EventSchedule::CANCELLED && !empty($googleUserEventSchedule->google_meet_link);
+    $meetingLink = null;
+    if ($isVideoCall && $row->status != \App\Models\EventSchedule::CANCELLED) {
+        $booker = $row->otherPartyByPhone;
+
+        if ($isGoogleMeet) {
+            $meetingLink = $row->userGoogleEventSchedule->google_meet_link ?? null;
+        } elseif ($isZoom) {
+            $meetingLink = $row->userZoomEventSchedule->zoom_join_url ?? null;
+        }
+    }
+
+    $showMeetLink = ! empty($meetingLink);
 @endphp
 <div class="text-center">
     @if($isInPersonMeeting)
@@ -74,8 +86,16 @@
         @endif
     @elseif($isGoogleMeet)
         @if($showMeetLink)
-            <a href="{{ $googleUserEventSchedule->google_meet_link }}" target="_blank" title="Google Meet">
+            <a href="{{ $meetingLink }}" target="_blank" title="Google Meet">
                 <img src="{{ asset('assets/images/logo_google_meet.svg') }}" alt="Google Meet" width="20" height="20">
+            </a>
+        @else
+            —
+        @endif
+    @elseif($isZoom)
+        @if($showMeetLink)
+            <a href="{{ $meetingLink }}" target="_blank" title="Zoom">
+                <img src="{{ asset('assets/images/logo_zoom_meet.svg') }}" alt="Zoom" width="20" height="20">
             </a>
         @else
             —

@@ -112,18 +112,32 @@
                 </div>
             </div>
             @if($eventSchedule->event->event_location != \App\Models\Event::PHONE_CALL)
+                @php
+                    $isVideoCall = $eventSchedule->event->event_location == \App\Models\Event::VIDEO_CALL;
+                    $isGoogleMeetBooking = $isVideoCall && $eventSchedule->video_provider === 'google_meet';
+                    $isZoomBooking = $isVideoCall && $eventSchedule->video_provider === 'zoom';
+
+                    $meetingLink = null;
+                    if ($isGoogleMeetBooking) {
+                        $meetingLink = \App\Models\UserGoogleEventSchedule::where('event_schedule_id', $eventSchedule->id)->value('google_meet_link');
+                    } elseif ($isZoomBooking) {
+                        $meetingLink = \App\Models\UserZoomEventSchedule::where('event_schedule_id', $eventSchedule->id)->value('zoom_join_url');
+                    }
+
+                    $meetingLinkLabel = $isGoogleMeetBooking ? 'Google Meet Link' : ($isZoomBooking ? 'Zoom Link' : __('messages.event.location'));
+                @endphp
+
                 <div class="row mb-7">
                     <label class="col-lg-4 fs-4 text-gray-600">
-                        {{ $eventSchedule->event->event_location == \App\Models\Event::GOOGLE_MEET ? 'Google Meet Link' : __('messages.event.location') }}
+                        {{ $meetingLinkLabel }}
                     </label>
                     <div class="col-lg-8">
-                        @if($eventSchedule->event->event_location == \App\Models\Event::GOOGLE_MEET)
-                            @php
-                                $meetLink = \App\Models\UserGoogleEventSchedule::where('event_schedule_id', $eventSchedule->id)->value('google_meet_link');
-                            @endphp
-                            @if($meetLink)
+                        @if($eventSchedule->status == \App\Models\EventSchedule::CANCELLED)
+                            <span class="fs-4 text-gray-800">—</span>
+                        @elseif($isVideoCall)
+                            @if($meetingLink)
                                 <span class="fs-4 text-gray-800">
-                                    <a href="{{ $meetLink }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">{{ $meetLink }}</a>
+                                    <a href="{{ $meetingLink }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">{{ $meetingLink }}</a>
                                 </span>
                             @else
                                 <span class="fs-4 text-gray-800">—</span>

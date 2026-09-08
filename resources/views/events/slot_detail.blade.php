@@ -37,9 +37,9 @@
                                                 @elseif($event->event_location == \App\Models\Event::PHONE_CALL)
                                                     <i class="fa-solid fa-phone  me-2 fs-2 text-primary"></i>
                                                     <span class="fs-4 text-primary fw-bold">{{ \App\Models\Event::LOCATION_ARRAY[$event->event_location] }}</span>
-                                                @elseif($event->event_location == \App\Models\Event::GOOGLE_MEET)
+                                                @elseif($event->event_location == \App\Models\Event::VIDEO_CALL)
                                                     <i class="fa-solid fa-video me-2 fs-2 text-primary"></i>
-                                                    <span class="fs-4 text-primary fw-bold ms-2">Google Meet</span>
+                                                    <span class="fs-4 text-primary fw-bold ms-2">Video Call</span>
                                                 @else
                                                     {{ __('messages.common.n/a') }}
                                                 @endif
@@ -70,6 +70,26 @@
                                                 {{ Form::label('email', __('messages.user.email') . ':', ['class' => 'required form-label']) }}
                                                 {{ Form::email('email', null, ['class' => 'form-control', 'placeholder' => __('messages.user.email'), 'required']) }}
                                             </div>
+                                            @if ($event->event_location == \App\Models\Event::VIDEO_CALL)
+                                                <div class="mb-5">
+                                                    <label class="form-label mb-2">{{ __('messages.common.meeting_provider') ?? 'Meeting Provider' }}:</label>
+                                                    <div class="d-flex mt-2">
+                                                        <div class="form-check me-10">
+                                                            <input class="form-check-input" type="radio" name="video_provider" id="videoProviderGoogleMeet" value="google_meet" checked>
+                                                            <label class="form-check-label" for="videoProviderGoogleMeet">
+                                                                Google Meet
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="video_provider" id="videoProviderZoom" value="zoom">
+                                                            <label class="form-check-label" for="videoProviderZoom">
+                                                                Zoom
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             <p class="form-label">
                                                 {{ __('messages.event.please_share_anything_that_will_help_prepare_for') }}
                                                 .</p>

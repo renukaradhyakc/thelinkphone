@@ -17,12 +17,16 @@ use App\Http\Controllers\UserPaypalController;
 use App\Http\Controllers\UserSettingController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventLocationController;
+use App\Http\Controllers\ZoomController;
 
 Route::get('google-auth', [GoogleCalendarController::class, 'oauth'])->name('googleAuth');
 Route::get('sync-google-calendar-list',
     [GoogleCalendarController::class, 'syncGoogleCalendarList'])->name('syncGoogleCalendarList');
 Route::get('google/redirect', [GoogleCalendarController::class, 'redirect']);
 Route::any('google-webhook', [GoogleWebhookController::class, 'webhook'])->name('google.webhook');
+
+Route::get('zoom-auth', [ZoomController::class, 'oauth'])->name('zoomAuth');
+Route::get('zoom/redirect', [ZoomController::class, 'redirect']);
 
 Route::middleware([
     'auth', 'xss', 'role:user', 'verified', 'checkCustomerOnBoard', 'check_subscription',
@@ -77,6 +81,11 @@ Route::middleware([
     Route::post('event-google-calendar', [
         GoogleCalendarController::class, 'eventGoogleCalendarStore',
     ])->name('event.google.calendar.store');
+
+
+    // zoom meeting routes
+    Route::get('connect-zoom', [ZoomController::class, 'zoomIndex'])->name('zoom.index');
+    Route::get('disconnect-zoom', [ZoomController::class, 'disconnect'])->name('disconnectZoom.destroy');
 
     // Setting routes
     Route::get('/settings', [UserSettingController::class, 'index'])->name('user.settings');

@@ -18,15 +18,15 @@ class EventLocationController extends AppBaseController
         $this->authorizeEvent($event);
 
         $location = $event->location;
-        \Log::info('[CallaLink] startSharing called', ['event_id' => $event->id, 'location_type' => optional($location)->location_type, 'event_status' => $event->status]);
+        // \Log::info('[CallaLink] startSharing called', ['event_id' => $event->id, 'location_type' => optional($location)->location_type, 'event_status' => $event->status]);
 
         if (! $location || (int) $location->location_type !== Location::LIVE) {
-            \Log::warning('[CallaLink] startSharing rejected — not set to Live', ['event_id' => $event->id]);
+            // \Log::warning('[CallaLink] startSharing rejected — not set to Live', ['event_id' => $event->id]);
             return $this->sendError('Set this event\'s location to Live and save before starting sharing.', 422);
         }
 
         if (! (bool) $event->status) {
-            \Log::warning('[CallaLink] startSharing rejected — event not active', ['event_id' => $event->id]);
+            // \Log::warning('[CallaLink] startSharing rejected — event not active', ['event_id' => $event->id]);
             return $this->sendError('This event is not active.', 422);
         }
 
@@ -36,9 +36,9 @@ class EventLocationController extends AppBaseController
             ->first();
 
         if ($conflict) {
-            \Log::warning('[CallaLink] startSharing rejected — another event already live', [
-                'event_id' => $event->id, 'conflicting_event_id' => $conflict->id,
-            ]);
+            // \Log::warning('[CallaLink] startSharing rejected — another event already live', [
+            //     'event_id' => $event->id, 'conflicting_event_id' => $conflict->id,
+            // ]);
             return $this->sendError("You're already sharing live location for \"{$conflict->name}\". Stop that one first.", 409);
         }
 
@@ -46,7 +46,7 @@ class EventLocationController extends AppBaseController
             'is_live_sharing_active' => true,
             'live_started_at' => now(),
         ]);
-        \Log::info('[CallaLink] startSharing succeeded', ['event_id' => $event->id]);
+        // \Log::info('[CallaLink] startSharing succeeded', ['event_id' => $event->id]);
         return $this->sendResponse(['event_id' => $event->id], 'Live sharing started.');
     }
 
@@ -73,12 +73,12 @@ class EventLocationController extends AppBaseController
         $location = $event->location;
 
         if (! $this->isSessionValid($event, $location)) {
-            \Log::warning('[CallaLink] updateLive: session invalid', ['event_id' => $event->id]);
+            // \Log::warning('[CallaLink] updateLive: session invalid', ['event_id' => $event->id]);
             return $this->sendError('Live sharing is not active for this event.', 409);
         }
 
         if ($this->isLiveExpired($event, $location)) {
-            \Log::warning('[CallaLink] updateLive: expired', ['event_id' => $event->id]);
+            // \Log::warning('[CallaLink] updateLive: expired', ['event_id' => $event->id]);
             $this->stopSharingInternal($location);
             return $this->sendError('Live sharing window has expired.', 409);
         }
@@ -92,13 +92,13 @@ class EventLocationController extends AppBaseController
 
         $hasMovedMeaningfully = is_null($location->latitude) || $movedMeters >= 150;
 
-        \Log::info('[CallaLink] updateLive writing', [
-            'event_id' => $event->id,
-            'data' => $data,
-            'movedMeters' => round($movedMeters, 1),
-            'hasMovedMeaningfully' => $hasMovedMeaningfully,
-            'was_dirty' => $location->isDirty()
-        ]);
+        // \Log::info('[CallaLink] updateLive writing', [
+        //     'event_id' => $event->id,
+        //     'data' => $data,
+        //     'movedMeters' => round($movedMeters, 1),
+        //     'hasMovedMeaningfully' => $hasMovedMeaningfully,
+        //     'was_dirty' => $location->isDirty()
+        // ]);
 
         if ($hasMovedMeaningfully) {
             $data['address'] = null;
@@ -113,7 +113,7 @@ class EventLocationController extends AppBaseController
     public function activeSession(): JsonResponse
     {
         $userId = getLogInUserId();
-        \Log::info('[CallaLink] activeSession check', ['user_id' => $userId]);
+        // \Log::info('[CallaLink] activeSession check', ['user_id' => $userId]);
 
         $event = Event::where('user_id', $userId)
             ->where('status', Event::ACTIVE)
@@ -125,17 +125,17 @@ class EventLocationController extends AppBaseController
             ->first();
 
         if (! $event) {
-            \Log::info('[CallaLink] activeSession: no matching event found');
+            // \Log::info('[CallaLink] activeSession: no matching event found');
             return $this->sendResponse(['active' => false], 'No active live session.');
         }
 
         if ($this->isLiveExpired($event, $event->location)) {
-            \Log::info('[CallaLink] activeSession: expired, stopping', ['event_id' => $event->id]);
+            // \Log::info('[CallaLink] activeSession: expired, stopping', ['event_id' => $event->id]);
             $this->stopSharingInternal($event->location);
             return $this->sendResponse(['active' => false], 'Live session expired.');
         }
 
-        \Log::info('[CallaLink] activeSession: active', ['event_id' => $event->id]);
+        // \Log::info('[CallaLink] activeSession: active', ['event_id' => $event->id]);
         return $this->sendResponse([
             'active' => true,
             'event_id' => $event->id,
@@ -196,7 +196,7 @@ class EventLocationController extends AppBaseController
     {
         $expiresAt = $location->liveExpiresAt($event);
         $expired = $expiresAt !== null && now()->greaterThanOrEqualTo($expiresAt);
-        \Log::info('[CallaLink] isLiveExpired check', ['event_id' => $event->id, 'now' => now()->toDateTimeString(), 'expiresAt' => optional($expiresAt)->toDateTimeString(), 'expired' => $expired]);
+        // \Log::info('[CallaLink] isLiveExpired check', ['event_id' => $event->id, 'now' => now()->toDateTimeString(), 'expiresAt' => optional($expiresAt)->toDateTimeString(), 'expired' => $expired]);
 
         return $expired;
     }

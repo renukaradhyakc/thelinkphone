@@ -73,7 +73,7 @@ class GoogleCalendarRepository
                     'description' => $meta['description'],
                 ]);
 
-                if ($eventSchedule->event->event_location == Event::GOOGLE_MEET) {
+                if ($eventSchedule->event->event_location == Event::VIDEO_CALL && $eventSchedule->video_provider === 'google_meet') {
                     if (is_null($sharedConferenceId)) {
                         $data = $service->events->insert($calendarId, $event, ['conferenceDataVersion' => 1]);
 

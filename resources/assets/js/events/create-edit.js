@@ -295,7 +295,7 @@ function loadEventData() {
             $("#shortDescLoc").val(locationMeta[1] ? locationMeta[1] : "");
             $("#longDescLoc").val(locationMeta[2] ? locationMeta[2] : "");
 
-            console.log('[CallaLink][UI] restoring location_type:', eventLocationType, 'liveSharingActive:', eventIsLiveSharingActive);
+            // console.log('[CallaLink][UI] restoring location_type:', eventLocationType, 'liveSharingActive:', eventIsLiveSharingActive);
             if (eventLocationType == 2) {
                 $("input[name='location_type'][value='live']").prop("checked", true);
                 $("#liveSharingToggleWrap").removeClass("d-none");
@@ -621,7 +621,7 @@ listenClick(".add-location-modal", function () {
 listenSubmit("#addLocationInfo", function (e) {
     e.preventDefault();
     let id = $(".add-location").val();
-    console.log('[CallaLink][UI] addLocationInfo submit, add-location id =', id);
+    // console.log('[CallaLink][UI] addLocationInfo submit, add-location id =', id);
     let prepareLocationData = [];
     let radio = $("#phoneCallOption").val();
     if ($("#phoneCallOption2").prop("checked") == true) {
@@ -654,12 +654,12 @@ listenSubmit("#addLocationInfo", function (e) {
             $("input[name='location_type']:checked").val() === "live" ? 2 : 1
         );
 
-        console.log('[CallaLink][UI] at submit — radioIsLive:', radioIsLive, 'liveChecked:', liveChecked);
+        // console.log('[CallaLink][UI] at submit — radioIsLive:', radioIsLive, 'liveChecked:', liveChecked);
 
         $("#newLocationIsLiveSharingActive").val(
             $("input[name='location_type']:checked").val() === "live" && $("#liveSharingToggle").is(":checked") ? 1 : 0
         );
-        console.log('[CallaLink][UI] newLocationIsLiveSharingActive set to:', $("#newLocationIsLiveSharingActive").val());
+        // console.log('[CallaLink][UI] newLocationIsLiveSharingActive set to:', $("#newLocationIsLiveSharingActive").val());
 
         $("#newLocationAddress").val($("#shortDescLoc").val());
 
@@ -779,26 +779,26 @@ $(document).on('mouseenter', '.live-location-icon', function () {
 
         $icon.attr('title', title).data('resolved', true);
     }).fail(function (xhr) {
-        console.error('[CallaLink] address resolve failed:', xhr.status, xhr.responseText);
+        // console.error('[CallaLink] address resolve failed:', xhr.status, xhr.responseText);
     });
 });
 
 
 listenClick("input[name='location_type']", function () {
-    console.log('[CallaLink][UI] location_type radio clicked:', $(this).val())
+    // console.log('[CallaLink][UI] location_type radio clicked:', $(this).val())
     if ($(this).val() === "live") {
         $("#liveSharingToggleWrap").removeClass("d-none");
-        console.log('[CallaLink][UI] liveSharingToggleWrap shown');
+        // console.log('[CallaLink][UI] liveSharingToggleWrap shown');
     } else {
         $("#liveSharingToggleWrap").addClass("d-none");
         $("#liveSharingToggle").prop("checked", false);
-        console.log('[CallaLink][UI] liveSharingToggleWrap hidden, toggle force-unchecked');
+        // console.log('[CallaLink][UI] liveSharingToggleWrap hidden, toggle force-unchecked');
     }
 });
 
 listenClick("#liveSharingToggle", function () {
     const isChecked = $(this).is(':checked');
-    console.log('[CallaLink][UI] liveSharingToggle changed, checked =', $(this).is(':checked')); 
+    // console.log('[CallaLink][UI] liveSharingToggle changed, checked =', $(this).is(':checked')); 
 
     if (isChecked && conflictingLiveEventName) {
         $(this).prop('checked', false); // revert immediately
@@ -815,7 +815,7 @@ listenClick("#liveSharingToggle", function () {
         $("#newLocationAccuracy").val("");
         $("#newLocationAddress").val("");
         $("#locationFetchStatus").addClass("d-none");
-        console.log('[CallaLink][UI] liveSharingToggle off — cleared location fields');
+        // console.log('[CallaLink][UI] liveSharingToggle off — cleared location fields');
     }
 });
 
@@ -911,7 +911,7 @@ listenSubmit("#eventStoreForm", function () {
 });
 
 listenSubmit("#eventEditForm", function () {
-    console.log('[CallaLink][UI] eventEditForm submitting with newLocationType=%s, newLocationIsLiveSharingActive=%s', $("#newLocationType").val(), $("#newLocationIsLiveSharingActive").val());
+    // console.log('[CallaLink][UI] eventEditForm submitting with newLocationType=%s, newLocationIsLiveSharingActive=%s', $("#newLocationType").val(), $("#newLocationIsLiveSharingActive").val());
     if (
         $('[name="event_location"]').val() == 1 &&
         $("#locationAddData").val() == ""
@@ -934,7 +934,7 @@ listenHiddenBsModal("#addScheduleNameModal", function () {
 
 if (currentRouteName == "events.create") {
     listenHiddenBsModal("#updateLocation", function () {
-        console.log('[CallaLink][UI] updateLocation modal hidden — resetting toggle & radio state');
+        // console.log('[CallaLink][UI] updateLocation modal hidden — resetting toggle & radio state');
         $("#phoneNumber").val("");
         $("#valid-msg").addClass("hide");
         $("#error-msg").addClass("hide");

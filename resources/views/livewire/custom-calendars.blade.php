@@ -20,7 +20,7 @@
                         <i class="fas fa-map-marker-alt fs-1"></i>
                     @elseif($event->event_location == \App\Models\Event::PHONE_CALL)
                         <i class="fa-solid fa-phone fs-1"></i>
-                    @elseif($event->event_location == \App\Models\Event::GOOGLE_MEET)
+                    @elseif($event->event_location == \App\Models\Event::VIDEO_CALL)
                         <i class="fa-solid fa-video fs-1"></i>
                     @endif
                     <span class="justify-content-center align-content-center ms-3">{!! $event->description !!}</span>

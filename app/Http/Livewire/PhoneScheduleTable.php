@@ -119,7 +119,13 @@ class PhoneScheduleTable extends LivewireTableComponent
             $this->paginators[$pageName] = (int) request()->query($pageName, 1);
         }
 
+        \DB::enableQueryLog();
+
         $all = $this->builder()->get();
+
+        \Log::info('PHONE_SCHEDULE_QUERY_LOG', [
+            'queries' => \DB::getQueryLog(),
+        ]);
 
         $flat = collect();
 

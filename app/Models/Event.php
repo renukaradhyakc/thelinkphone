@@ -151,7 +151,7 @@ class Event extends Model
 
     const PHONE_CALL = 2;
 
-    const GOOGLE_MEET = 3;
+    const VIDEO_CALL = 3;
 
     const ACTIVE = 1;
 
@@ -160,7 +160,7 @@ class Event extends Model
     const LOCATION_ARRAY = [
         self::IN_PERSON_MEETING => 'In Person Meeting',
         self::PHONE_CALL => 'Phone Call',
-        self::GOOGLE_MEET => 'Google Meet',
+        self::VIDEO_CALL => 'Video Call',
     ];
 
     const FREE = 1;

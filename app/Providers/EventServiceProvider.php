@@ -6,6 +6,8 @@ use App\Events\CreateGoogleEvent;
 use App\Events\DeleteEventFromGoogleCalendar;
 use App\Listeners\HandleCreatedGoogleEvent;
 use App\Listeners\HandleDeletedEventFromGoogleCalendar;
+use App\Listeners\HandleCreatedZoomMeeting;
+use App\Events\CreateZoomMeeting;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -26,6 +28,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         CreateGoogleEvent::class => [
             HandleCreatedGoogleEvent::class,
+        ],
+        CreateZoomMeeting::class => [
+            HandleCreatedZoomMeeting::class,
         ],
     ];
 

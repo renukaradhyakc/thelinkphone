@@ -189,6 +189,7 @@ return [
         'unlimited' => 'Unlimited',
         'email' => 'Email',
         'link' => 'Link',
+        'meeting_provider' => 'Meeting Provider',
     ],
 
     'cash_payment' => [
@@ -369,7 +370,8 @@ return [
         'live_location_desc' => 'Automatically update your location while the event is active.',
         'live_sharing_active' => 'Share live location now',
         'live_sharing_status' => 'Live Location Status',
-        'meeting_type' => 'Meeting Type'
+        'meeting_type' => 'Meeting Type',
+        'live_location_not_started' => 'Live location sharing hasn\'t started yet',
     ],
 
     'schedule' => [

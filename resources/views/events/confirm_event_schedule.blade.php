@@ -40,8 +40,7 @@
                                                     {{ Form::close() }}
                                                 @endif
                                                 <div class="mt-10 border border-start-0 border-end-0 border-bottom-0 py-5"
-                                                    {{ $styleCss }}="max-width: 500px;width: 100%;margin: 0 auto;display: block;
-                                            ">
+                                                    {{ $styleCss }}="max-width: 500px;width: 100%;margin: 0 auto;display: block;">
                                                     <div class="d-flex align-items-center justify-content-center ">
                                                         <i class="fa fa-circle fs-2"
                                                             {{ $styleCss }}="color: #8247f5;"></i>
@@ -71,9 +70,18 @@
                                                     </div>
                                                     <div class="d-flex align-items-center justify-content-center  mt-4">
                                                         @if ($eventSchedule->event->event_location == \App\Models\Event::IN_PERSON_MEETING)
-                                                            <i class="fa fa-map-marker-alt fs-2 text-success"></i>
-                                                            @php($location = json_decode($eventSchedule->event->location_meta))
-                                                            <span class="ms-3 fs-4 ">{{ $location[1] }}</span>
+                                                            <i class="fa fa-map-marker-alt fs-3"></i>
+                                                             @php
+                                                                $location = json_decode($eventSchedule->event->location_meta);
+                                                                $locationAddress = $location[1] ?? null;
+                                                            @endphp
+                                                            <span class="ms-3 fs-4 ">
+                                                                @if (!empty($locationAddress))
+                                                                    {{ $locationAddress }}
+                                                                @else
+                                                                    {{ __('messages.event.live_location_not_started') }}
+                                                                @endif
+                                                            </span>
                                                         @elseif($eventSchedule->event->event_location == \App\Models\Event::PHONE_CALL)
                                                             @php($phoneCallNumber = json_decode($eventSchedule->event->location_meta))
                                                             @if (count($phoneCallNumber) > 0 && !empty($phoneCallNumber[1]))
@@ -92,13 +100,23 @@
                                                                     class="ms-3 fs-4 ">{{ \App\Models\Event::LOCATION_ARRAY[$eventSchedule->event->event_location] }}</span>
                                                             @endif
                                                         @else
-                                                            @if (!empty($eventSchedule->userGoogleEventSchedule->google_meet_link))
+                                                            @if ($eventSchedule->video_provider === 'zoom' && !empty($eventSchedule->userZoomEventSchedule->zoom_join_url))
+                                                                <img src="{{ asset('assets/images/logo_zoom_meet.svg') }}"
+                                                                    alt="logo" width="25px" height="25px">
+                                                                <a href="{{ $eventSchedule->userZoomEventSchedule->zoom_join_url }}"
+                                                                    class="ms-3 fs-4"
+                                                                    target="_blank">Zoom Call</a><span
+                                                                    class="ms-2 cursor-pointer copy-google-meet-link"
+                                                                    data-link="{{ $eventSchedule->userZoomEventSchedule->zoom_join_url }}"><i
+                                                                        class="fa fa-copy"
+                                                                        style="color: #009ef7"></i></span>
+                                                            @elseif (!empty($eventSchedule->userGoogleEventSchedule->google_meet_link))
                                                                 @php($location = json_decode($eventSchedule->event->location_meta))
                                                                 <img src="{{ asset('assets/images/logo_google_meet.svg') }}"
                                                                     alt="logo" width="25px" height="25px">
                                                                 <a href="{{ $eventSchedule->userGoogleEventSchedule->google_meet_link }}"
                                                                     class="ms-3 fs-4"
-                                                                    target="_blank">{{ \App\Models\Event::LOCATION_ARRAY[$eventSchedule->event->event_location] }}</a><span
+                                                                    target="_blank">Google Meet</a><span
                                                                     class="ms-2 cursor-pointer copy-google-meet-link"
                                                                     data-link="{{ $eventSchedule->userGoogleEventSchedule->google_meet_link }}"><i
                                                                         class="fa fa-copy"

@@ -94,7 +94,7 @@ class EventScheduleTable extends LivewireTableComponent
 
         // $query = EventSchedule::with(['event','userGoogleEventSchedule'])->where('event_schedules.user_id', getLogInUserId());
 
-        $query = EventSchedule::with(['event', 'userGoogleEventSchedule', 'user', 'otherPartyByPhone']);
+        $query = EventSchedule::with(['event.location', 'event.user', 'userGoogleEventSchedule', 'userZoomEventSchedule', 'user', 'otherPartyByPhone']);
 
         if ($this->direction === 'given_to_me') {
             $query->where('phone_call', $myPhone);

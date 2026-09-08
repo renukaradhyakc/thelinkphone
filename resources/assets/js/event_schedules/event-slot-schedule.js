@@ -124,6 +124,10 @@ listenSubmit('#addEventSlotScheduleForm', function (e) {
                     window.location.href = result.data.authUrl
                     return
                 }
+                if (result.data.needsZoomAuth) {
+                    window.location.href = result.data.authUrl
+                    return
+                }
                 if (result.data.needsCalendarSelection) {
                     displayErrorMessage(result.message)
                     window.location.href = result.data.settingsUrl

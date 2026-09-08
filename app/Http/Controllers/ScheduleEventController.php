@@ -89,25 +89,41 @@ class ScheduleEventController extends AppBaseController
             return $this->sendError('This Event schedule is already booked.');
         }
 
-        if ($event->event_location == Event::GOOGLE_MEET) {
-            if(! \App\Models\GoogleCalendarIntegration::whereUserId($caller->id)->exists()) {
-                session(['pending_booking' => $input, 'pending_booking_return_url' => url()->previous()]);
-                \Log::info('pending_booking written', ['session_id' => session()->getId(), 'data' => $input]);
+        if ($event->event_location == Event::VIDEO_CALL) {
+            $videoProvider = $input['video_provider'] ?? null;
 
-                return $this->sendResponse([
-                    'needsGoogleAuth' => true,
-                    'authUrl' => route('googleAuth'),
-                ], 'Google Calendar connection required.');
-            }
+            if ($videoProvider === 'google_meet') {
+                if(! \App\Models\GoogleCalendarIntegration::whereUserId($caller->id)->exists()) {
+                    session(['pending_booking' => $input, 'pending_booking_return_url' => url()->previous()]);
+                    \Log::info('pending_booking written', ['session_id' => session()->getId(), 'data' => $input]);
 
-            $hasUsableCalendar = \App\Models\EventGoogleCalendar::whereUserId($caller->id)->exists()
-                || \App\Models\GoogleCalendarList::whereUserId($caller->id)->exists();
-            
-            if (! $hasUsableCalendar) {
-                return $this->sendResponse([
-                    'needsCalendarSelection' => true,
-                    'settingsUrl' => route('google.calendar.index'),
-                ], 'Please select a Google Calendar to continue.');
+                    return $this->sendResponse([
+                        'needsGoogleAuth' => true,
+                        'authUrl' => route('googleAuth'),
+                    ], 'Google Calendar connection required.');
+                }
+
+                $hasUsableCalendar = \App\Models\EventGoogleCalendar::whereUserId($caller->id)->exists()
+                    || \App\Models\GoogleCalendarList::whereUserId($caller->id)->exists();
+                
+                if (! $hasUsableCalendar) {
+                    return $this->sendResponse([
+                        'needsCalendarSelection' => true,
+                        'settingsUrl' => route('google.calendar.index'),
+                    ], 'Please select a Google Calendar to continue.');
+                }
+            } elseif ($videoProvider === 'zoom') {
+                if (! \App\Models\ZoomIntegration::whereUserId($caller->id)->exists()) {
+                    session(['pending_booking' => $input, 'pending_booking_return_url' => url()->previous()]);
+                    \Log::info('pending_booking written (zoom)', ['session_id' => session()->getId(), 'data' => $input]);
+
+                    return $this->sendResponse([
+                        'needsZoomAuth' => true,
+                        'authUrl' => route('zoomAuth'),
+                    ], 'Zoom connection required.');
+                }
+            } else {
+                return $this->sendError('Please choose a meeting provider (Google Meet or Zoom).');
             }
         }
 

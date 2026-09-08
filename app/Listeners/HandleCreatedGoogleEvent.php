@@ -27,6 +27,11 @@ class HandleCreatedGoogleEvent
     public function createGoogleEvent($eventScheduleID): bool
     {
         $eventSchedule = EventSchedule::with(['user', 'event'])->find($eventScheduleID);
+
+        if ($eventSchedule->video_provider !== 'google_meet') {
+            return true;
+        }
+        
         $booker = $eventSchedule->otherPartyByPhone;
 
         $googleCalendarConnected = GoogleCalendarIntegration::whereUserId($booker->id)->exists();

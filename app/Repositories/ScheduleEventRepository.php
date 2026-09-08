@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Events\CreateGoogleEvent;
+use App\Events\CreateZoomMeeting;
 use App\Events\DeleteEventFromGoogleCalendar;
 use App\Mail\EventScheduleMail;
 use App\Mail\UserEventScheduleMail;
@@ -93,16 +94,23 @@ class ScheduleEventRepository extends BaseRepository
         }
         $data['loginUserName'] = $eventSchedule->user->full_name;
         $loginUserEmail = $eventSchedule->user->email;
-        if ($eventSchedule->event->event_location == Event::GOOGLE_MEET) {
-            CreateGoogleEvent::dispatch($eventSchedule->id);
-        }
 
         $booker = $eventSchedule->otherPartyByPhone;
-        $googleUserEventSchedule = UserGoogleEventSchedule::whereUserId($booker->id ?? null)->whereEventScheduleId($eventSchedule->id)->first();
-        if ($eventSchedule->event->event_location == Event::GOOGLE_MEET && ! empty($googleUserEventSchedule->google_meet_link)) {
-            $data['googleMeetLink'] = $googleUserEventSchedule->google_meet_link;
-        } else {
-            $data['googleMeetLink'] = '';
+        $data['googleMeetLink'] = '';
+
+        if ($eventSchedule->event->event_location == Event::VIDEO_CALL) {
+            if ($eventSchedule->video_provider === 'google_meet') {
+                CreateGoogleEvent::dispatch($eventSchedule->id);
+
+                $googleUserEventSchedule = UserGoogleEventSchedule::whereUserId($booker->id ?? null)
+                    ->whereEventScheduleId($eventSchedule->id)->first();
+
+                if (! empty($googleUserEventSchedule->google_meet_link)) {
+                    $data['googleMeetLink'] = $googleUserEventSchedule->google_meet_link;
+                }
+            } elseif ($eventSchedule->video_provider === 'zoom') {
+                CreateZoomMeeting::dispatch($eventSchedule->id);
+            }
         }
 
         if ($eventSchedule->event->event_type == Event::FREE) {
@@ -182,6 +190,18 @@ class ScheduleEventRepository extends BaseRepository
                 DeleteEventFromGoogleCalendar::dispatch($userEventSchedule, $user);
             }
 
+            try {
+                $userZoomEventSchedules = \App\Models\UserZoomEventSchedule::where('event_schedule_id', $scheduledEvent->id)->get();
+                if ($userZoomEventSchedules->isNotEmpty()) {
+                    app(\App\Repositories\ZoomRepository::class)->destroy($userZoomEventSchedules);
+                }
+            } catch (Exception $zoomException) {
+                \Log::warning('[Zoom] cleanup failed during cancellation, continuing anyway', [
+                    'event_schedule_id' => $scheduledEvent->id,
+                    'error' => $zoomException->getMessage(),
+                ]);
+            }
+
             DB::commit();
 
             return $scheduledEvent;
@@ -208,6 +228,18 @@ class ScheduleEventRepository extends BaseRepository
                 foreach ($userEventSchedules as $userEventSchedule) {
                     $user = $userEventSchedule[0]->user;
                     DeleteEventFromGoogleCalendar::dispatch($userEventSchedule, $user);
+                }
+
+                try {
+                $userZoomEventSchedules = \App\Models\UserZoomEventSchedule::where('event_schedule_id', $scheduledEvent->id)->get();
+                    if ($userZoomEventSchedules->isNotEmpty()) {
+                        app(\App\Repositories\ZoomRepository::class)->destroy($userZoomEventSchedules);
+                    }
+                } catch (Exception $zoomException) {
+                    \Log::warning('[Zoom] cleanup failed during auto-cancel, continuing anyway', [
+                        'event_schedule_id' => $scheduledEvent->id,
+                        'error' => $zoomException->getMessage(),
+                    ]);
                 }
             }
         }

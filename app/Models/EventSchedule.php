@@ -105,6 +105,7 @@ class EventSchedule extends Model
         'otp',
         'payment_type',
         'reminder_sent',
+        'video_provider',
     ];
 
     /**
@@ -124,6 +125,7 @@ class EventSchedule extends Model
         'uuid' => 'string',
         'otp' => 'string',
         'payment_type' => 'integer',
+        'video_provider' => 'string',  
     ];
 
     const BOOKED = 1;
@@ -182,6 +184,11 @@ class EventSchedule extends Model
     public function userGoogleEventSchedule(): HasOne
     {
         return $this->hasOne(UserGoogleEventSchedule::class);
+    }
+
+    public function userZoomEventSchedule(): HasOne
+    {
+        return $this->hasOne(UserZoomEventSchedule::class);
     }
 
     public function scopeUser($query)

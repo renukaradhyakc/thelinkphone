@@ -52,4 +52,10 @@ return [
         'key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    'zoom' => [
+        'client_id' => env('ZOOM_CLIENT_ID'),
+        'client_secret' => env('ZOOM_CLIENT_SECRET'),
+        'redirect_uri' => env('ZOOM_REDIRECT_URI'),
+    ],
+
 ];

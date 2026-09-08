@@ -34,21 +34,21 @@
 
     function sendUpdate() {
         if (!latestPosition || !activeEventId) {
-            console.log('[CallaLink] sendUpdate skipped — no position or no active event'); 
+            // console.log('[CallaLink] sendUpdate skipped — no position or no active event'); 
             return;
         }
 
         const coords = latestPosition.coords;
-        console.log('[CallaLink] sending update:', coords.latitude, coords.longitude, coords.accuracy);
+        // console.log('[CallaLink] sending update:', coords.latitude, coords.longitude, coords.accuracy);
 
         postJson(buildUrl(UPDATE_URL_TEMPLATE, activeEventId), {
             latitude: coords.latitude,
             longitude: coords.longitude,
             accuracy: coords.accuracy,
         }).done(function (res) {
-            console.log('[CallaLink] update ACK:', res);
+            // console.log('[CallaLink] update ACK:', res);
         }).fail(function (xhr) {
-            console.error('[CallaLink] update FAILED:', xhr.status, xhr.responseText);
+            // console.error('[CallaLink] update FAILED:', xhr.status, xhr.responseText);
             if (xhr.status === 409 || xhr.status === 404) {
                 deactivateTracking();
             }
@@ -73,25 +73,25 @@
 
     function beginWatching() {
         if (!navigator.geolocation || watchId !== null) {
-            console.log('[CallaLink] beginWatching skipped — already watching or no geolocation'); 
+            // console.log('[CallaLink] beginWatching skipped — already watching or no geolocation'); 
             return; 
         }
 
-        console.log('[CallaLink] beginWatching: starting watch + timer');
+        // console.log('[CallaLink] beginWatching: starting watch + timer');
 
         watchId = navigator.geolocation.watchPosition(
             function (position) {
                  maybeSend(position);
-                console.log('[CallaLink] position updated:', position.coords.latitude, position.coords.longitude, position.coords.accuracy); 
+                // console.log('[CallaLink] position updated:', position.coords.latitude, position.coords.longitude, position.coords.accuracy); 
             },
             function (err) {
-                console.error('[CallaLink] watchPosition ERROR:', err.code, err.message); 
+                // console.error('[CallaLink] watchPosition ERROR:', err.code, err.message); 
             },
             { enableHighAccuracy: true, maximumAge: 0 }
         );
 
         updateTimer = setInterval(function () {
-            console.log('[CallaLink] heartbeat interval fired');
+            // console.log('[CallaLink] heartbeat interval fired');
             sendUpdate();
         }, HEARTBEAT_INTERVAL_MS);
     }
@@ -135,12 +135,12 @@
     function restoreSessionIfActive() {
         $.get(SESSION_CHECK_URL).done(function (response) {
             const data = response.data || response;
-            console.log('[CallaLink] session check:', data);
+            // console.log('[CallaLink] session check:', data);
 
             if (data.active) {
                 const previousEventId = localStorage.getItem(STORAGE_EVENT_KEY);
                 const isNewActivation = String(previousEventId) !== String(data.event_id);
-                console.log('[CallaLink] session active, isNewActivation:', isNewActivation); 
+                // console.log('[CallaLink] session active, isNewActivation:', isNewActivation); 
 
                 activeEventId = data.event_id;
                 localStorage.setItem(STORAGE_ACTIVE_KEY, '1');
@@ -152,11 +152,11 @@
 
                 beginWatching(); 
             } else {
-                console.log('[CallaLink] session inactive, deactivating');
+                // console.log('[CallaLink] session inactive, deactivating');
                 deactivateTracking();
             }
         }).fail(function (xhr) {
-            console.error('[CallaLink] session check FAILED:', xhr.status, xhr.responseText); 
+            // console.error('[CallaLink] session check FAILED:', xhr.status, xhr.responseText); 
         });
     }
 
