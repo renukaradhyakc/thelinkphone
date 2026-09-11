@@ -24,12 +24,17 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laracasts\Flash\Flash;
 use App\Models\EventSchedule;
+use App\Traits\HasSafeOAuthReturn;
+use App\Traits\HasOAuthState;
 
 /**
  * Class GoogleCalendarController
  */
 class GoogleCalendarController extends AppBaseController
 {
+    use HasSafeOAuthReturn;
+    use HasOAuthState;
+
     public $client;
 
     public function __construct()
@@ -68,6 +73,14 @@ class GoogleCalendarController extends AppBaseController
             return redirect()->back();
         }
 
+        $statePayload = [
+            'user_id' => getLogInUserId(),
+            'pending_booking' => session('pending_booking'),
+            'pending_booking_return_url' => session('pending_booking_return_url'),
+        ];
+        session()->forget(['pending_booking', 'pending_booking_return_url']);
+        $this->client->setState($this->buildOAuthState($statePayload));
+
         $authUrl = $this->client->createAuthUrl();
         $filteredUrl = filter_var($authUrl, FILTER_SANITIZE_URL);
 
@@ -79,37 +92,48 @@ class GoogleCalendarController extends AppBaseController
      */
     public function redirect(Request $request): RedirectResponse
     {
+        $stateData = $this->decodeOAuthState($request->get('state')) ?? [];
+        $userId = $stateData['user_id'] ?? null;
+
         try {
-            \Log::info('redirect() hit', ['session_id' => session()->getId(), 'has_pending' => session()->has('pending_booking')]);
+
+            if (empty($userId)) {
+                Flash::error('Your session expired before Google could connect. Please try again.');
+                return redirect(route('google.oauth.return', [
+                    'type' => 'google',
+                    'next' => route('google.calendar.index'),
+                ]));
+            }
+
             if ($request->get('error')) {
-                $returnUrl = session()->pull('pending_booking_return_url', route('events.index'));
-                session()->forget('pending_booking');
+                $returnUrl = $stateData['pending_booking_return_url'] ?? route('events.index');
+    
                 Flash::error('Booking requires Google Calendar access to continue.');
-                return redirect($returnUrl);
+                return redirect(route('google.oauth.return', ['type' => 'google', 'next' => $returnUrl]));
             }
             $accessToken = $this->client->fetchAccessTokenWithAuthCode($request->get('code'));
-            $exists = GoogleCalendarIntegration::whereUserId(getLogInUserId())->exists();
+            $exists = GoogleCalendarIntegration::whereUserId($userId)->exists();
 
             if ($exists) {
-                GoogleCalendarIntegration::whereUserId(getLogInUserId())->delete();
-                GoogleCalendarList::whereUserId(getLogInUserId())->delete();
+                GoogleCalendarIntegration::whereUserId($userId)->delete();
+                GoogleCalendarList::whereUserId($userId)->delete();
             }
 
             $googleCalendarIntegration = GoogleCalendarIntegration::create([
-                'user_id' => getLogInUserId(),
+                'user_id' => $userId,
                 'access_token' => $accessToken['access_token'],
                 'last_used_at' => Carbon::now(),
                 'meta' => json_encode($accessToken),
             ]);
 
             $this->client->setAccessToken($accessToken);
-            $calendarLists = $this->fetchCalendarListAndSyncToDB();
+            $calendarLists = $this->fetchCalendarListAndSyncToDB($userId);
 
-            $this->ensureDefaultCalendarSelected();
+            $this->ensureDefaultCalendarSelected($userId);
 
-            if (session()->has('pending_booking')) {
-                $pendingBooking = session()->pull('pending_booking');
-                $returnUrl = session()->pull('pending_booking_return_url', route('events.index'));
+            if (!empty($stateData['pending_booking'])) {
+                $pendingBooking = $stateData['pending_booking'];
+                $returnUrl = $stateData['pending_booking_return_url'] ?? route('events.index');
 
                 if (assignPlanFeatures($pendingBooking['user_id'])->schedule_events <= getActiveScheduleEventsCount($pendingBooking['user_id'])) {
                     Flash::error(__('messages.success_message.schedule_events_upgrade'));
@@ -130,17 +154,31 @@ class GoogleCalendarController extends AppBaseController
                 $scheduleEventRepo = App::make(\App\Repositories\ScheduleEventRepository::class);
                 $eventSchedule = $scheduleEventRepo->store($pendingBooking);
 
+                session()->forget(['pending_booking', 'pending_booking_return_url']);
+
                 Flash::success(__('messages.success_message.google_calender_connected'));
 
-                return redirect(url(getSlotConfirmPageUrl($eventSchedule)));
+                return redirect(route('google.oauth.return', [
+                    'type' => 'google',
+                    'next' => url(getSlotConfirmPageUrl($eventSchedule)),
+                ]));
             }
+            session()->forget(['pending_booking', 'pending_booking_return_url']);
         } catch (Exception $exception) {
             Log::error($exception->getMessage());
         }
 
         Flash::success(__('messages.success_message.google_calender_connected'));
 
-        return redirect(route('google.calendar.index'));
+        return redirect(route('google.oauth.return', [
+            'type' => 'google',
+            'next' => route('google.calendar.index'),
+        ]));
+    }
+
+    public function oauthReturn(Request $request): RedirectResponse
+    {
+        return redirect($this->resolveSafeNext($request, route('google.calendar.index')));
     }
 
     public function createNotification()
@@ -160,26 +198,30 @@ class GoogleCalendarController extends AppBaseController
     /**
      * @return array
      */
-    public function fetchCalendarListAndSyncToDB()
+    public function fetchCalendarListAndSyncToDB($userId)
     {
         $gcHelper = new Google_Service_Calendar($this->client);
         // Use the Google Client calendar service. This gives us methods for interacting
         // with the Google Calendar API
         $calendarList = $gcHelper->calendarList->listCalendarList();
 
-        $googleCalendarList = [];
-        foreach ($calendarList->getItems() as $calendarListEntry) {
-            if ($calendarListEntry->accessRole == 'owner') {
-                $googleCalendarList[] = GoogleCalendarList::create([
-                    'user_id' => getLogInUserId(),
-                    'calendar_name' => $calendarListEntry['summary'],
-                    'google_calendar_id' => $calendarListEntry['id'],
-                    'meta' => json_encode($calendarListEntry),
-                ]);
-            }
-        }
+        return \DB::transaction(function () use ($calendarList, $userId) {
+            GoogleCalendarList::whereUserId($userId)->delete();
 
-        return $googleCalendarList;
+            $googleCalendarList = [];
+            foreach ($calendarList->getItems() as $calendarListEntry) {
+                if ($calendarListEntry->accessRole == 'owner') {
+                    $googleCalendarList[] = GoogleCalendarList::create([
+                        'user_id' => $userId,
+                        'calendar_name' => $calendarListEntry['summary'],
+                        'google_calendar_id' => $calendarListEntry['id'],
+                        'meta' => json_encode($calendarListEntry),
+                    ]);
+                }
+            }
+
+            return $googleCalendarList;
+        });
     }
 
     /**
@@ -337,18 +379,18 @@ class GoogleCalendarController extends AppBaseController
 
         $repo->syncCalendarList(getLogInUser());
 
-        $this->ensureDefaultCalendarSelected();
+        $this->ensureDefaultCalendarSelected(getLogInUserId());
 
         return $this->sendSuccess(__('messages.success_message.google_calender_updated'));
     }
 
-    private function ensureDefaultCalendarSelected(): void
+    private function ensureDefaultCalendarSelected($userId): void
     {
-        if (EventGoogleCalendar::whereUserId(getLogInUserId())->exists()) {
+        if (EventGoogleCalendar::whereUserId($userId)->exists()) {
             return;
         }
 
-        $candidates = GoogleCalendarList::whereUserId(getLogInUserId())->get();
+        $candidates = GoogleCalendarList::whereUserId($userId)->get();
 
         if ($candidates->isEmpty()) {
             return;
@@ -360,7 +402,8 @@ class GoogleCalendarController extends AppBaseController
         });
 
         if (! $primaryCalendar) {
-            $primaryCalendar = $candidates->firstWhere('google_calendar_id', getLogInUser()->email);
+            $user = \App\Models\User::find($userId);
+            $primaryCalendar = $candidates->firstWhere('google_calendar_id', $user?->email);
         }
 
         if (! $primaryCalendar) {
@@ -369,7 +412,7 @@ class GoogleCalendarController extends AppBaseController
 
         if ($primaryCalendar) {
             EventGoogleCalendar::create([
-                'user_id' => getLogInUserId(),
+                'user_id' => $userId,
                 'google_calendar_list_id' => $primaryCalendar->id,
                 'google_calendar_id' => $primaryCalendar->google_calendar_id,
             ]);

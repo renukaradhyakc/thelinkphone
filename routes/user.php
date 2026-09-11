@@ -23,10 +23,12 @@ Route::get('google-auth', [GoogleCalendarController::class, 'oauth'])->name('goo
 Route::get('sync-google-calendar-list',
     [GoogleCalendarController::class, 'syncGoogleCalendarList'])->name('syncGoogleCalendarList');
 Route::get('google/redirect', [GoogleCalendarController::class, 'redirect']);
+Route::get('google-oauth-return', [GoogleCalendarController::class, 'oauthReturn'])->name('google.oauth.return');
 Route::any('google-webhook', [GoogleWebhookController::class, 'webhook'])->name('google.webhook');
 
 Route::get('zoom-auth', [ZoomController::class, 'oauth'])->name('zoomAuth');
 Route::get('zoom/redirect', [ZoomController::class, 'redirect']);
+Route::get('zoom-oauth-return', [ZoomController::class, 'oauthReturn'])->name('zoom.oauth.return');
 
 Route::middleware([
     'auth', 'xss', 'role:user', 'verified', 'checkCustomerOnBoard', 'check_subscription',

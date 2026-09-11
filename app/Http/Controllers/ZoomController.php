@@ -9,9 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laracasts\Flash\Flash;
+use App\Traits\HasSafeOAuthReturn;
+use App\Traits\HasOAuthState;
 
 class ZoomController extends AppBaseController
 {
+    use HasSafeOAuthReturn;
+    use HasOAuthState;
+
     private const AUTHORIZE_URL = 'https://zoom.us/oauth/authorize';
     private const TOKEN_URL = 'https://zoom.us/oauth/token';
 
@@ -28,10 +33,18 @@ class ZoomController extends AppBaseController
             return redirect()->back();
         }
 
+        $statePayload = [
+            'user_id' => getLogInUserId(),
+            'pending_booking' => session('pending_booking'),
+            'pending_booking_return_url' => session('pending_booking_return_url'),
+        ];
+
+        session()->forget(['pending_booking', 'pending_booking_return_url']);
         $authUrl = self::AUTHORIZE_URL.'?'.http_build_query([
             'response_type' => 'code',
             'client_id' => $clientId,
             'redirect_uri' => $redirectUri,
+            'state' => $this->buildOAuthState($statePayload),
         ]);
 
         return redirect($authUrl);
@@ -42,18 +55,25 @@ class ZoomController extends AppBaseController
      */
     public function redirect(Request $request): RedirectResponse
     {
+        $stateData = $this->decodeOAuthState($request->get('state')) ?? [];
+        $userId = $stateData['user_id'] ?? null;
+
         if ($request->get('error')) {
-            $returnUrl = session()->pull('pending_booking_return_url', route('events.index'));
-            session()->forget('pending_booking');
+            $returnUrl = $stateData['pending_booking_return_url'] ?? route('events.index');
             Flash::error('Booking requires Zoom access to continue.');
-            return redirect($returnUrl);
+            return redirect(route('zoom.oauth.return', ['next' => $returnUrl]));
+        }
+
+        if (empty($userId)) {
+            Flash::error('Your session expired before Zoom could connect. Please try again.');
+            return redirect(route('zoom.oauth.return', ['next' => route('zoom.index')]));
         }
 
         $code = $request->get('code');
 
         if (empty($code)) {
             Flash::error('Zoom authorization failed — no code received.');
-            return redirect(route('zoom.index'));
+            return redirect(route('zoom.oauth.return', ['next' => route('zoom.index')]));
         }
 
         try {
@@ -78,7 +98,7 @@ class ZoomController extends AppBaseController
             $meta = array_merge($tokenData, ['obtained_at' => now()->timestamp]);
 
             ZoomIntegration::updateOrCreate(
-                ['user_id' => getLogInUserId()],
+                ['user_id' => $userId],
                 [
                     'access_token' => $tokenData['access_token'],
                     'refresh_token' => $tokenData['refresh_token'],
@@ -87,9 +107,9 @@ class ZoomController extends AppBaseController
                 ]
             );
 
-            if (session()->has('pending_booking')) {
-                $pendingBooking = session()->pull('pending_booking');
-                $returnUrl = session()->pull('pending_booking_return_url', route('events.index'));
+            if (!empty($stateData['pending_booking'])) {
+                $pendingBooking = $stateData['pending_booking'];
+                // $returnUrl = session()->pull('pending_booking_return_url', route('events.index'));
 
                 // Same slot/plan re-checks as the Google flow — mirror ScheduleEventController::store()'s
                 // pre-booking validation here once the booking-form radio buttons (step 6) are wired in.
@@ -97,17 +117,26 @@ class ZoomController extends AppBaseController
                 $scheduleEventRepo = app(\App\Repositories\ScheduleEventRepository::class);
                 $eventSchedule = $scheduleEventRepo->store($pendingBooking);
 
+                session()->forget(['pending_booking', 'pending_booking_return_url']);
+
                 Flash::success('Zoom connected and your meeting is booked.');
-                return redirect(url(getSlotConfirmPageUrl($eventSchedule)));
+                return redirect(route('zoom.oauth.return', ['next' => url(getSlotConfirmPageUrl($eventSchedule))]));
             }
 
+            session()->forget(['pending_booking', 'pending_booking_return_url']);
+
             Flash::success('Zoom account connected successfully.');
-            return redirect(route('zoom.index'));
+            return redirect(route('zoom.oauth.return', ['next' => route('zoom.index')]));
         } catch (\Exception $exception) {
             Log::error('[Zoom] OAuth callback error', ['error' => $exception->getMessage()]);
             Flash::error('Something went wrong connecting your Zoom account.');
             return redirect(route('zoom.index'));
         }
+    }
+
+    public function oauthReturn(Request $request): RedirectResponse
+    {
+        return redirect($this->resolveSafeNext($request, route('zoom.index')));
     }
 
     /**
