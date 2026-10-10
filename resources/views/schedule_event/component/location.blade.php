@@ -4,7 +4,8 @@
     $isRecipientView = isset($component) && $component->direction === 'given_to_me';
 
     $isInPersonMeeting = $eventLocation === \App\Models\Event::IN_PERSON_MEETING;
-    $location = $isInPersonMeeting ? optional($row->event)->location : null;
+    
+    $location = $isInPersonMeeting ? ($isRecipientView ? optional($row->event)->location : $row->location) : null;
 
     $isLive = $location && (int) $location->location_type === \App\Models\Location::LIVE;
     $hasCoords = $location && $location->latitude !== null && $location->longitude !== null;
@@ -12,21 +13,21 @@
 
     $isActivelySharing = false;
     if ($isLive && $location->is_live_sharing_active) {
-        $expiresAt = $location->liveExpiresAt($row->event);
+        $expiresAt = $location->liveExpiresAt($isRecipientView ? $row->event : $row);
         $isActivelySharing = ! ($expiresAt && now()->greaterThanOrEqualTo($expiresAt));
     }
 
     $iconColorClass = $isLive ? ($isActivelySharing ? 'text-success' : 'text-danger') : '';
 
     $mapsUrl = null;
-    if ($isRecipientView) {
-        if ($hasCoords) {
-            $mapsUrl = "https://www.google.com/maps/search/?api=1&query={$location->latitude},{$location->longitude}";
-        } elseif ($address) {
-            $mapsUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode($address);
-        }
-    }   
-    $showLocationIcon = $mapsUrl || ($isLive && $isRecipientView);
+
+    if ($hasCoords) {
+        $mapsUrl = "https://www.google.com/maps/search/?api=1&query={$location->latitude},{$location->longitude}";
+    } elseif ($address) {
+        $mapsUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode($address);
+    }
+   
+    $showLocationIcon = $mapsUrl || $isLive;
 
     $isPhoneCall = $eventLocation === \App\Models\Event::PHONE_CALL;
     $party = $isRecipientView ? ($row->event->user ?? null) : ($row->otherPartyByPhone ?? null);
@@ -57,7 +58,9 @@
                 <a href="{{ $mapsUrl }}"
                     target="_blank" rel="noopener"
                     class="live-location-icon text-decoration-none"
+                    data-direction="{{ $isRecipientView ? 'owner' : 'booker' }}"
                     data-event-id="{{ optional($row->event)->id }}"
+                    data-schedule-id="{{ $row->id }}"
                     data-location-type="{{ optional($location)->location_type }}"
                     data-address="{{ $address }}"
                     title="{{ $isActivelySharing ? 'Loading…' : ($address ?? '') }}">
@@ -66,7 +69,9 @@
             @else
                 <a href="javascript:void(0)"
                     class="live-location-icon"
+                    data-direction="{{ $isRecipientView ? 'owner' : 'booker' }}"
                     data-event-id="{{ optional($row->event)->id }}"
+                    data-schedule-id="{{ $row->id }}"
                     data-location-type="{{ optional($location)->location_type }}"
                     data-address=""
                     title="Location sharing hasn't started yet">

@@ -9,9 +9,12 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\UserSchedule;
 use App\Services\TimeParser;
+use App\Http\Requests\Concerns\HandlesLiveLocationSharing;
 
 class EventLocationController extends AppBaseController
 {
+
+    use HandlesLiveLocationSharing;
 
     public function startSharing(Request $request, Event $event): JsonResponse
     {
@@ -192,45 +195,11 @@ class EventLocationController extends AppBaseController
     //     return $cap;
     // }
 
-    private function isLiveExpired(Event $event, Location $location): bool
-    {
-        $expiresAt = $location->liveExpiresAt($event);
-        $expired = $expiresAt !== null && now()->greaterThanOrEqualTo($expiresAt);
-        // \Log::info('[CallaLink] isLiveExpired check', ['event_id' => $event->id, 'now' => now()->toDateTimeString(), 'expiresAt' => optional($expiresAt)->toDateTimeString(), 'expired' => $expired]);
-
-        return $expired;
-    }
-
-    private function stopSharingInternal(Location $location): void
-    {
-        $location->update([
-            'is_live_sharing_active' => false,
-            'live_started_at' => null,
-        ]);
-    }
-
     private function authorizeEvent(Event $event): void
     {
         if ((int) $event->user_id !== (int) getLogInUserId()) {
             abort(403);
         }
-    }
-
-    private function validatedCoords(Request $request): array
-    {
-        $validated = $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'accuracy' => 'nullable|numeric|min:0',
-            'address' => 'nullable|string|max:1000',
-        ]);
-
-        return [
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
-            'accuracy' => $validated['accuracy'] ?? null,
-            'address' => $validated['address'] ?? null,
-        ];
     }
 
     public function resolveAddress(Event $event): JsonResponse
@@ -243,56 +212,7 @@ class EventLocationController extends AppBaseController
             return $this->sendResponse(['address' => null, 'status' => 'no_location'], 'No location set.');
         }
 
-        if ((int) $location->location_type === Location::FIXED) {
-            return $this->sendResponse(['address' => $location->address, 'status' => 'fixed'], 'Resolved.');
-        }
-
-        if ($location->latitude === null || $location->longitude === null) {
-            return $this->sendResponse(['address' => null, 'status' => 'not_started'], 'Not started yet.');
-        }
-
-        if (! $location->is_live_sharing_active) {
-            return $this->sendResponse(['address' => $location->address, 'status' => 'stopped'], 'Sharing stopped.');
-        }
-
-        if ($location->address) {
-            return $this->sendResponse(['address' => $location->address, 'status' => 'active'], 'Resolved.');
-        }
-
-        $lat = $location->latitude;
-        $lon = $location->longitude;
-
-        $cacheKey = "location_address_{$location->id}_{$lat}_{$lon}";
-
-        $address = \Cache::remember($cacheKey, now()->addMinutes(15), function () use ($lat, $lon) {
-            $response = \Http::withHeaders(['User-Agent' => 'CallaLink/1.0 (support@callalink.com)'])
-                ->get('https://nominatim.openstreetmap.org/reverse', [
-                    'format' => 'json',
-                    'lat' => $lat,
-                    'lon' => $lon,
-                ]);
-
-            return $response->successful() ? $response->json('display_name') : null;
-        });
-
-        if ($address && $location->address !== $address) {
-            Location::where('id', $location->id)
-                ->where('latitude', $lat)
-                ->where('longitude', $lon)
-                ->update(['address' => $address]);
-        }
-
-        return $this->sendResponse(['address' => $address, 'status' => 'active'], 'Resolved.');
-    }
-
-    private function distanceInMeters(float $lat1, float $lon1, float $lat2, float $lon2): float
-    {
-        $earthRadius = 6371000; // meters
-        $latDelta = deg2rad($lat2 - $lat1);
-        $lonDelta = deg2rad($lon2 - $lon1);
-        $a = sin($latDelta / 2) ** 2
-            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($lonDelta / 2) ** 2;
-        return $earthRadius * 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $this->sendResponse($location->resolveAddress(), 'Resolved.');
     }
 
     private function authorizeEventViewer(Event $event): void

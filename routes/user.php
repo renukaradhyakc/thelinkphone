@@ -16,6 +16,7 @@ use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UserPaypalController;
 use App\Http\Controllers\UserSettingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventScheduleLocationController;
 use App\Http\Controllers\EventLocationController;
 use App\Http\Controllers\ZoomController;
 
@@ -108,6 +109,17 @@ Route::middleware([
 
     Route::get('events/{event}/location/address', [EventLocationController::class, 'resolveAddress'])
         ->name('events.location.address');
+
+    Route::post('scheduled-events/{eventSchedule}/location/live/start', [EventScheduleLocationController::class, 'startBookerSharing'])
+    ->name('scheduled-events.location.live.start');
+    Route::post('scheduled-events/{eventSchedule}/location/live/stop', [EventScheduleLocationController::class, 'stopBookerSharing'])
+        ->name('scheduled-events.location.live.stop');
+    Route::post('scheduled-events/location/live/update', [EventScheduleLocationController::class, 'updateBookerLive'])
+        ->name('scheduled-events.location.live.update');
+    Route::get('scheduled-events/location/live-session', [EventScheduleLocationController::class, 'activeBookerSession'])
+        ->name('scheduled-events.location.live.session');
+    Route::get('scheduled-events/{eventSchedule}/location/address', [EventScheduleLocationController::class, 'resolveBookerAddress'])
+        ->name('scheduled-events.location.address');
 });
 
 Route::middleware(['auth', 'xss', 'role:user', 'verified', 'checkCustomerOnBoard'])->group(function () {

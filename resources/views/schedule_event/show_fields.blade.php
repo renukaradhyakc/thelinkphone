@@ -19,15 +19,15 @@
                     ? rtrim(config('app.url'), '/') . '/call/' . ltrim($linkParty->domain_url, '/')
                     : null;
 
-                $location = optional($eventSchedule->event)->location;
+                $location = $isOwner ? $eventSchedule->location : optional($eventSchedule->event)->location;
                 $isLiveType = $location && (int) $location->location_type === \App\Models\Location::LIVE;
                 $isFixedType = $location && (int) $location->location_type === \App\Models\Location::FIXED;
-                $locationAddress = (!$isOwner && $location) ? $location->address : null;
+                $locationAddress = $location ? $location->resolveAddress()['address'] : null;
 
                 $liveStatusLabel = null;
                 $liveStartedLabel = null;
 
-                if (!$isOwner && $isLiveType) {
+                if ($isLiveType) {
                     if ($location->latitude === null || $location->longitude === null) {
                         $liveStartedLabel = 'Not Started';
                         $liveStatusLabel = 'Not Started';
@@ -37,7 +37,7 @@
                     } else {
                         $liveStartedLabel = $location->live_started_at ? $location->live_started_at->diffForHumans() : 'Not Started';
 
-                        $expiresAt = $location->liveExpiresAt($eventSchedule->event);
+                        $expiresAt = $location->liveExpiresAt($isOwner ? $eventSchedule : $eventSchedule->event);
                         $isExpired = $expiresAt && now()->greaterThanOrEqualTo($expiresAt);
 
                         $liveStatusLabel = $isExpired
@@ -148,7 +148,7 @@
                     </div>
                 </div>
             @endif
-            @if($isLiveType && !$isOwner)
+            @if($isLiveType)
                 <div class="row mb-7">
                     <label class="col-lg-4 fs-4 text-gray-600">Live Started At</label>
                     <div class="col-lg-8">

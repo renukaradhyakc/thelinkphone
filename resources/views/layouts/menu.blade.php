@@ -154,6 +154,15 @@
         <span class="aside-menu-title">{{__('messages.setting.connect_google_calendar')}}</span>
     </a>
 </li>
+<li class="nav-item {{ Request::is('connect-zoom*') ? 'active' : '' }}">
+    <a class="nav-link d-flex align-items-center py-3"
+       href="{{ route('zoom.index') }}">
+        <span class="aside-menu-icon pe-3">
+            <i class="fas fa-video fs-3"></i>
+        </span>
+        <span class="aside-menu-title">{{__('messages.setting.connect_zoom')}}</span>
+    </a>
+</li>
 <li class="nav-item {{ (Request::is('settings*')  ? 'active' : '') }}">
     <a class="nav-link d-flex align-items-center py-3"
        href="{{ route('user.settings') }}">

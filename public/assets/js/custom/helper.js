@@ -1,1 +1,30 @@
-window.listen=function(n,o,i){$(document).on(n,o,i)},window.listenClick=function(n,o){$(document).on("click",n,o)},window.listenSubmit=function(n,o){$(document).on("submit",n,o)},window.listenChange=function(n,o){$(document).on("change",n,o)},window.listenKeyup=function(n,o){$(document).on("keyup",n,o)},window.listenHiddenBsModal=function(n,o){$(document).on("hidden.bs.modal",n,o)};
+/******/ (() => { // webpackBootstrap
+var __webpack_exports__ = {};
+/*!**********************************************!*\
+  !*** ./resources/assets/js/custom/helper.js ***!
+  \**********************************************/
+window.listen = function (event, selector, callback) {
+  $(document).on(event, selector, callback);
+};
+
+window.listenClick = function (selector, callback) {
+  $(document).on('click', selector, callback);
+};
+
+window.listenSubmit = function (selector, callback) {
+  $(document).on('submit', selector, callback);
+};
+
+window.listenChange = function (selector, callback) {
+  $(document).on('change', selector, callback);
+};
+
+window.listenKeyup = function (selector, callback) {
+  $(document).on('keyup', selector, callback);
+};
+
+window.listenHiddenBsModal = function (selector, callback) {
+  $(document).on('hidden.bs.modal', selector, callback);
+};
+/******/ })()
+;

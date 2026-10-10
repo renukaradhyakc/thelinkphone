@@ -89,6 +89,69 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            @elseif ($event->event_location == \App\Models\Event::IN_PERSON_MEETING)
+                                                <div class="mb-5">
+                                                    <label class="form-label">{{ __('messages.event.location') ?? 'Location' }}:</label>
+                                                    <span data-bs-toggle="tooltip" data-placement="top"
+                                                        data-bs-original-title="{{ __('messages.tooltip.booker_share_location_heading') ?? 'Optional — let the event owner know where you are or will be. You can turn this on now or later from the confirmation page.' }}">
+                                                        <i class="fa fa-question-circle ms-1 fs-7"></i>
+                                                    </span>
+                                                    <div class="form-check form-switch mt-1">
+                                                        <input class="form-check-input" type="checkbox" name="share_location_enabled" id="bookerShareLocationToggle" value="1">
+                                                        <label class="form-check-label" for="bookerShareLocationToggle">
+                                                            {{ __('messages.event.share_your_location') ?? 'Share your location' }}
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="mt-4 d-none" id="bookerLocationTypeWrap">
+                                                        <label class="form-label">{{ __('messages.event.location_type') ?? 'Location Type' }}:</label>
+                                                        <span data-bs-toggle="tooltip" data-placement="top"
+                                                            data-bs-original-title="{{ __('messages.tooltip.booker_location_type') ?? 'Fixed Location uses a single address. Live Location shares your real-time location with the event owner while active.' }}">
+                                                            <i class="fa fa-question-circle ms-1 fs-7"></i>
+                                                        </span>
+                                                        <div class="d-flex mt-1">
+                                                            <div class="form-check me-10">
+                                                                <input class="form-check-input" type="radio" name="booker_location_type" id="bookerLocationTypeFixed" value="fixed" checked>
+                                                                <label class="form-check-label" for="bookerLocationTypeFixed">
+                                                                    {{ __('messages.event.fixed_location') ?? 'Fixed Location' }}
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="booker_location_type" id="bookerLocationTypeLive" value="live">
+                                                                <label class="form-check-label" for="bookerLocationTypeLive">
+                                                                    {{ __('messages.event.live_location') ?? 'Live Location' }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mt-4 d-none" id="bookerLiveSharingToggleWrap">
+                                                            <label class="form-label">{{ __('messages.event.live_sharing_status') ?? 'Live Location Status' }}:</label>
+                                                            <span data-bs-toggle="tooltip" data-placement="top"
+                                                                data-bs-original-title="{{ __('messages.tooltip.booker_live_sharing_status') ?? 'Turn this on now to share your live location right away, or leave it off and turn it on later from the confirmation page.' }}">
+                                                                <i class="fa fa-question-circle ms-1 fs-7"></i>
+                                                            </span>
+                                                            <div class="form-check form-switch mt-1">
+                                                                <input class="form-check-input" type="checkbox" name="is_booker_live_sharing_active" id="bookerLiveSharingToggle" value="1">
+                                                                <label class="form-check-label" for="bookerLiveSharingToggle">
+                                                                    {{ __('messages.event.live_sharing_active') ?? 'Share live location now' }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                         <div class="mt-4">
+                                                            <div class="input-group mb-2">
+                                                                {{ Form::text('booker_short_description_location', null, ['class' => 'form-control', 'id' => 'shortDescLoc', 'placeholder' => __('messages.web.location')]) }}
+                                                                {{ Form::hidden('booker_new_location_latitude', null, ['id' => 'newBookerLocationLatitude']) }}
+                                                                {{ Form::hidden('booker_new_location_longitude', null, ['id' => 'newBookerLocationLongitude']) }}
+                                                                {{ Form::hidden('booker_new_location_accuracy', null, ['id' => 'newBookerLocationAccuracy']) }}
+                                                                <button type="button" class="btn btn-outline-secondary" id="useMyLocationBtn" title="Use my current location">
+                                                                    <i class="fas fa-location-crosshairs"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div id="locationFetchStatus" class="text-muted fs-6 d-none"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endif
                                             <p class="form-label">
                                                 {{ __('messages.event.please_share_anything_that_will_help_prepare_for') }}
@@ -136,6 +199,32 @@
     @endsection
     @push('scripts')
         <script src="//js.stripe.com/v3/" data-turbo-eval="false"></script>
+
+        <script data-turbo-eval="false">
+            let PlaceApiEnable = '{{ getSettingData()['auto_detect_location_enable'] }}'
+            let PlaceApiKey = ''
+            if (PlaceApiEnable == 1) {
+                PlaceApiKey = '{{ getSettingData()['google_place_api_key'] }}'
+                let PlaceUrl = `https://maps.google.com/maps/api/js?key=${PlaceApiKey}&libraries=places`
+                document.write('<script type=\'text/javascript\' src=\'' + PlaceUrl + '\'><\/script>')
+            }
+        </script>
+
+         <script data-turbo-eval="false">
+            if (PlaceApiKey !== '') {
+                google.maps.event.addDomListener(window, 'load', initializeBookerLocationAutocomplete)
+
+                function initializeBookerLocationAutocomplete () {
+                    let input = document.getElementById('shortDescLoc')
+                    if (!input) return
+                    let autocomplete = new google.maps.places.Autocomplete(input)
+                    autocomplete.addListener('place_changed', function () {
+                        let place = autocomplete.getPlace()
+                    })
+                }
+            }
+        </script>
+
         <script data-turbo-eval="false">
             let eventLocation = "{{ $event->event_location }}"
             let locationMeta = @json(json_decode($event->location_meta));

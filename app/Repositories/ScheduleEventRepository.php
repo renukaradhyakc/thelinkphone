@@ -9,6 +9,7 @@ use App\Mail\EventScheduleMail;
 use App\Mail\UserEventScheduleMail;
 use App\Models\Event;
 use App\Models\EventSchedule;
+use App\Models\Location;
 use App\Models\UserGoogleEventSchedule;
 use Carbon\Carbon;
 use Exception;
@@ -60,6 +61,10 @@ class ScheduleEventRepository extends BaseRepository
 
             if (! empty($input['location_meta'])) {
                 $eventSchedule->event->update(['location_meta' => $input['location_meta']]);
+            }
+
+            if (! empty($input['share_location_enabled']) && $eventSchedule->event->event_location == Event::IN_PERSON_MEETING) {
+                $this->saveBookerLocation($eventSchedule, $input);
             }
 
             $this->scheduleEventMails($eventSchedule, $input['email'], false);
@@ -245,5 +250,50 @@ class ScheduleEventRepository extends BaseRepository
         }
 
         return true;
+    }
+
+    private function saveBookerLocation(EventSchedule $eventSchedule, array $input): void
+    {
+        $locationType = ($input['booker_location_type'] ?? 'fixed') === 'live'
+            ? Location::LIVE
+            : Location::FIXED;
+
+        $isLiveSharingActive = $locationType === Location::LIVE
+            && ! empty($input['is_booker_live_sharing_active'])
+            && (int) $input['is_booker_live_sharing_active'] === 1;
+
+        if ($isLiveSharingActive) {
+            $activeCount = EventSchedule::where('phone_call', $eventSchedule->phone_call)
+                ->where('id', '!=', $eventSchedule->id)
+                ->where('status', '!=', EventSchedule::CANCELLED)
+                ->whereHas('location', fn ($q) => $q->where('location_type', Location::LIVE)->where('is_live_sharing_active', true))
+                ->count();
+
+            if ($activeCount >= 3) {
+                $isLiveSharingActive = false;
+            }
+        }
+
+        $latitude  = $input['booker_new_location_latitude']  ?? null;
+        $longitude = $input['booker_new_location_longitude'] ?? null;
+        $accuracy  = $input['booker_new_location_accuracy']  ?? null;
+        $address   = $input['booker_short_description_location'] ?? null;
+
+        $isLiveSharingActive = $locationType === Location::LIVE
+            && ! empty($input['is_booker_live_sharing_active'])
+            && (int) $input['is_booker_live_sharing_active'] === 1;
+
+        $eventSchedule->location()->updateOrCreate(
+            [],
+            [
+                'location_type' => $locationType,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'accuracy' => $accuracy,
+                'address' => $address,
+                'is_live_sharing_active' => $isLiveSharingActive,
+                'live_started_at' => $isLiveSharingActive ? now() : null,
+            ]
+        );
     }
 }

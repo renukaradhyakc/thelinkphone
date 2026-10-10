@@ -300,6 +300,10 @@ return [
         'when_patient_book_an_appointment_with_you_new_appointment_will_created_on_selected_calendars' => 'When patient book an appointment with you, new appointment will created on selected calendars',
         'when_you_book_an_appointment_new_appointment_will_created_on_selected_calendars' => 'When you book an appointment, new appointment will created on selected calendars',
         'time_format' => 'Time Format',
+        'connect_zoom' => 'Connect Zoom',
+        'connect_your_zoom_account' => 'Connect your Zoom account',
+        'zoom_account_connected' => 'Your Zoom account is connected.',
+        'disconnect_your_zoom_account' => 'Disconnect your Zoom account',
     ],
 
     'personal_experience' => [
@@ -372,6 +376,8 @@ return [
         'live_sharing_status' => 'Live Location Status',
         'meeting_type' => 'Meeting Type',
         'live_location_not_started' => 'Live location sharing hasn\'t started yet',
+        'share_your_location' => 'Share your location',
+        'share_location_heading' => 'Share Your Location',
     ],
 
     'schedule' => [
@@ -812,6 +818,10 @@ return [
         'best_resolution' => 'Best resolution for this image will be ',
         'location_type' => 'Fixed Location uses a single address for the whole event. Live Location shares your real-time location with the invitee while the event is active.',
         'live_sharing_status' => 'Turn this on anytime to share your live location manually. If left off, sharing will start automatically when the event begins and stop when it ends. Live Sharing turns off every 24 hours, so for multi-day events you can turn it back on once a day if you want it to continue.',
+        'booker_share_location' => 'Optional - let the event owner know where you are or will be. You can turn this on now or later from the confirmation page.',
+        'booker_location_type' => 'Fixed Location uses a single address. Live Location shares your real-time location with the event owner while active.',
+        'booker_live_sharing_status' => 'Turn this on now to share your live location right away, or leave it off and turn it on later from the confirmation page.',
+        'booker_share_location_heading' => 'Optional - let the event owner know where you are or will be. You can turn this on now or later from the confirmation page.',
     ],
 
     'currency' => [

@@ -759,10 +759,20 @@ $(document).on('mouseenter', '.live-location-icon', function () {
         return;
     }
 
-    const eventId = $icon.data('event-id');
-    if (!eventId) return;
+    const direction = $icon.data('direction');
+    let url;
 
-    $.get(`/events/${eventId}/location/address`).done(function (res) {
+    if (direction === 'owner') {
+        const eventId = $icon.data('event-id');
+        if (!eventId) return;
+        url = `/events/${eventId}/location/address`;
+    } else {
+        const scheduleId = $icon.data('schedule-id');
+        if (!scheduleId) return;
+        url = `/scheduled-events/${scheduleId}/location/address`;
+    }
+
+    $.get(url).done(function (res) {
         const payload = res.data || res;
         let title;
 

@@ -440,7 +440,16 @@
       setTimeout(() => { this.innerHTML = '<span class="cta-icon">📱</span> Open CallALink App'; }, 2000);
     });
 
-    attemptAppOpen();
+    var IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var openBtn = document.getElementById('open-btn');
+
+    if (IS_IOS) {
+      // Never auto-launch on iOS, and don't use the Android scheme
+      openBtn.setAttribute('href', 'callalink://call?user={{ rawurlencode($userId) }}');
+    } else {
+      attemptAppOpen(); // Android and desktop stay exactly as before
+    }
 
     // Icon fallbacks — if /images/ files don't load, swap to inline SVG
     function makeSVG(pathD) {

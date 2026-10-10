@@ -74,7 +74,6 @@
 
         let eventLocationType = {{ optional($event->location)->location_type ?? 'null' }};
         let eventIsLiveSharingActive = {{ optional($event->location)->is_live_sharing_active ? 1 : 0 }};
-        console.log('[CallaLink][UI] loaded from DB — eventLocationType:', eventLocationType, 'eventIsLiveSharingActive:', eventIsLiveSharingActive);
         @php
             $conflictingEvent = \App\Models\Event::where('user_id', getLogInUserId())
                 ->where('id', '!=', $event->id)

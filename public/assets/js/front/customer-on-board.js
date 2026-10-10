@@ -1,1 +1,197 @@
-(()=>{"use strict";$(document).ready((function(){$("#fromTime, #toTime").select2(),$("#customerTimeZoneId").select2()}));var e=jstz.determine();document.cookie="timezoneName="+e.name(),$.ajaxSetup({headers:{"X-CSRF-TOKEN":$('meta[name="csrf-token"]').attr("content")}}),listenSubmit("#frontCustomerOnBoardForm1",(function(e){return e.preventDefault(),""==$("#domainUrlId").val()?(displayErrorMessage("Domain URL field is required."),!1):""==$("#timeZoneId").val()?(displayErrorMessage("Timezone field is required."),!1):void $.ajax({url:route("customer.onboard.store"),type:"POST",data:$("#frontCustomerOnBoardForm1").serialize(),dataType:"json",success:function(e){e.success&&(""!=e.message&&displaySuccessMessage(e.message),window.location.reload())},error:function(e){displayErrorMessage(e.responseJSON.message)}})})),listenSubmit("#frontCustomerOnBoardForm2",(function(e){return e.preventDefault(),""==$("#domainUrlId").val()?(displayErrorMessage("Domain URL field is required."),!1):""==$("#timeZoneId").val()?(displayErrorMessage("Timezone field is required."),!1):""==$("#fromTime").val()?(displayErrorMessage("From hour field is required."),!1):""==$("#toTime").val()||null==$("#toTime").val()?(displayErrorMessage("To hour field is required."),!1):0===$('input[name="day_of_week[]"]:checked').length?(displayErrorMessage("Please select any days"),!1):void $.ajax({url:route("customer.onboard.store"),type:"POST",data:$("#frontCustomerOnBoardForm2").serialize(),dataType:"json",success:function(e){e.success&&""!=e.message&&displaySuccessMessage(e.message),window.location.reload()},error:function(e){displayErrorMessage(e.responseJSON.message)}})})),listenSubmit("#frontCustomerOnBoardForm3",(function(e){return e.preventDefault(),""==$("#domainUrlId").val()?(displayErrorMessage("Domain URL field is required."),!1):""==$("#timeZoneId").val()?(displayErrorMessage("Timezone field is required."),!1):""==$("#fromTime").val()?(displayErrorMessage("From hour field is required."),!1):""==$("#toTime").val()||null==$("#toTime").val()?(displayErrorMessage("To hour field is required."),!1):0===$('input[name="day_of_week[]"]:checked').length?(displayErrorMessage("Please select any days"),!1):0===$('input[name="personal_experience_id"]:checked').length?(displayErrorMessage("Personal experience field is required."),!1):void $.ajax({url:route("customer.onboard.store"),type:"POST",data:$("#frontCustomerOnBoardForm3").serialize(),dataType:"json",success:function(e){e.success&&(""!=e.message&&displaySuccessMessage(e.message),userRole?window.location.href=route("dashboard"):window.location.href=route("admin.dashboard"))},error:function(e){displayErrorMessage(e.responseJSON.message)}})})),listen("keypress","#domainUrlId",(function(e){if(32===e.keyCode||95===e.keyCode)return!1;var r=e.keyCode||e.which;return!!/^[A-Za-z0-9\-]+$/.test(String.fromCharCode(r))&&void 0})),listenClick("#checkAllDays",(function(){$(this).is(":checked")?$(".day-of-week").each((function(){$(this).prop("checked",!0)})):$(".day-of-week").each((function(){$(this).prop("checked",!1)}))})),listenChange('select[name^="from_time"]',(function(e){var r=$(this)[0].selectedIndex,s=$(this).closest(".on-board-time").find('select[name^="to_time"] option'),o=$(this).closest(".on-board-time").find('select[name^="to_time"] option:selected')[0].index;24===r&&s.eq(0).prop("selected",!0).trigger("change"),r>=o&&s.eq(r+1).prop("selected",!0).trigger("change"),s.each((function(e){e<=r?$(this).attr("disabled",!0):$(this).attr("disabled",!1)}))})),listenChange('[name^="day_of_week[]"]',(function(){7==$('[name^="day_of_week[]"]:checked').length?$("#checkAllDays").prop("checked",!0):$("#checkAllDays").prop("checked",!1)}))})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+var __webpack_exports__ = {};
+/*!********************************************************!*\
+  !*** ./resources/assets/js/front/customer-on-board.js ***!
+  \********************************************************/
+
+
+$(document).ready(function () {
+  $('#fromTime, #toTime').select2();
+  $('#customerTimeZoneId').select2();
+}); // timezone detect automatic 
+
+var timezone = jstz.determine();
+document.cookie = 'timezoneName=' + timezone.name();
+$.ajaxSetup({
+  headers: {
+    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  }
+});
+listenSubmit('#frontCustomerOnBoardForm1', function (e) {
+  e.preventDefault();
+
+  if ($('#domainUrlId').val() == '') {
+    displayErrorMessage('Domain URL field is required.');
+    return false;
+  } else if ($('#timeZoneId').val() == '') {
+    displayErrorMessage('Timezone field is required.');
+    return false;
+  }
+
+  $.ajax({
+    url: route('customer.onboard.store'),
+    type: 'POST',
+    data: $('#frontCustomerOnBoardForm1').serialize(),
+    dataType: 'json',
+    success: function success(result) {
+      if (result.success) {
+        if (result.message != '') {
+          displaySuccessMessage(result.message);
+        }
+
+        window.location.reload();
+      }
+    },
+    error: function error(result) {
+      displayErrorMessage(result.responseJSON.message);
+    }
+  });
+});
+listenSubmit('#frontCustomerOnBoardForm2', function (e) {
+  e.preventDefault();
+
+  if ($('#domainUrlId').val() == '') {
+    displayErrorMessage('Domain URL field is required.');
+    return false;
+  } else if ($('#timeZoneId').val() == '') {
+    displayErrorMessage('Timezone field is required.');
+    return false;
+  }
+
+  if ($('#fromTime').val() == '') {
+    displayErrorMessage('From hour field is required.');
+    return false;
+  } else if ($('#toTime').val() == '' || $('#toTime').val() == null) {
+    displayErrorMessage('To hour field is required.');
+    return false;
+  } else if ($('input[name="day_of_week[]"]:checked').length === 0) {
+    displayErrorMessage('Please select any days');
+    return false;
+  }
+
+  $.ajax({
+    url: route('customer.onboard.store'),
+    type: 'POST',
+    data: $('#frontCustomerOnBoardForm2').serialize(),
+    dataType: 'json',
+    success: function success(result) {
+      if (result.success) {
+        if (result.message != '') {
+          displaySuccessMessage(result.message);
+        }
+      }
+
+      window.location.reload();
+    },
+    error: function error(result) {
+      displayErrorMessage(result.responseJSON.message);
+    }
+  });
+});
+listenSubmit('#frontCustomerOnBoardForm3', function (e) {
+  e.preventDefault();
+
+  if ($('#domainUrlId').val() == '') {
+    displayErrorMessage('Domain URL field is required.');
+    return false;
+  } else if ($('#timeZoneId').val() == '') {
+    displayErrorMessage('Timezone field is required.');
+    return false;
+  }
+
+  if ($('#fromTime').val() == '') {
+    displayErrorMessage('From hour field is required.');
+    return false;
+  } else if ($('#toTime').val() == '' || $('#toTime').val() == null) {
+    displayErrorMessage('To hour field is required.');
+    return false;
+  } else if ($('input[name="day_of_week[]"]:checked').length === 0) {
+    displayErrorMessage('Please select any days');
+    return false;
+  }
+
+  if ($('input[name="personal_experience_id"]:checked').length === 0) {
+    displayErrorMessage('Personal experience field is required.');
+    return false;
+  }
+
+  $.ajax({
+    url: route('customer.onboard.store'),
+    type: 'POST',
+    data: $('#frontCustomerOnBoardForm3').serialize(),
+    dataType: 'json',
+    success: function success(result) {
+      if (result.success) {
+        if (result.message != '') {
+          displaySuccessMessage(result.message);
+        }
+
+        if (userRole) {
+          window.location.href = route('dashboard');
+        } else {
+          window.location.href = route('admin.dashboard');
+        }
+      }
+    },
+    error: function error(result) {
+      displayErrorMessage(result.responseJSON.message);
+    }
+  });
+});
+listen('keypress', '#domainUrlId', function (e) {
+  if (e.keyCode === 32 || e.keyCode === 95) {
+    return false;
+  }
+
+  var keyCode = e.keyCode || e.which;
+  var regex = /^[A-Za-z0-9\-]+$/;
+  var isValid = regex.test(String.fromCharCode(keyCode));
+
+  if (!isValid) {
+    return false;
+  }
+});
+listenClick('#checkAllDays', function () {
+  if ($(this).is(':checked')) {
+    $('.day-of-week').each(function () {
+      $(this).prop('checked', true);
+    });
+  } else {
+    $('.day-of-week').each(function () {
+      $(this).prop('checked', false);
+    });
+  }
+});
+listenChange('select[name^="from_time"]', function (e) {
+  var selectedIndex = $(this)[0].selectedIndex;
+  var endTimeOptions = $(this).closest('.on-board-time').find('select[name^="to_time"] option');
+  var endSelectedIndex = $(this).closest('.on-board-time').find('select[name^="to_time"] option:selected')[0].index;
+
+  if (selectedIndex === 24) {
+    endTimeOptions.eq(0).prop('selected', true).trigger('change');
+  }
+
+  if (selectedIndex >= endSelectedIndex) {
+    endTimeOptions.eq(selectedIndex + 1).prop('selected', true).trigger('change');
+  }
+
+  endTimeOptions.each(function (index) {
+    if (index <= selectedIndex) {
+      $(this).attr('disabled', true);
+    } else {
+      $(this).attr('disabled', false);
+    }
+  });
+});
+listenChange('[name^="day_of_week[]"]', function () {
+  var checkBoxCheck = $('[name^="day_of_week[]"]:checked').length;
+
+  if (checkBoxCheck == 7) {
+    $('#checkAllDays').prop('checked', true);
+  } else {
+    $('#checkAllDays').prop('checked', false);
+  }
+});
+/******/ })()
+;

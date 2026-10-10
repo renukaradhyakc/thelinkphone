@@ -125,6 +125,7 @@ mix.js([
     'resources/assets/js/sidebar-menu-search/sidebar-menu-search.js',
     'resources/assets/js/currencies/currencies.js',
     'resources/assets/js/location/live-location.js',
+    'resources/assets/js/location/live-location-booker.js',
 ], 'public/assets/js/pages.js')
 
 // front page JS 
@@ -135,6 +136,7 @@ mix.js([
     'resources/assets/js/slot_calendar/slot-calendar.js',
     'resources/assets/js/event_schedules/event-slot-schedule.js',
     'resources/assets/js/custom-livewire-calendar/custom-livewire-calendar.js',
+    'resources/assets/js/location/live-location-booker.js',
 ], 'public/assets/js/front-pages.js')
 
 //stepper JS code
