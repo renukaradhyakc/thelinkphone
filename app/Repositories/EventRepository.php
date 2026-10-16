@@ -68,6 +68,9 @@ class EventRepository extends BaseRepository
                 abort(403);
             }
 
+            $locationBefore = optional($event->location)->only(['location_type', 'latitude', 'longitude', 'address']);
+            $before = $event->only(['name', 'description', 'event_location']);
+
             $event->update($this->eventFormAttributes($input));
 
             if ((int) $event->event_location === Event::IN_PERSON_MEETING) {
@@ -76,6 +79,29 @@ class EventRepository extends BaseRepository
                 }
             } else {
                 $event->location()->delete();
+            }
+
+            $event->load('location');
+            $locationAfter = optional($event->location)->only(['location_type', 'latitude', 'longitude', 'address']);
+            $fixedAddressChanged = (int) ($locationAfter['location_type'] ?? 0) === Location::FIXED && $locationBefore != $locationAfter;
+            $locationChanged = $event->wasChanged('event_location') || $fixedAddressChanged;
+
+            $changes = [];
+            foreach ($before as $field => $old) {
+                $new = $event->{$field};
+                if ((string) $old !== (string) $new) {
+                    $changes[$field] = ['old' => $old, 'new' => $new];
+                }
+            }
+
+            if ($fixedAddressChanged) {
+                $changes['location'] = ['old' => $locationBefore['address'] ?? null, 'new' => $locationAfter['address'] ?? null];
+            }
+
+            if ($locationChanged) {
+                app(\App\Modules\Notifications\Services\BookingNotifier::class)->eventChanged($event, 'location_changed', $changes);
+            } elseif ($changes) {
+                app(\App\Modules\Notifications\Services\BookingNotifier::class)->eventChanged($event, 'event_edited', $changes);
             }
 
             return $event;

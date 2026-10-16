@@ -12,6 +12,9 @@ use App\Http\Controllers\API\TimeZoneController;
 use App\Http\Controllers\API\ScheduleController;
 use App\Http\Controllers\API\UnifiedScheduleController;
 use App\Http\Controllers\API\ContactLookupController;
+use App\Modules\Notifications\Controllers\DeviceController;
+use App\Modules\Notifications\Controllers\NotificationController;
+use App\Modules\Notifications\Controllers\PreferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,4 +88,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/unified-schedules', [UnifiedScheduleController::class, 'index']);
+});
+
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+    Route::post('devices', [DeviceController::class, 'store'])->middleware('throttle:30,1');
+    Route::delete('devices/{token}', [DeviceController::class, 'destroy'])->where('token', '.+');
+
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->middleware('throttle:20,1');
+    Route::post('notifications/{uuid}/read', [NotificationController::class, 'read']);
+    Route::delete('notifications/{uuid}', [NotificationController::class, 'destroy']);
+
+    Route::get('notification-preferences', [PreferenceController::class, 'show']);
+    Route::put('notification-preferences', [PreferenceController::class, 'update'])->middleware('throttle:30,1');
 });

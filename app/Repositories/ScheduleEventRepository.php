@@ -121,6 +121,14 @@ class ScheduleEventRepository extends BaseRepository
             Mail::to($loginUserEmail)->send(new UserEventScheduleMail($data));
         }
 
+        if ($eventSchedule->event->event_type == Event::FREE || $paidEventMail) {
+            try {
+                app(\App\Modules\Notifications\Services\BookingNotifier::class)->created($eventSchedule);
+            } catch (\Throwable $e) {
+                \Log::error('notifications.booking.hook_failed', ['error' => $e->getMessage()]);
+            }
+        }
+
         return true;
     }
 
@@ -200,6 +208,12 @@ class ScheduleEventRepository extends BaseRepository
                     'event_schedule_id' => $scheduledEvent->id,
                     'error' => $zoomException->getMessage(),
                 ]);
+            }
+
+            try {
+                app(\App\Modules\Notifications\Services\BookingNotifier::class)->cancelled($scheduledEvent, 'owner_cancelled');
+            } catch (\Throwable $e) {
+                \Log::error('notifications.booking.hook_failed', ['error' => $e->getMessage()]);
             }
 
             DB::commit();

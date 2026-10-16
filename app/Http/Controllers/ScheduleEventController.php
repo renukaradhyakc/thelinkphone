@@ -333,6 +333,13 @@ class ScheduleEventController extends AppBaseController
         }
 
         $eventSchedule->update(['status' => EventSchedule::CANCELLED]);
+
+        try {
+            app(\App\Modules\Notifications\Services\BookingNotifier::class)->cancelled($eventSchedule, 'booker_cancelled');
+        } catch (\Throwable $e) {
+            \Log::error('notifications.booking.hook_failed', ['error' => $e->getMessage()]);
+        }
+
         $data['name'] = $eventSchedule->user->full_name;
         $data['email'] = $eventSchedule->user->email;
         $data['schedule_date'] = $eventSchedule->schedule_date;

@@ -81,6 +81,21 @@ class Events extends SearchableComponent
                 }
             }
 
+            $notifier = app(\App\Modules\Notifications\Services\BookingNotifier::class);
+
+            $upcomingBookings = EventSchedule::where('event_id', $event->id)
+                ->where('status', EventSchedule::BOOKED)
+                ->whereDate('schedule_date', '>=', now()->toDateString())
+                ->get();
+
+            foreach ($upcomingBookings as $upcomingBooking) {
+                $start = $notifier->startUtc($upcomingBooking);
+
+                if ($start !== null && $start->gt(now())) {
+                    $notifier->cancelled($upcomingBooking, 'event_deleted');
+                }
+            }
+
             $event->delete();
             $this->dispatchBrowserEvent('deleted');
         }

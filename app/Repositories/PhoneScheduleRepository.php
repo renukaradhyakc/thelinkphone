@@ -33,6 +33,8 @@ class PhoneScheduleRepository
 
                 $phoneNumber = $this->phoneNormalizer->normalize($phoneNumber);
 
+                $before = $this->getScheduleForPhone($phoneNumber);
+
                 $mapping = PhoneSchedule::updateOrCreate(
                     [
                         'user_id' => getLogInUserId(),
@@ -44,6 +46,8 @@ class PhoneScheduleRepository
                 );
 
                 UserSchedule::where('phone_schedule_id', $mapping->id)->delete();
+
+                app(\App\Modules\Notifications\Services\PhoneScheduleNotifier::class)->changed(getLogInUserId(), $phoneNumber, $before, $mapping);
 
                 return $mapping;
             });
@@ -59,6 +63,8 @@ class PhoneScheduleRepository
 
                 $phoneNumber = $this->phoneNormalizer->normalize($phoneNumber);
 
+                $before = $this->getScheduleForPhone($phoneNumber);
+
                 $mapping = PhoneSchedule::updateOrCreate(
                     [
                         'user_id' => getLogInUserId(),
@@ -70,6 +76,9 @@ class PhoneScheduleRepository
                 );
 
                 $this->replaceCustomSlots($mapping, $slots);
+
+                $mapping->load('userSchedules');
+                app(\App\Modules\Notifications\Services\PhoneScheduleNotifier::class)->changed(getLogInUserId(), $phoneNumber, $before, $mapping);
 
                 return $mapping->load('userSchedules');
             });
@@ -103,6 +112,8 @@ class PhoneScheduleRepository
                 if (!$mapping) {
                     return false;
                 }
+
+                app(\App\Modules\Notifications\Services\PhoneScheduleNotifier::class)->changed(getLogInUserId(), $phoneNumber, $mapping->load(['schedule', 'userSchedules']), null);
 
                 UserSchedule::where('phone_schedule_id', $mapping->id)->delete();
 

@@ -32,6 +32,7 @@ return [
     'env' => env('APP_ENV', 'production'),
 
     'google_oauth_path' => env('GOOGLE_OAUTH_PATH'),
+    'fcm_credentials_path' => env('FCM_CREDENTIALS_PATH'),
 
     'show_version' => env('SHOW_VERSION', true),
     'send_before' => env('SEND_REMINDER_BEFORE_MINUTES', 5),
@@ -182,6 +183,7 @@ return [
         Dyrynda\Database\LaravelEfficientUuidServiceProvider::class,
         Mariuzzo\LaravelJsLocalization\LaravelJsLocalizationServiceProvider::class,
         App\Modules\Loyalty\Providers\LoyaltyServiceProvider::class,
+        App\Modules\Notifications\Providers\NotificationsServiceProvider::class,
     ])->toArray(),
 
     /*

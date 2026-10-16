@@ -129,6 +129,10 @@ class ScheduleController extends AppBaseController
             return $this->sendError(__('messages.schedule.this_schedule_used_somewhere'));
         }
 
+        if (\App\Models\PhoneSchedule::where('schedule_id', $schedule->id)->exists()) {
+            return $this->sendError(__('messages.schedule.this_schedule_used_somewhere'));
+        }
+
         $schedule = $schedule->delete();
 
         return $this->sendSuccess(__('messages.schedule.schedule_deleted_successfully'));
@@ -159,6 +163,9 @@ class ScheduleController extends AppBaseController
             }
         }
 
+        $phoneNotifier = app(\App\Modules\Notifications\Services\PhoneScheduleNotifier::class);
+        $hoursBefore = $phoneNotifier->hoursSignature((int) $request->schedule_id);
+
         // Delete existing slots for this schedule so we don't duplicate old slots
         UserSchedule::where('schedule_id', $request->schedule_id)->delete();
 
@@ -170,6 +177,8 @@ class ScheduleController extends AppBaseController
         if (! $result['success']) {
             return $this->sendError($result);
         }
+
+        $phoneNotifier->scheduleHoursSaved((int) getLogInUserId(), (int) $request->schedule_id, $hoursBefore);
 
         return $this->sendSuccess(__('messages.success_message.event_schedule_create'));
     }
