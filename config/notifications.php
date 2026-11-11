@@ -38,7 +38,7 @@ return [
         'event_changes'   => ['label' => 'Event changes',    'android_importance' => 'default', 'default_enabled' => true],
         'location'        => ['label' => 'Location sharing', 'android_importance' => 'high',    'default_enabled' => true],
         'phone_schedules' => ['label' => 'Phone schedules',  'android_importance' => 'default', 'default_enabled' => true],
-        'loyalty'         => ['label' => 'Loyalty',          'android_importance' => 'low',     'default_enabled' => true],
+        'loyalty'         => ['label' => 'Loyalty',          'android_importance' => 'high',    'default_enabled' => true],
         'subscription'    => ['label' => 'Subscription',     'android_importance' => 'default', 'default_enabled' => true],
         'security'        => ['label' => 'Security',         'android_importance' => 'high',    'default_enabled' => true],
         'announcements'   => ['label' => 'Announcements',    'android_importance' => 'low',     'default_enabled' => false],
@@ -54,6 +54,7 @@ return [
         'trial_ending_days_before'             => [3, 1],
         'live_location_cap_hours'              => 24,
         'revalidate_before_send'               => true,
+        'subscription_expiring_days_before' => [3],
     ],
 
     'types' => [
@@ -127,23 +128,23 @@ return [
         ],
 
         'location.stopped' => [
-            'category' => 'location', 'priority' => 'low',
-            'link' => 'booking', 'push_ttl_min' => 0, 'inbox_days' => 7,
+            'category' => 'location', 'priority' => 'high',
+            'link' => 'booking', 'push_ttl_min' => 15, 'inbox_days' => 7,
             'collapse' => 'location:{booking_id}',
             'dedupe' => 'location.stopped:{booking_id}:{session}',
             'variants' => [
-                'default' => ['channels' => ['inbox']],
+                'default' => ['channels' => ['inbox', 'push']],
             ],
         ],
 
         'location.auto_stopped' => [
-            'category' => 'location', 'priority' => 'normal',
-            'link' => 'booking', 'push_ttl_min' => 1440, 'inbox_days' => 7,
+            'category' => 'location', 'priority' => 'high',
+            'link' => 'booking', 'push_ttl_min' => 15, 'inbox_days' => 7,
             'collapse' => 'location:{booking_id}',
             'dedupe' => 'location.auto_stopped:{booking_id}:{session}:{recipient}',
             'variants' => [
                 'cap_24h_sharer' => ['channels' => ['inbox', 'push']],
-                'cap_24h_other'  => ['channels' => ['inbox']],
+                'cap_24h_other'  => ['channels' => ['inbox', 'push']],
                 'schedule_ended' => ['channels' => ['inbox']],
             ],
         ],
@@ -162,26 +163,36 @@ return [
             'category' => 'loyalty', 'priority' => 'normal',
             'link' => 'loyalty', 'push_ttl_min' => 1440, 'inbox_days' => 90,
             'collapse' => null,
-            'dedupe' => 'loyalty.result:{bill_id}',
+            'dedupe' => 'loyalty.result:{bill_id}:{reason}',
             'variants' => [
                 'success'   => ['channels' => ['inbox', 'push']],
                 'duplicate' => ['channels' => ['inbox', 'push']],
                 'failed'    => ['channels' => ['inbox', 'push']],
+                'invalid'   => ['channels' => ['inbox', 'push']],
+                'review'    => ['channels' => ['inbox', 'push']],
+                'rejected'  => ['channels' => ['inbox', 'push']],
             ],
         ],
 
         // Text flags: android (trial has no auto-conversion), ios_will_charge,
         // ios_cancelled (trial ends, no charge). Wording stays informational.
         'subscription.status' => [
-            'enabled' => false, // needs RevenueCat webhooks; today the server only knows trials
             'category' => 'subscription', 'priority' => 'normal',
             'link' => 'subscription', 'push_ttl_min' => 1440, 'inbox_days' => 90,
             'collapse' => 'subscription',
-            'dedupe' => 'subscription.status:{user_id}:{variant}:{period_end}',
+            'dedupe' => 'subscription.status:{user_id}:{variant}:{key}',
             'variants' => [
-                'trial_ending'  => ['channels' => ['inbox', 'push']],
-                'expired'       => ['channels' => ['inbox', 'push']],
-                'billing_issue' => ['channels' => ['inbox', 'push'], 'mandatory' => true, 'link' => 'manage_subscription'],
+                'trial_started'          => ['channels' => ['inbox', 'push']],
+                'trial_ending'           => ['channels' => ['inbox', 'push']], // own trial: no auto-conversion
+                'trial_ending_auto'      => ['channels' => ['inbox', 'push']], // store trial that renews unless cancelled
+                'trial_ending_cancelled' => ['channels' => ['inbox', 'push']], // store trial already cancelled: no charge
+                'trial_ended'            => ['channels' => ['inbox', 'push']],
+                'subscription_started'   => ['channels' => ['inbox', 'push']],
+                'renewed'                => ['channels' => ['inbox', 'push']],
+                'subscription_expiring'  => ['channels' => ['inbox', 'push']],
+                'subscription_ended'     => ['channels' => ['inbox', 'push']],
+                'subscription_cancelled' => ['channels' => ['inbox', 'push']],
+                'billing_issue'          => ['channels' => ['inbox', 'push'], 'mandatory' => true, 'link' => 'manage_subscription'],
             ],
         ],
 

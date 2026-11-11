@@ -6,12 +6,17 @@ use App\Mail\DeleteEventMail;
 use App\Models\Event;
 use App\Models\EventSchedule;
 use App\Models\User;
+use App\Modules\Notifications\Repositories\OutboxRepository;
+use App\Modules\Notifications\Services\BookingNotifier;
+use App\Modules\Notifications\Services\RecipientResolver;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Str;
 
@@ -71,32 +76,63 @@ class Events extends SearchableComponent
                 User::TIME_ZONE_ARRAY[getLoginUser()->timezone] : User::TIME_ZONE_ARRAY[getTimeZone()];
             date_default_timezone_set($timeZoneName);
             $eventScheduleEmails = EventSchedule::whereUserId($event->user_id)
-                ->whereEventId($id)->where('schedule_date', '>', Carbon::now()->format('Y-m-d'))->get();
+                ->whereEventId($id)
+                ->where('status', EventSchedule::BOOKED)
+                ->where('schedule_date', '>', Carbon::now()->format('Y-m-d'))
+                ->get();
+
+            $notifier = app(BookingNotifier::class);
+            $recipients = app(RecipientResolver::class);
+            $outbox = app(OutboxRepository::class);
+
+            DB::transaction(function () use ($event, $notifier, $recipients, $outbox) {
+                $upcomingBookings = EventSchedule::where('event_id', $event->id)
+                    ->where('status', EventSchedule::BOOKED)
+                    ->whereDate('schedule_date', '>=', now()->subDay()->toDateString())
+                    ->get()
+                    ->sortBy(fn ($b) => $notifier->startUtc($b)?->timestamp ?? PHP_INT_MAX);
+
+                $told = [];
+
+                foreach ($upcomingBookings as $upcomingBooking) {
+                    $start = $notifier->startUtc($upcomingBooking);
+                    $end = $start ? ($notifier->endUtc($upcomingBooking) ?? $start->copy()->addMinutes(30)) : null;
+
+                    if ($start === null || ! $end->gt(now())) {
+                        continue;
+                    }
+
+                    $phone = trim((string) $upcomingBooking->phone_call);
+                    $person = $phone === '' ? null : $recipients->uniqueUserByPhone($phone);
+
+                    if ($person !== null && isset($told[$person->id])) {
+                        $outbox->cancelPendingForBooking($upcomingBooking->id);
+
+                        continue;
+                    }
+
+                    if ($person !== null) {
+                        $told[$person->id] = true;
+                    }
+
+                    $notifier->cancelled($upcomingBooking, 'event_deleted');
+                }
+
+                $event->delete();
+            });
 
             $emailNotification = getUserSettings();
             if (isset($emailNotification['email_notification']) && ($emailNotification['email_notification'] == 1)) {
                 foreach ($eventScheduleEmails as $eventScheduleEmail) {
-                    Mail::to($eventScheduleEmail->email)->send(new DeleteEventMail('emails.delete_event',
-                        'You have created schedule this event is deleted', [$event, $eventScheduleEmail]));
+                    try {
+                        Mail::to($eventScheduleEmail->email)->send(new DeleteEventMail('emails.delete_event',
+                            'You have created schedule this event is deleted', [$event, $eventScheduleEmail]));
+                    } catch (\Throwable $e) {
+                        Log::error('events.delete_mail_failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+                    }
                 }
             }
 
-            $notifier = app(\App\Modules\Notifications\Services\BookingNotifier::class);
-
-            $upcomingBookings = EventSchedule::where('event_id', $event->id)
-                ->where('status', EventSchedule::BOOKED)
-                ->whereDate('schedule_date', '>=', now()->toDateString())
-                ->get();
-
-            foreach ($upcomingBookings as $upcomingBooking) {
-                $start = $notifier->startUtc($upcomingBooking);
-
-                if ($start !== null && $start->gt(now())) {
-                    $notifier->cancelled($upcomingBooking, 'event_deleted');
-                }
-            }
-
-            $event->delete();
             $this->dispatchBrowserEvent('deleted');
         }
     }

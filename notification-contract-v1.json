@@ -1,0 +1,366 @@
+﻿{
+    "success":  true,
+    "data":  [
+                 {
+                     "id":  "36a0ae05-32bb-4797-b62f-37d8317ee546",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-04T08:02:02+00:00",
+                     "created_at":  "2026-11-04T07:58:56+00:00",
+                     "expires_at":  "2026-11-11T07:58:56+00:00"
+                 },
+                 {
+                     "id":  "5fdcab1b-163d-47d7-8e1e-c128e7aa986e",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-04T08:03:25+00:00",
+                     "created_at":  "2026-11-04T07:58:53+00:00",
+                     "expires_at":  "2026-11-11T07:58:53+00:00"
+                 },
+                 {
+                     "id":  "ce1a844e-21b4-49b7-82d5-e14fd1ef16cc",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-04T08:04:21+00:00",
+                     "created_at":  "2026-11-04T07:58:45+00:00",
+                     "expires_at":  "2026-11-11T07:58:45+00:00"
+                 },
+                 {
+                     "id":  "880ad587-fd3d-4097-ae03-7c1c267a1540",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-04T08:04:25+00:00",
+                     "created_at":  "2026-11-04T07:58:42+00:00",
+                     "expires_at":  "2026-11-11T07:58:42+00:00"
+                 },
+                 {
+                     "id":  "4b5e7997-ddde-4473-9ff0-c6d67bb1c9e2",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:58:37+00:00",
+                     "expires_at":  "2026-11-11T07:58:37+00:00"
+                 },
+                 {
+                     "id":  "c55efe99-74b5-4950-9bab-7d7e627c24c4",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:58:24+00:00",
+                     "expires_at":  "2026-11-11T07:58:24+00:00"
+                 },
+                 {
+                     "id":  "a91e0034-7eaa-40fb-bb98-d8e6187fd61e",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:53:53+00:00",
+                     "expires_at":  "2026-11-11T07:53:53+00:00"
+                 },
+                 {
+                     "id":  "98cd3284-02e4-4617-b4f2-2b3ffeace7fd",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:53:50+00:00",
+                     "expires_at":  "2026-11-11T07:53:50+00:00"
+                 },
+                 {
+                     "id":  "b9f1658a-ce68-40d6-87c1-a1c002d9d066",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:53:42+00:00",
+                     "expires_at":  "2026-11-11T07:53:42+00:00"
+                 },
+                 {
+                     "id":  "cf34dcc6-4f76-41d3-93a2-82c3c15bb187",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:53:39+00:00",
+                     "expires_at":  "2026-11-11T07:53:39+00:00"
+                 },
+                 {
+                     "id":  "148fd179-93ab-4f2e-89c7-33ab3b06f3a4",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:53:34+00:00",
+                     "expires_at":  "2026-11-11T07:53:34+00:00"
+                 },
+                 {
+                     "id":  "c84b5000-1671-437a-8335-b0ec130a8b9f",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:53:22+00:00",
+                     "expires_at":  "2026-11-11T07:53:22+00:00"
+                 },
+                 {
+                     "id":  "9c9ae7f6-ce23-4abd-9966-470b090b0759",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:36:01+00:00",
+                     "expires_at":  "2026-11-11T07:36:01+00:00"
+                 },
+                 {
+                     "id":  "84c3e12d-a7d7-4a39-850c-91caafaff8d0",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:35:54+00:00",
+                     "expires_at":  "2026-11-11T07:35:54+00:00"
+                 },
+                 {
+                     "id":  "5318ce16-d18b-4d0c-951c-2d647756a023",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:35:46+00:00",
+                     "expires_at":  "2026-11-11T07:35:46+00:00"
+                 },
+                 {
+                     "id":  "9341f882-76ad-4421-92e4-60f77a2ad6ba",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:35:42+00:00",
+                     "expires_at":  "2026-11-11T07:35:42+00:00"
+                 },
+                 {
+                     "id":  "b4fb3bb2-ac67-43a0-905c-4b7bdfadb875",
+                     "schema_version":  "1",
+                     "type":  "location.stopped",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing stopped",
+                     "body":  "Tejas Gowda stopped sharing their location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:35:38+00:00",
+                     "expires_at":  "2026-11-11T07:35:38+00:00"
+                 },
+                 {
+                     "id":  "1a6a31d9-5ed1-4109-8938-cfe9bad8fda1",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:35:30+00:00",
+                     "expires_at":  "2026-11-11T07:35:30+00:00"
+                 },
+                 {
+                     "id":  "7a196f15-584a-479a-9bc4-8ab79d6d45a5",
+                     "schema_version":  "1",
+                     "type":  "location.started",
+                     "reason":  "default",
+                     "category":  "location",
+                     "title":  "Location sharing started",
+                     "body":  "Tejas Gowda started sharing their live location.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/scheduled-events",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:35:24+00:00",
+                     "expires_at":  "2026-11-11T07:35:24+00:00"
+                 },
+                 {
+                     "id":  "332d49dd-d696-4688-97e6-5dadf5b59a40",
+                     "schema_version":  "1",
+                     "type":  "booking.created",
+                     "reason":  "booker",
+                     "category":  "bookings",
+                     "title":  "Booking confirmed",
+                     "body":  "Your booking for Video Call Testing with Tejas Gowda on 30 Nov, 06:00 PM is confirmed.",
+                     "deep_link":  "https://unexpected-locked-legislative-attach.trycloudflare.com/sc/Jjj/zoom/4d00d0a3-4003-43b3-997f-96e9b6f3dd9f",
+                     "data":  {
+                                  "event_schedule_id":  314,
+                                  "audience":  "booker"
+                              },
+                     "is_read":  true,
+                     "read_at":  "2026-11-05T10:13:30+00:00",
+                     "created_at":  "2026-11-04T07:33:53+00:00",
+                     "expires_at":  "2027-02-02T07:33:53+00:00"
+                 }
+             ],
+    "next_cursor":  "Njg4"
+}

@@ -27,21 +27,46 @@ class PhoneScheduleNotifier
     public function changed(int $ownerId, string $normalizedPhone, ?PhoneSchedule $before, ?PhoneSchedule $after): void
     {
         try {
+            $beforeSignature = $this->signature($before);
+            $afterSignature = $this->signature($after);
+
             $variant = match (true) {
                 $before === null && $after !== null => 'assigned',
                 $before !== null && $after === null => 'revoked',
-                $before !== null && $after !== null && $this->signature($before) !== $this->signature($after) => 'modified',
+                $before !== null && $after !== null && $beforeSignature !== $afterSignature => 'modified',
                 default => null,
             };
 
             if ($variant === null) {
+                Log::info('notifications.phone_schedule.no_change', [
+                    'owner_id' => $ownerId,
+                    'phone_number' => $normalizedPhone,
+                    'before_signature' => $beforeSignature,
+                    'after_signature' => $afterSignature,
+                    'reason' => 'assignment_unchanged',
+                ]);
                 return;
             }
+
+            Log::info('notifications.phone_schedule.change_detected', [
+                'owner_id' => $ownerId,
+                'phone_number' => $normalizedPhone,
+                'variant' => $variant,
+                'before_signature' => $beforeSignature,
+                'after_signature' => $afterSignature,
+            ]);
 
             $contact = $this->recipients->uniqueUserByPhone($normalizedPhone);
             $owner = User::find($ownerId);
 
             if ($contact === null || $owner === null || $contact->id === $owner->id) {
+            Log::info('notifications.phone_schedule.notification_skipped', [
+                    'owner_id' => $ownerId,
+                    'contact_id' => $contact?->id,
+                    'reason' => $contact === null
+                        ? 'recipient_not_found_or_not_unique'
+                        : ($owner === null ? 'owner_not_found' : 'owner_is_recipient'),
+                ]);
                 return;
             }
 
@@ -49,7 +74,7 @@ class PhoneScheduleNotifier
                 $contact->id,
                 'phone_schedule.changed',
                 $variant,
-                "phone_schedule.changed:{$ownerId}:{$contact->id}:{$variant}:".substr(md5($this->signature($after)), 0, 8).':'.intdiv(time(), 60),
+                "phone_schedule.changed:{$ownerId}:{$contact->id}:{$variant}:".substr(md5($afterSignature), 0, 8).':'.(int) (microtime(true) * 1000),
                 ['name' => $owner->full_name, 'hours' => $this->hours($after)],
                 ['audience' => 'contact', 'owner_id' => $ownerId]
             );

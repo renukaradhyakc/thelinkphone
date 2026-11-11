@@ -42,10 +42,17 @@ class EventLocationController extends AppBaseController
             return $this->sendError("You're already sharing live location for \"{$conflict->name}\". Stop that one first.", 409);
         }
 
+        if ((bool) $location->is_live_sharing_active) {
+            return $this->sendResponse(['event_id' => $event->id], 'Live sharing is already active.');
+        }
+
         $location->update([
             'is_live_sharing_active' => true,
-            'live_started_at' => now(),
+            'live_started_at' => \App\Support\LiveSession::startedAt($event->id),
         ]);
+        
+        app(\App\Modules\Notifications\Services\LocationNotifier::class)->started($event, $location->live_started_at);
+
         // \Log::info('[CallaLink] startSharing succeeded', ['event_id' => $event->id]);
         return $this->sendResponse(['event_id' => $event->id], 'Live sharing started.');
     }
@@ -56,11 +63,17 @@ class EventLocationController extends AppBaseController
 
         $location = $event->location;
 
+        $startedAt = optional($location)->live_started_at;
+
         if ($location) {
             $location->update([
                 'is_live_sharing_active' => false,
                 'live_started_at' => null,
             ]);
+
+            if ($startedAt) {
+                app(\App\Modules\Notifications\Services\LocationNotifier::class)->stopped($event, $startedAt);
+            }
         }
 
         return $this->sendSuccess('Live sharing stopped.');
@@ -203,10 +216,18 @@ class EventLocationController extends AppBaseController
 
     private function stopSharingInternal(Location $location): void
     {
+        $startedAt = $location->live_started_at;
+        $event = Event::find($location->locationable_id);
+
         $location->update([
             'is_live_sharing_active' => false,
             'live_started_at' => null,
         ]);
+
+        if ($event && $startedAt) {
+            app(\App\Modules\Notifications\Services\LocationNotifier::class)
+                ->autoStopped($event, $startedAt, $startedAt->copy()->addHours(24)->lte(now()->addMinute()));
+        }
     }
 
     private function authorizeEvent(Event $event): void

@@ -24,15 +24,60 @@
             </a>
         </li>
         @endImpersonating
+
+        @php
+            try {
+                $notificationUnread = app(\App\Modules\Notifications\Repositories\UserNotificationRepository::class)
+                    ->unreadCount(getLogInUser()->id);
+            } catch (\Throwable $e) {
+                $notificationUnread = 0;
+            }
+        @endphp
+        <li class="px-xxl-3 px-2" id="notificationBellWrapper"
+            data-notification-api="{{ url('/notification-center/api') }}">
+            <div class="dropdown d-flex align-items-center py-4">
+                <button class="btn hide-arrow position-relative px-2" type="button" id="notificationBell"
+                        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+                        aria-label="Notifications">
+                    <i class="fa-regular fa-bell fs-2 text-gray-600"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {{ $notificationUnread > 0 ? '' : 'd-none' }}"
+                        id="notificationBadge" data-count="{{ $notificationUnread }}">{{ $notificationUnread > 99 ? '99+' : $notificationUnread }}</span>
+                </button>
+
+                <div class="dropdown-menu dropdown-menu-end p-0 my-2" aria-labelledby="notificationBell"
+                    style="width: 360px; max-width: calc(100vw - 24px);">
+                    <div class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+                        <h4 class="mb-0 text-gray-900">Notifications</h4>
+                        <button type="button" class="btn btn-link p-0 fs-6 text-decoration-none" id="notificationMarkAll">
+                            Mark all as read
+                        </button>
+                    </div>
+
+                    <div id="notificationList" style="max-height: 420px; overflow-y: auto;"></div>
+
+                    <div id="notificationEmpty" class="text-center text-gray-600 py-6 d-none">
+                        You're all caught up.
+                    </div>
+                    <div id="notificationError" class="text-center text-gray-600 py-6 d-none">
+                        Could not load notifications. Close and open this menu to try again.
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top">
+                        <a href="{{ route('notification-center.index') }}" class="text-decoration-none" data-turbo="false">View all</a>
+                        <a href="{{ route('notification-center.settings') }}" class="text-decoration-none" data-turbo="false">Settings</a>
+                    </div>
+                </div>
+            </div>
+        </li>
+
         <li class="px-xxl-3 px-2">
             <div class="dropdown d-flex align-items-center py-4">
-                <div class="image image-circle image-mini">
-                    <img src="{{ getLogInUser()->profile_image }}"
-                         class="img-fluid object-cover" alt="profile image">
-                </div>
-                <button class="btn dropdown-toggle hide-arrow position-relative" type="button" id="dropdownMenuButton1"
-                        data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                    {{ getLogInUser()->full_name }}
+                <button class="btn dropdown-toggle hide-arrow position-relative d-flex align-items-center px-0" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" aria-label="Account menu">
+                    <span class="image image-circle image-mini d-block">
+                        <img src="{{ getLogInUser()->profile_image }}" class="img-fluid object-cover" alt="profile image">
+                    </span>
+                    <span class="d-none d-sm-inline ms-3">{{ getLogInUser()->full_name }}</span>
                 </button>
                 <div class="dropdown-menu py-7 pb-4 my-2" aria-labelledby="dropdownMenuButton1">
                     <div class="text-center border-bottom pb-5">
@@ -80,7 +125,7 @@
                                 <form id="logout-form" action="{{ route('logout')}}" method="post">
                                     @csrf
                                 </form>
-                                <span onclick="event.preventDefault(); localStorage.clear();  document.getElementById('logout-form').submit();">
+                                <span onclick="callalinkLogout(event)">
                                     {{ __('messages.sign_out') }}</span>
                             </a>
                         </li>
@@ -89,7 +134,7 @@
             </div>
         </li>
         <li>
-            <button type="button" class="btn px-0 d-block d-xl-none header-btn pb-2">
+            <button type="button" class="btn px-0 d-none header-btn pb-2">
                 <i class="fa-solid fa-bars fs-1"></i>
             </button>
         </li>

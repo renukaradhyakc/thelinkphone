@@ -56,6 +56,21 @@ class ScheduleEventRepository extends BaseRepository
     {
         try {
             DB::beginTransaction();
+
+            Event::whereKey($input['event_id'])->lockForUpdate()->firstOrFail();
+
+            $slotTaken = EventSchedule::whereEventId($input['event_id'])
+                ->whereDate('schedule_date', '=', $input['schedule_date'])
+                ->where('slot_time', '=', $input['slot_time'])
+                ->where(function ($q) {
+                    $q->whereNull('status')->orWhere('status', '!=', EventSchedule::CANCELLED);
+                })
+                ->exists();
+
+            if ($slotTaken) {
+                throw new UnprocessableEntityHttpException('This Event schedule is already booked.');
+            }
+
             $eventSchedule = EventSchedule::create($input);
 
             if (! empty($input['location_meta'])) {

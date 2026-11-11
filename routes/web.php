@@ -27,6 +27,9 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use App\Modules\Loyalty\Controllers\BillController;
 use App\Modules\Loyalty\Controllers\LoyaltyController;
+use App\Modules\Notifications\Controllers\NotificationController;
+use App\Modules\Notifications\Controllers\NotificationPageController;
+use App\Modules\Notifications\Controllers\PreferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -231,6 +234,24 @@ Route::prefix('admin')->middleware(['auth', 'role:admin', 'verified', 'checkCust
     // manual subscription payment route
     Route::get('cash-payments', [CashPaymentController::class, 'index'])->name('cash.payments.index');
     Route::get('download-attachment/{mediaId}', [CashPaymentController::class, 'downloadAttachment'])->name('download.attachment');
+});
+
+Route::middleware('auth')->prefix('notification-center')->group(function () {
+    // pages
+    Route::get('/', [NotificationPageController::class, 'index'])->name('notification-center.index');
+    Route::get('settings', [NotificationPageController::class, 'settings'])->name('notification-center.settings');
+ 
+    // JSON used by the bell and the pages
+    Route::prefix('api')->group(function () {
+        Route::get('list', [NotificationController::class, 'index']);
+        Route::get('unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('read-all', [NotificationController::class, 'readAll'])->middleware('throttle:20,1');
+        Route::post('{uuid}/read', [NotificationController::class, 'read']);
+        Route::delete('{uuid}', [NotificationController::class, 'destroy']);
+ 
+        Route::get('preferences', [PreferenceController::class, 'show']);
+        Route::put('preferences', [PreferenceController::class, 'update'])->middleware('throttle:30,1');
+    });
 });
 
 require __DIR__.'/auth.php';

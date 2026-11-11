@@ -4,6 +4,7 @@ namespace App\Modules\Notifications\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class TickCommand extends Command
@@ -23,9 +24,19 @@ class TickCommand extends Command
         try {
             $this->runStep('notifications:dispatch-due');
 
-            if (now()->format('H:i') === '03:30') {
+            // if (now()->format('H:i') === '03:30') {
+            //     $this->runStep('notifications:prune');
+            // }
+
+            if (now()->hour >= 3 && Cache::add('notifications.prune.'.now()->format('Ymd'), 1, 86400)) {
                 $this->runStep('notifications:prune');
             }
+
+            // hourly (first tick of each hour); the command is idempotent
+            if (Cache::add('notifications.subscription-reminders.'.now()->format('YmdH'), 1, 3600)) {
+                $this->runStep('notifications:subscription-reminders');
+            }
+            // $this->runStep('notifications:subscription-reminders');
 
             $this->call('queue:work', [
                 '--queue' => 'notifications,default',

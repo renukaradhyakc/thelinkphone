@@ -35,6 +35,8 @@ class TrialController extends Controller
         try {
             $trial = $this->trialService->start($user);
 
+            app(\App\Modules\Notifications\Services\SubscriptionNotifier::class)->trialStarted($user->id, $trial->expires_at);
+
             Log::info('Trial started successfully', ['email' => $user->email]);
 
             return response()->json([

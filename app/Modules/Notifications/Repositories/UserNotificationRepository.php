@@ -69,6 +69,14 @@ class UserNotificationRepository
             ->update(['read_at' => now()]) > 0;
     }
 
+    public function markUnread(int $userId, string $uuid): bool
+    {
+        return UserNotification::forUser($userId)
+            ->where('uuid', $uuid)
+            ->whereNotNull('read_at')
+            ->update(['read_at' => null]) > 0;
+    }
+
     public function markAllRead(int $userId): int
     {
         return UserNotification::forUser($userId)->unread()->update(['read_at' => now()]);

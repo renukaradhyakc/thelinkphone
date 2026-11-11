@@ -15,6 +15,7 @@ use App\Http\Controllers\API\ContactLookupController;
 use App\Modules\Notifications\Controllers\DeviceController;
 use App\Modules\Notifications\Controllers\NotificationController;
 use App\Modules\Notifications\Controllers\PreferenceController;
+use App\Http\Controllers\RevenueCatWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,8 +99,11 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
     Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->middleware('throttle:20,1');
     Route::post('notifications/{uuid}/read', [NotificationController::class, 'read']);
+    Route::post('notifications/{uuid}/unread', [NotificationController::class, 'unread']);
     Route::delete('notifications/{uuid}', [NotificationController::class, 'destroy']);
 
     Route::get('notification-preferences', [PreferenceController::class, 'show']);
     Route::put('notification-preferences', [PreferenceController::class, 'update'])->middleware('throttle:30,1');
 });
+
+Route::post('/revenuecat/webhook', [RevenueCatWebhookController::class, 'handle'])->middleware('throttle:120,1');

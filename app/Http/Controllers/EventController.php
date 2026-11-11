@@ -181,6 +181,23 @@ class EventController extends AppBaseController
 
         $event->update(['status' => ! $event->status]);
 
+        if (! $event->status) {
+            $location = $event->location;
+
+            if ($location && $location->is_live_sharing_active) {
+                $startedAt = $location->live_started_at;
+
+                $location->update([
+                    'is_live_sharing_active' => false,
+                    'live_started_at' => null,
+                ]);
+
+                if ($startedAt) {
+                    app(\App\Modules\Notifications\Services\LocationNotifier::class)->stopped($event, $startedAt);
+                }
+            }
+        }
+
         return $this->sendSuccess(__('messages.success_message.event_status_change'));
     }
 

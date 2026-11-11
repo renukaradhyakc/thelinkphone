@@ -164,6 +164,12 @@
         {{ __('messages.settings') }}
     </a>
 </li>
+<li class="nav-item position-relative mx-xl-3 mb-3 mb-xl-0 {{ (!Request::is('notification-center/settings*')) ? 'd-none' : '' }}">
+    <a class="nav-link p-0 {{ Request::is('notification-center/settings*') ? 'active' : ''  }}"
+       href="{{ route('notification-center.settings') }}">
+        Notification Settings
+    </a>
+</li>
 @endrole
 <li class="nav-item position-relative mx-xl-3 mb-3 mb-xl-0 {{ (!Request::is('profile/edit*')) ? 'd-none' : '' }}">
     <a class="nav-link p-0 {{ Request::is('profile/edit*') ? 'active' : ''  }}" href="{{ route('profile.setting') }}">

@@ -56,7 +56,7 @@ class NotificationService
             'title' => $text['title'],
             'body' => $text['body'],
             'data' => $context ?: null,
-            'deep_link' => $this->links->resolve($type, $variant, $context),
+            'deep_link' => $this->links->resolve($type, $variant, $context, $userId),
             'dedupe_key' => $dedupeKey,
             'expires_at' => $this->expiry($type),
         ]);

@@ -89,6 +89,7 @@ mix.js([
     'resources/assets/js/turbo.js',
     'resources/assets/js/custom/helper.js',
     'resources/assets/js/custom/custom.js',
+    'resources/assets/js/custom/logout.js',
     'resources/assets/js/users/user.js',
     'resources/assets/js/users/user-create-edit.js',
     'resources/assets/js/users/user-profile.js',
@@ -125,6 +126,7 @@ mix.js([
     'resources/assets/js/sidebar-menu-search/sidebar-menu-search.js',
     'resources/assets/js/currencies/currencies.js',
     'resources/assets/js/location/live-location.js',
+    'resources/assets/js/notifications/notifications.js',
 ], 'public/assets/js/pages.js')
 
 // front page JS 

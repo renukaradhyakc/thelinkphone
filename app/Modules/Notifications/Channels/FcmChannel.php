@@ -5,6 +5,7 @@ namespace App\Modules\Notifications\Channels;
 use App\Modules\Notifications\Models\DeviceToken;
 use App\Modules\Notifications\Models\UserNotification;
 use App\Modules\Notifications\Services\NotificationRegistry;
+use App\Modules\Notifications\Repositories\UserNotificationRepository;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -25,7 +26,7 @@ class FcmChannel
 
     private ?array $credentials = null;
 
-    public function __construct(private NotificationRegistry $registry)
+    public function __construct(private NotificationRegistry $registry, private UserNotificationRepository $inbox,)
     {
     }
 
@@ -54,6 +55,7 @@ class FcmChannel
 
         $data = [
             'notification_id' => (string) $n->uuid,
+            'schema_version' => (string) UserNotification::SCHEMA_VERSION,
             'type' => (string) $n->type,
             'reason' => (string) $n->reason,
             'category' => (string) $n->category,
@@ -61,9 +63,11 @@ class FcmChannel
             'body' => (string) $n->body,
             'deep_link' => (string) ($n->deep_link ?? ''),
             'data' => json_encode($n->data ?? new \stdClass()),
-            'created_at' => optional($n->created_at)->toIso8601String() ?? '',
-            'expires_at' => optional($n->expires_at)->toIso8601String() ?? '',
+            'created_at' => $n->created_at?->copy()->utc()->toIso8601String() ?? '',
+            'expires_at' => $n->expires_at?->copy()->utc()->toIso8601String() ?? '',
         ];
+
+        $badge = $this->inbox->unreadCount((int) $n->user_id);
 
         return [
             'token' => $device->token,
@@ -82,8 +86,9 @@ class FcmChannel
                 'headers' => [
                     'apns-priority' => $high ? '10' : '5',
                     'apns-collapse-id' => (string) $n->uuid,
+                    'apns-expiration' => (string) (time() + $this->registry->pushTtlMinutes($n->type) * 60),
                 ],
-                'payload' => ['aps' => ['sound' => 'default', 'thread-id' => $n->category]],
+                'payload' => ['aps' => ['sound' => 'default', 'thread-id' => $n->category, 'badge' => $badge]],
             ],
         ];
     }

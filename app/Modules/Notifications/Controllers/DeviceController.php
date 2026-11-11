@@ -20,7 +20,7 @@ class DeviceController extends Controller
         $validated = $request->validate([
             'platform' => ['required', Rule::in([DeviceToken::ANDROID, DeviceToken::IOS, DeviceToken::WEB])],
             'token' => 'required|string|max:4096',
-            'device_id' => 'nullable|string|max:191',
+            'device_id' => 'nullable|string|max:64',
             'app_version' => 'nullable|string|max:50',
             'web_keys' => 'nullable|array',
             'web_keys.p256dh' => 'required_with:web_keys|string',
@@ -47,7 +47,13 @@ class DeviceController extends Controller
 
     public function destroy(Request $request, string $token): JsonResponse
     {
-        $revoked = $this->devices->unregister($request->user()->id, $token);
+        $validated = $request->validate(['device_id' => 'nullable|string|max:64']);
+
+        $revoked = $this->devices->unregister(
+            $request->user()->id,
+            $token,
+            $validated['device_id'] ?? null
+        );
 
         return response()->json([
             'success' => $revoked,

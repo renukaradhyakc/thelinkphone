@@ -332,6 +332,13 @@ class ScheduleEventController extends AppBaseController
             return redirect()->back();
         }
 
+        if ((int) $eventSchedule->status === EventSchedule::CANCELLED) {
+            Flash::info('This booking is already cancelled.');
+
+            return redirect(route('sc.cancel',
+                [$eventSchedule->event->user->domain_url, $eventSchedule->event->event_link, $eventSchedule->uuid]));
+        }
+
         $eventSchedule->update(['status' => EventSchedule::CANCELLED]);
 
         try {

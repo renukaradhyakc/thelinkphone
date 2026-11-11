@@ -71,6 +71,10 @@ class EventRepository extends BaseRepository
             $locationBefore = optional($event->location)->only(['location_type', 'latitude', 'longitude', 'address']);
             $before = $event->only(['name', 'description', 'event_location']);
 
+            $liveStartedBefore = optional($event->location)->is_live_sharing_active
+                ? $event->location->live_started_at
+                : null;
+
             $event->update($this->eventFormAttributes($input));
 
             if ((int) $event->event_location === Event::IN_PERSON_MEETING) {
@@ -79,12 +83,25 @@ class EventRepository extends BaseRepository
                 }
             } else {
                 $event->location()->delete();
+
+                if ($liveStartedBefore) {
+                    app(\App\Modules\Notifications\Services\LocationNotifier::class)
+                        ->stopped($event, $liveStartedBefore);
+                }
             }
 
             $event->load('location');
             $locationAfter = optional($event->location)->only(['location_type', 'latitude', 'longitude', 'address']);
-            $fixedAddressChanged = (int) ($locationAfter['location_type'] ?? 0) === Location::FIXED && $locationBefore != $locationAfter;
-            $locationChanged = $event->wasChanged('event_location') || $fixedAddressChanged;
+
+            $typeBefore = (int) ($locationBefore['location_type'] ?? 0);
+            $typeAfter = (int) ($locationAfter['location_type'] ?? 0);
+
+            $fixedAddressChanged = $typeAfter === Location::FIXED && $locationBefore != $locationAfter;
+
+            $sharingStartedNow = $liveStartedBefore === null && (bool) optional($event->location)->is_live_sharing_active;
+            $switchedToLive = $typeBefore === Location::FIXED && $typeAfter === Location::LIVE && ! $sharingStartedNow;
+
+            $locationChanged = $event->wasChanged('event_location') || $fixedAddressChanged || $switchedToLive;
 
             $changes = [];
             foreach ($before as $field => $old) {
@@ -96,6 +113,10 @@ class EventRepository extends BaseRepository
 
             if ($fixedAddressChanged) {
                 $changes['location'] = ['old' => $locationBefore['address'] ?? null, 'new' => $locationAfter['address'] ?? null];
+            }
+
+            if ($switchedToLive) {
+                $changes['location'] = ['old' => $locationBefore['address'] ?? null, 'new' => 'Live location (the owner will share it)'];
             }
 
             if ($locationChanged) {
@@ -595,7 +616,7 @@ class EventRepository extends BaseRepository
 
         $isLiveSharingActive = $requestedSharingActive;
 
-        $liveStartedAt = $isLiveSharingActive ? ($wasAlreadyActive ? optional($existingLocation)->live_started_at : now()) : null;
+        $liveStartedAt = $isLiveSharingActive ? ($wasAlreadyActive ? optional($existingLocation)->live_started_at : \App\Support\LiveSession::startedAt($event->id)) : null;
 
         \Log::info('[CallaLink] saveEventLocation resolved', [ 
             'event_id' => optional($event)->id,
@@ -605,6 +626,19 @@ class EventRepository extends BaseRepository
             'isLiveSharingActive' => $isLiveSharingActive,
             'liveStartedAt' => $liveStartedAt,
         ]);
+
+        if ($isLiveSharingActive && ! $wasAlreadyActive) {
+            $other = Event::where('user_id', getLogInUserId())
+                ->where('id', '!=', $event->id)
+                ->whereHas('location', fn ($q) => $q->where('location_type', Location::LIVE)->where('is_live_sharing_active', true))
+                ->first();
+
+            if ($other) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'new_location_is_live_sharing_active' => "You're already sharing live location for \"{$other->name}\". Stop that one first.",
+                ]);
+            }
+        }
 
         $event->location()->updateOrCreate(
             [],
@@ -618,6 +652,14 @@ class EventRepository extends BaseRepository
                 'live_started_at' => $liveStartedAt,
             ]
         );
+
+        $locationNotifier = app(\App\Modules\Notifications\Services\LocationNotifier::class);
+
+        if (! $wasAlreadyActive && $isLiveSharingActive) {
+            $locationNotifier->started($event, $liveStartedAt);
+        } elseif ($wasAlreadyActive && ! $isLiveSharingActive) {
+            $locationNotifier->stopped($event, optional($existingLocation)->live_started_at);
+        }
 
         \Log::info('[CallaLink] saveEventLocation persisted', [
             'event_id' => $event?->id,

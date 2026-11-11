@@ -18302,3 +18302,142 @@ ul {
 .pricing-plan-btn {
   min-width: 120px;
 }
+
+.notification-surface {
+    background: #FFFFFF;
+    border: 1px solid #E9ECEF;
+    border-radius: .5rem;
+    box-shadow: 0 0 20px rgba(173, 181, 189, 0.1);
+    overflow: hidden; /* keeps the row colours inside the rounded corners */
+}
+
+#notificationBellWrapper .dropdown-menu {
+    background: #FFFFFF;
+    border: 1px solid #E9ECEF;
+    overflow: hidden;
+}
+
+/* dropdown header and footer use the table-header grey */
+#notificationBellWrapper .dropdown-menu > .border-bottom,
+#notificationBellWrapper .dropdown-menu > .border-top {
+    background: #F8F9FA;
+    border-color: #E9ECEF !important;
+}
+
+/* text sizes follow the site: body 0.875rem, small text 0.781rem (as in the header nav), weight 400 */
+.notification-title {
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.313rem;
+}
+
+.notification-body {
+    font-size: 0.781rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+#notificationBellWrapper .dropdown-menu h4 {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+#notificationBellWrapper #notificationMarkAll {
+    font-size: 0.781rem !important; /* beats the .fs-6 class on the button */
+    font-weight: 400;
+}
+
+#notificationBellWrapper .dropdown-menu .border-top a {
+    font-size: 0.781rem;
+}
+
+/* rows */
+.notification-item {
+    border-bottom: 1px solid rgba(108, 117, 125, 0.18);
+    transition: background-color .12s ease;
+}
+
+#notificationList .notification-item:last-child {
+    border-bottom: 0; /* the dropdown footer draws its own line */
+}
+
+.notification-item a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* unread = bright: white, a primary accent bar, dark bold title */
+.notification-item.is-unread {
+    background: #FFFFFF;
+}
+
+.notification-item.is-unread:hover {
+    background: #F8F9FA;
+}
+
+.notification-item.is-unread .notification-dot {
+    background: #6571FF;
+}
+
+.notification-item.is-unread .notification-title {
+    color: #212529;
+}
+
+.notification-item.is-unread .notification-body {
+    color: #495057;
+}
+
+.notification-item.is-unread .notification-time {
+    color: #6C757D;
+}
+
+/* read = dull: grey surface, no accent bar, lighter title */
+.notification-item.is-read {
+    background: #F8F9FA;
+}
+
+.notification-item.is-read:hover {
+    background: #F1F3F5;
+}
+
+.notification-item.is-read .notification-dot {
+    background: transparent;
+}
+
+.notification-item.is-read .notification-title {
+    color: #495057;
+}
+
+.notification-item.is-read .notification-body,
+.notification-item.is-read .notification-time {
+    color: #5F6B76;
+}
+
+.notification-delete:hover {
+    background: rgba(108, 117, 125, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notification-item {
+        transition: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    #notificationBellWrapper .dropdown-menu {
+        position: fixed !important;
+        top: 76px !important;
+        left: 12px !important;
+        right: 12px !important;
+        bottom: auto !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+}

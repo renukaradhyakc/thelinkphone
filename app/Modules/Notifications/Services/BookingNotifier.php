@@ -66,6 +66,11 @@ class BookingNotifier
             $this->outbox->cancelPendingForBooking($booking->id);
             $booking->loadMissing(['event', 'user']);
 
+            $end = $this->endUtc($booking);
+            if ($end !== null && $end->isPast()) {
+                return; 
+            }
+
             $audience = $variant === 'booker_cancelled' ? 'owner' : 'booker';
             $user = $audience === 'owner' ? $booking->user : $this->booker($booking);
 
@@ -103,9 +108,10 @@ class BookingNotifier
 
             foreach ($bookings as $booking) {
                 $start = $this->startUtc($booking);
+                $end = $start ? ($this->endUtc($booking) ?? $start->copy()->addMinutes(30)) : null;
                 $booker = $this->booker($booking);
 
-                if ($start === null || $start->lte(now()) || $booker === null || $booker->id === $booking->user_id) {
+                if ($start === null || $end->lte(now()) || $booker === null || $booker->id === $booking->user_id) {
                     continue;
                 }
 
@@ -258,6 +264,31 @@ class BookingNotifier
         }
     }
 
+    public function endUtc(EventSchedule $booking): ?Carbon
+    {
+        try {
+            $booking->loadMissing('user');
+
+            $date = Carbon::parse($booking->schedule_date)->format('Y-m-d');
+            $end = trim(preg_split('/\s*-\s*/', (string) $booking->slot_time)[1] ?? '');
+
+            if ($end === '') {
+                return null;
+            }
+
+            $endUtc = Carbon::parse("$date $end", $this->timezone($booking->user))->utc();
+            $start = $this->startUtc($booking);
+
+            if ($start !== null && $endUtc->lte($start)) {
+                $endUtc->addDay();
+            }
+
+            return $endUtc;
+        } catch (Throwable $e) {
+            return null;
+        }
+    }
+
     private function timezone(?User $user): string
     {
         $key = $user->timezone ?? null;
@@ -278,9 +309,17 @@ class BookingNotifier
     {
         $start = $this->startUtc($booking);
 
+        $ownerName = trim((string) optional($booking->user)->full_name);
+        $guestName = trim((string) $booking->name);
+        $recipientIsOwner = (int) $recipient->id === (int) $booking->user_id;
+
         return [
             'event' => $booking->event->name ?? '',
             'name' => $booking->name,
+            'owner' => $ownerName !== '' ? $ownerName : 'The host',
+            'with' => $recipientIsOwner
+                ? ($guestName !== '' ? $guestName : 'your guest')
+                : ($ownerName !== '' ? $ownerName : 'the host'),
             'time' => $start
                 ? $start->copy()->setTimezone($this->timezone($recipient))->format('d M, h:i A')
                 : trim($booking->schedule_date.' '.$booking->slot_time),

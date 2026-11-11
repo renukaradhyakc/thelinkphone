@@ -66,6 +66,22 @@ class NotificationController extends Controller
         ]);
     }
 
+    public function unread(Request $request, string $uuid): JsonResponse
+    {
+        $userId = $request->user()->id;
+
+        if ($this->inbox->findForUser($userId, $uuid) === null) {
+            return response()->json(['success' => false, 'message' => 'Notification not found.'], 404);
+        }
+
+        $this->inbox->markUnread($userId, $uuid); // already-unread is fine: idempotent
+
+        return response()->json([
+            'success' => true,
+            'data' => ['unread_count' => $this->inbox->unreadCount($userId)],
+        ]);
+    }
+
     public function readAll(Request $request): JsonResponse
     {
         $userId = $request->user()->id;
@@ -91,6 +107,7 @@ class NotificationController extends Controller
     {
         return [
             'id' => $n->uuid,
+            'schema_version' => (string) UserNotification::SCHEMA_VERSION,
             'type' => $n->type,
             'reason' => $n->reason,
             'category' => $n->category,

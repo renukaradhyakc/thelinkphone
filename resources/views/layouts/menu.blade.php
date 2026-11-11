@@ -154,6 +154,15 @@
         <span class="aside-menu-title">{{__('messages.setting.connect_google_calendar')}}</span>
     </a>
 </li>
+<li class="nav-item {{ Request::is('notification-center*') ? 'active' : '' }}">
+    <a class="nav-link d-flex align-items-center py-3"
+       href="{{ route('notification-center.settings') }}">
+        <span class="aside-menu-icon pe-3">
+            <i class="fa-solid fa-bell fs-3"></i>
+        </span>
+        <span class="aside-menu-title">Notification Settings</span>
+    </a>
+</li>
 <li class="nav-item {{ (Request::is('settings*')  ? 'active' : '') }}">
     <a class="nav-link d-flex align-items-center py-3"
        href="{{ route('user.settings') }}">

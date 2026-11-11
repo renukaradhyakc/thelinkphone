@@ -26,8 +26,8 @@ class TrialService
                     ]
                 );
 
-            // ❌ Trial already used and finished
-            if ($trial->consumed) {
+            // already used once (finished or consumed): never start a second trial
+            if ($trial->consumed || ($trial->expires_at && $trial->expires_at->isPast())) {
                 throw new DomainException('TRIAL_ALREADY_CONSUMED');
             }
 

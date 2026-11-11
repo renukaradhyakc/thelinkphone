@@ -11,6 +11,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use App\Modules\Notifications\Repositories\PreferenceRepository;
+use App\Modules\Notifications\Services\NotificationRegistry;
+use Illuminate\Support\Facades\Cache;
 use RuntimeException;
 
 /**
@@ -28,7 +31,7 @@ class SendPushNotificationJob implements ShouldQueue
 
     public function backoff(): array
     {
-        return [60, 300];
+        return [30, 120];
     }
 
     public function failed(\Throwable $e): void
@@ -39,7 +42,7 @@ class SendPushNotificationJob implements ShouldQueue
         ]);
     }
 
-    public function handle(FcmChannel $fcm, DeviceTokenRepository $devices, DeviceService $deviceService): void
+    public function handle(FcmChannel $fcm, DeviceTokenRepository $devices, DeviceService $deviceService, PreferenceRepository $preferences, NotificationRegistry $registry): void
     {
         $notification = UserNotification::find($this->notificationId);
 
@@ -53,10 +56,23 @@ class SendPushNotificationJob implements ShouldQueue
 
         $retry = false;
 
+        if (! $this->pushStillWanted($notification, $preferences, $registry)) {
+            return; 
+        }
+
         foreach ($devices->activeForUser($notification->user_id, [DeviceToken::ANDROID, DeviceToken::IOS]) as $device) {
+
+            $sentKey = "push_sent:{$notification->id}:{$device->id}";
+
+            if (Cache::has($sentKey)) {
+                continue;
+            }
+
             $result = $fcm->send($notification, $device);
 
-            if ($result === FcmChannel::INVALID_TOKEN) {
+            if ($result === FcmChannel::SENT) {
+                Cache::put($sentKey, true, now()->addDay());
+            } elseif ($result === FcmChannel::INVALID_TOKEN) {
                 $deviceService->revokeInvalid($device);
             } elseif ($result === FcmChannel::RETRY) {
                 $retry = true;
@@ -66,5 +82,18 @@ class SendPushNotificationJob implements ShouldQueue
         if ($retry) {
             throw new RuntimeException('FCM temporary failure, retrying.');
         }
+    }
+
+    private function pushStillWanted(UserNotification $notification, PreferenceRepository $preferences, NotificationRegistry $registry): bool
+    {
+        if ((bool) (config('notifications.types')[$notification->type]['mandatory'] ?? false)) {
+            return true; // mandatory types ignore the category switch
+        }
+
+        return $preferences->isPushEnabled(
+            $notification->user_id,
+            (string) $notification->category,
+            $registry->categoryDefaultEnabled((string) $notification->category)
+        );
     }
 }

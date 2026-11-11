@@ -58,4 +58,8 @@ return [
         'redirect_uri' => env('ZOOM_REDIRECT_URI'),
     ],
 
+    'revenuecat' => [
+        'webhook_secret' => env('REVENUECAT_WEBHOOK_SECRET'),
+        'entitlement' => env('REVENUECAT_ENTITLEMENT', 'CallALink Premium'),
+    ],
 ];

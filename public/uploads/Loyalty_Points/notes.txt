@@ -1,0 +1,793 @@
+before we do next notification thing shall we asses our progress like how much we have done and how much is left and how much i need to still put how many hours of time like that
+keep in mind that i have already completed that inbox work
+
+STAGE 5: Web client, preferences UI, remaining events, email (13 h, range 11–16,
+plus 3 h optional)
+Phase 8: Web notification center (4.5 h)
+
+Exported with AI Exporter 162 / 556
+
+# Work item Hours
+8.1 Notification dropdown/page (the bell, "Mark all as read") 1.0
+8.2 Unread badge 0.5
+8.3 API endpoints wired to the page 0.75
+8.4 Pagination ("load more") 0.5
+8.5 Read/unread state (open, mark read, mark all read, persists after refresh) 0.75
+8.6 Notification routing (click → destination) 0.5
+8.7 Refresh/polling about every 60 s while the tab is visible; no WebSockets 0.5
+Phase 9, UI part: Notification preferences (1.75 h)
+# Work item
+
+Hou
+rs
+
+9.
+1
+Notification Settings screen: Scheduled calls ON, Schedule changes ON, Loyalty O
+N, Subscription ON, Marketing OFF, Push ON, Email ON
+
+1.0
+
+9.
+5
+(+) Defaults for new types, and the same API reused by Android and iOS 0.75
+
+i think i have covered this i will let you know afterwards by giving the entire code and checking is everything is covered according to the list or not but for now as far as i have seen inbox is working correctly so to measure the progress consider it as completed
+
+
+now after coming this far
+generate that same list as same but like for the covered ones check it and mark it as completed and remove the hours and for incomplete ones update the remaining time needed and then do it like this
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+STAGE 1: Common backend and contract (about 28.5 h, range 24–32)
+Phase 1: Requirements + architecture (3.5 h)
+
+Exported with AI Exporter 156 / 556
+
+# Work item
+
+Ho
+urs
+
+1.
+0
+(+) Audit existing code: API routes, auth scheme, any existing notifications / jobs t
+ables, queue config, mail flows such as scheduleEventMails() , existing models
+
+0.5
+
+1.
+1
+Define all notification types CallALink needs (the matrix across Calls, Schedules, Loc
+ation, Accounts, Loyalty, System)
+
+0.7
+5
+
+1.
+2
+Define categories/types and payloads: stable type keys and one envelope (
+notification_id , type , title , body , deep_link , data , created_at , expires_at ,
+schema_version )
+
+0.5
+
+1.
+3
+Decide which notifications are in-app only, push, email, or combinations 0.5
+
+1.
+4
+Create the central architecture: NotificationService , NotificationType , preference s
+ervice, delivery via a Laravel channel (confirm names after the audit)
+
+0.5
+
+1.
+5
+Add notification preferences/settings (decide categories and the channel model)
+
+0.2
+5
+
+1.
+6
+(+) Common architecture for web, Android and iOS, plus the written API contract:
+/api/v1 , cursor pagination, one deep-link format, UTC times, server-driven text, no r
+aw phone numbers in any text
+
+0.5
+
+Phase 2: DB schema, migrations, models (3.5 h)
+# Work item
+
+Hou
+rs
+
+2.
+1
+notifications table (persistent notification center, independent of push success) 0.5
+
+2.
+2
+device_tokens (user, platform, unique token, device id, last used; supports multiple
+devices)
+
+0.5
+
+2.
+3
+notification_preferences 0.5
+2.
+4
+(+) notification_outbox for scheduled reminders (user, type, payload, notify_at in
+UTC, sent_at , dedupe_key )
+
+0.5
+
+2.
+5
+Potential supporting tables: notification_logs (delivery debugging) and
+notification_templates . Decision: templates skipped, logs kept minimal
+
+0.2
+5
+
+2.
+6
+Models, relationships, casts, scopes
+
+0.7
+5
+Exported with AI Exporter 157 / 556
+
+# Work item
+
+Hou
+rs
+
+2.
+7
+Migrations: create, run, roll back, indexes (unread, pagination, token lookup), foreign
+keys, unique constraints
+
+0.5
+
+Phase 3: Notification service + APIs (9 h)
+# Work item
+
+Ho
+urs
+
+3.
+1
+Creating notifications: NotificationService → DB row → channels (Android push, i
+OS push, optionally email)
+
+1.0
+
+3.
+2
+(+) FCM v1 channel: service-account auth, cached access token, per-platform paylo
+ad (Android priority and channel, iOS badge and sound), validate_only dry run
+
+1.7
+5
+
+3.
+3
+Mark read, mark unread if wanted, and mark all read 0.5
+
+3.
+4
+Delete/dismiss
+
+0.2
+5
+
+3.
+5
+Fetch notifications: paginated list (cursor), ordering, unread filter
+
+0.7
+5
+
+3.
+6
+Unread count
+
+0.2
+5
+
+3.
+7
+Notification payload/data: the single envelope for all clients 0.5
+3.
+8
+Expiration of old notifications ( expires_at plus a prune command) 0.5
+3.
+9
+Invalid-token handling (revoke on UNREGISTERED or INVALID_ARGUMENT ) 0.5
+3.
+10
+Duplicate prevention/idempotency (unique dedupe_key ) 0.5
+3.
+11
+Device APIs: POST /api/v1/devices (upsert), DELETE /api/v1/devices/{token}
+
+0.7
+5
+
+3.
+12
+APIs: GET /notifications , GET /notifications/unread-count ,
+POST /notifications/{id}/read , POST /notifications/read-all , GET /
+PUT /notification-preferences
+
+0.7
+5
+
+Exported with AI Exporter 158 / 556
+
+# Work item
+
+Ho
+urs
+
+3.
+13
+(+) Test command notifications:test {user} {type} and feature tests for the APIs 1.0
+
+Phase 11, core part: Reliability foundations (2.5 h)
+# Work item Hours
+11.1 Retry handling ( tries , backoff ) 0.5
+11.2 Failed jobs ( failed_jobs handling, retry command) 0.5
+11.5 Logging (every FCM response logged) 0.75
+11.8 API authentication: users can only access their own notifications and tokens 0.75
+
+Phase 9, backend part: Preferences logic (1.75 h)
+# Work item Hours
+9.2 Preference categories connected to the Phase 1 types (Marketing default OFF) 0.5
+9.3 Channel preferences (push, email, in-app) 0.5
+9.4 Preference enforcement in the backend service, not only the UI 0.75
+Phase 4, core part: Reminder engine and dependent events (4.75 h)
+# Work item
+
+Hour
+s
+
+4.0
+(+) Reminder engine: outbox rows at 15/5/0 min, notifications:dispatch-due wit
+h an atomic claim, UTC
+
+2.0
+
+4.1.
+1
+Calls: scheduled call created 0.5
+
+4.1.
+2
+Calls: upcoming call reminder 0.5
+
+4.1.
+3
+Calls: call starting 0.25
+
+4.2.
+1
+Schedules: schedule created 0.25
+
+Exported with AI Exporter 159 / 556
+
+# Work item
+
+Hour
+s
+
+4.2.
+2
+Schedules: schedule modified (recompute unsent reminders) 0.5
+4.2.
+3
+Schedules: schedule cancelled (delete unsent reminders) 0.5
+
+4.2.
+6
+Schedules: reminder 0.25
+
+Phase 5: Scheduler, Hostinger cron, queue (3.5 h)
+# Work item
+
+Hou
+rs
+
+5.
+0
+(+) Prerequisite: resolve the IOPS/CPU/inode findings before adding per-minute job
+s
+
+0.5
+
+5.
+1
+Laravel scheduler: every minute for reminders, daily for expiry checks, hourly for cle
+anup/maintenance
+
+0.5
+
+5.
+2
+Hostinger Cron #1: keep the existing bill-processing cron, with a corrected worker c
+ommand
+
+0.5
+
+5.
+3
+Hostinger Cron #2: php artisan schedule:run 0.25
+5.
+4
+Queue integration: notification jobs on the database queue, notifications queue, j
+ob payload is just the notification ID
+
+0.5
+
+5.
+5
+Queue arrangement: a separate worker per queue (bills and notifications),
+withoutOverlapping(10) , --max-time , two-worker cap
+
+0.5
+
+5.
+6
+(+) External uptime pinger as a backup trigger 0.25
+5.
+7
+No VPS requirement: the stack stays Laravel + MySQL + shared Hostinger + cron +
+database queue (decision only)
+
+0
+
+5.
+8
+(+) End-to-end test: one reminder travels through cron, queue and push, and the log
+s are reviewed
+
+0.5
+
+STAGE 2: Android thin slice and contract freeze (4.5 h, range 4–5)
+Phase 6, part 1: Android FCM
+Exported with AI Exporter 160 / 556
+
+# Work item
+
+Hour
+s
+
+6.
+1
+FCM setup/verification (Messaging SDK, console, service-account key placed on t
+he server)
+
+1.0
+
+6.
+2
+Register the FCM token 0.5
+
+6.
+3
+Send the token to Laravel 0.75
+
+6.
+4
+Notification tap → deep link to the right screen (one type for the slice) 1.0
+6.
+5
+(+) Load the inbox list from the API 0.75
+6.
+0
+(+) Contract revision window (one day at most), then freeze 0.5
+
+STAGE 3: Android full (11 h, range 9–13)
+Phase 6, part 2: Android FCM
+# Work item Hours
+6.7 Refresh/update token 0.5
+6.8 Foreground notifications 1.0
+6.9 Background notifications 1.0
+6.10 Terminated-app behavior 1.0
+6.11 Notification taps (all types, with a fallback for unknown types) 1.0
+6.12 Deep-link/routing to all destinations (for example schedule details) 1.5
+6.13 Handle the common data payload (ignore unknown fields and types) 0.75
+6.14 (+) Notification channels (schedules, location, billing, general) 0.75
+6.15 (+) Android 13 POST_NOTIFICATIONS permission, asked in context 0.75
+6.16 Remove invalid tokens (confirm backend integration) 0.5
+6.17 Logout/token cleanup 0.75
+6.18 (+) MIUI/OEM battery-manager testing and the Android 12/13/14+ matrix 1.5
+Exported with AI Exporter 161 / 556
+
+STAGE 4: iOS (12.5 h, range 10–15)
+Phase 7: iOS APNs
+
+# Work item
+
+Ho
+urs
+7.1 APNs configuration: create the .p8 key in Apple Developer and upload it to Firebase 1.0
+7.2
+Push notification entitlement/capability (plus the remote-notification background
+mode); kept separate from the Default Calling App / LiveCommunicationKit work
+
+0.7
+5
+
+7.3
+(+) Add UIApplicationDelegateAdaptor and the Firebase Messaging SDK (no app
+delegate exists today)
+
+1.5
+
+7.4 Request notification permission (in context, not on first launch) 1.0
+7.5 Register for remote notifications 0.5
+7.6 Obtain the APNs device token
+
+0.7
+5
+
+7.7 Send the token to Laravel (same device API)
+
+0.7
+5
+7.8 Foreground notifications 1.0
+7.9 Background notifications 1.0
+7.1
+0
+(+) Terminated-app behavior on a physical iPhone 1.0
+7.1
+1
+Notification taps 1.0
+7.1
+2
+Route to the correct screen through DeepLinkManager
+
+1.2
+5
+
+7.1
+3
+Token refresh/invalid-token handling, plus logout cleanup 1.0
+
+STAGE 5: Web client, preferences UI, remaining events, email (13 h, range 11–16,
+plus 3 h optional)
+Phase 8: Web notification center (4.5 h)
+
+Exported with AI Exporter 162 / 556
+
+# Work item Hours
+8.1 Notification dropdown/page (the bell, "Mark all as read") 1.0
+8.2 Unread badge 0.5
+8.3 API endpoints wired to the page 0.75
+8.4 Pagination ("load more") 0.5
+8.5 Read/unread state (open, mark read, mark all read, persists after refresh) 0.75
+8.6 Notification routing (click → destination) 0.5
+8.7 Refresh/polling about every 60 s while the tab is visible; no WebSockets 0.5
+Phase 9, UI part: Notification preferences (1.75 h)
+# Work item
+
+Hou
+rs
+
+9.
+1
+Notification Settings screen: Scheduled calls ON, Schedule changes ON, Loyalty O
+N, Subscription ON, Marketing OFF, Push ON, Email ON
+
+1.0
+
+9.
+5
+(+) Defaults for new types, and the same API reused by Android and iOS 0.75
+
+Phase 4, remaining events (6.75 h)
+# Work item
+
+Hour
+s
+
+4.1.
+4
+Calls: missed call 0.5
+
+4.1.
+5
+Calls: call completed, if applicable 0.25
+4.2.
+4
+Schedules: participant added/removed 0.25
+4.2.
+5
+Schedules: schedule invitation 0.25
+
+4.3.
+1
+Location: sharing started 0.5
+4.3.
+2
+Location: sharing stopped 0.25
+
+Exported with AI Exporter 163 / 556
+
+# Work item
+
+Hour
+s
+
+4.3.
+3
+Location-related event notification 0.25
+
+4.4.
+1
+Accounts: trial started 0.25
+
+4.4.
+2
+Accounts: trial expiring (daily job) 0.5
+
+4.4.
+3
+Accounts: subscription expiring 0.5
+4.4.
+4
+Accounts: subscription renewed 0.25
+4.4.
+5
+Accounts: subscription/payment problem 0.25
+4.4.
+6
+(+) RevenueCat webhook receiver (if you don't have one) 0.5
+4.5.
+1
+Loyalty: bill uploaded 0.25
+4.5.
+2
+Loyalty: bill processing 0.25
+4.5.
+3
+Loyalty: bill successfully processed 0.25
+4.5.
+4
+Loyalty: points awarded 0.25
+4.5.
+5
+Loyalty: duplicate bill 0.25
+4.5.
+6
+Loyalty: bill processing failed 0.25
+
+4.5.
+7
+(+) Hook into ProcessBillJob on the notifications queue 0.25
+4.6.
+1
+System: important account/security notifications 0.25
+
+Exported with AI Exporter 164 / 556
+
+# Work item
+
+Hour
+s
+
+4.6.
+2
+System: announcements (deferred, not in v1) 0
+
+4.7
+Matrix validation: event → type → DB → allowed channels → payload → destin
+ation
+
+0.25
+
+Phase 10: Email channel, optional (3 h, not in totals)
+# Work item Hours
+10.1 Mail provider integration (Laravel → provider → user email) 0.75
+10.2 Email as another Laravel channel, with no email logic in controllers 1.0
+10.3 Email preference enforcement 0.5
+10.4 Connect selected notification types to email 0.75
+
+STAGE 6: Hardening, testing, production (21.5 h, range 18–25)
+Phase 11, remaining part: Reliability hardening (3.5 h)
+# Work item Hours
+11.3 Invalid FCM/APNs token removal, verified against real provider errors 0.5
+11.4 Duplicate prevention: atomic outbox claim, cron overlap 0.75
+11.6 Delivery status: created, queued, attempted, accepted, failed 0.75
+11.7 Queue failure handling: nothing disappears silently 0.5
+11.9 Rate limiting on device register, read-all and preferences 0.5
+11.10 (+) Cleanup: prune old notifications, dead tokens, jobs and logs 0.5
+Phase 12: Full testing/debugging (13.5 h)
+# Work item
+
+Hour
+s
+12.1 Backend: every selected event creates the correct notification 1.0
+12.2
+Web: list, unread count, read/unread, mark all read, pagination, routing, preferenc
+es
+
+1.0
+
+Exported with AI Exporter 165 / 556
+
+# Work item
+
+Hour
+s
+
+12.3
+Android: registration, token storage, foreground/background/killed, tap, routing, r
+efresh, invalid token, logout
+
+1.25
+
+12.4 iOS: the same on a physical iPhone, plus permission and token lifecycle 1.25
+
+12.5
+Scheduled path end to end: schedule → reminder time → scheduler → queue →
+push on all clients
+
+1.0
+
+12.6 Reminder time already passed 0.5
+12.7 Cancelled/modified schedule leaves no stale reminders 0.75
+12.8 Duplicate scheduler/cron execution 0.75
+12.9 Multiple devices per user (Android + iPhone) 0.75
+12.1
+0
+Expired/invalid token 0.5
+12.1
+1
+Permission denied, and logged-out users 0.75
+12.1
+2
+Timezones (reminders, trial and subscription expiry) 0.75
+12.1
+3
+Network/API/provider failure, queue failure, retries 0.75
+12.1
+4
+Hostinger cron actually invokes the scheduler, backup pinger works 0.5
+12.1
+5
+Loyalty/OCR flow: upload → process → success/failure → points → notification 0.75
+
+12.1
+6
+Cross-platform consistency: the same event on web, Android, iOS (and email if e
+nabled)
+
+0.75
+
+12.1
+7
+(+) Older app versions: users with no tokens, unknown types and fields 0.5
+
+Phase 13: Production deployment and verification (4.5 h)
+# Work item
+
+Hour
+s
+13.1 Production database migrations (back up first) 0.5
+
+Exported with AI Exporter 166 / 556
+
+# Work item
+
+Hour
+s
+13.2 Production Laravel configuration (FCM key path, config cache) 0.5
+
+13.3
+Hostinger cron: existing bill cron plus the scheduler cron, bill processing undistur
+bed
+
+0.5
+
+13.4 Production queue execution 0.25
+13.5 FCM production configuration (Android delivery) 0.25
+13.6 APNs production configuration (iOS delivery) 0.25
+13.7 Authenticated production API tests 0.25
+13.8 Controlled end-to-end production test 0.5
+13.9 Monitoring/log verification, plus watching CPU and IOPS after enabling 0.5
+13.1
+0
+(+) Store disclosures: Play Data safety, App Store privacy details, privacy policy
+updated for device tokens
+
+0.5
+
+13.1
+1
+(+) Staged rollout: your own account, then a small group, then everyone 0.5
+
+Phase totals
+# Phase Expected Range
+1 Requirements + architecture 3.5 h 3–4
+2 DB schema, migrations, models 3.5 h 3–4
+3 Notification service + APIs 9 h 8–10
+4 Feature integration 11.5 h 9–14
+5 Scheduler + cron + queue 3.5 h 3–4
+6 Android FCM 15.5 h 13–18
+7 iOS APNs 12.5 h 10–15
+8 Web notification center 4.5 h 4–5
+9 Notification preferences 3.5 h 3–4
+10 Email channel (optional) 3 h 2–4
+11 Failure handling/retries/tokens 6 h 5–7
+Exported with AI Exporter 167 / 556
+
+# Phase Expected Range
+12 Full testing/debugging 13.5 h 11–16
+13 Production deployment 4.5 h 4–5
+Total without email 91 h 76–106
+Total with email 94 h 78–110
+
+Stage totals
+
+Stage Expected Range
+1. Common backend and contract 28.5 h 24–32
+2. Android thin slice and freeze 4.5 h 4–5
+3. Android full 11 h 9–13
+4. iOS 12.5 h 10–15
+5. Web, preferences UI, remaining events 13 h 11–16
+6. Hardening, testing, production 21.5 h 18–25
+If time runs short: stages 1–3 are the MVP, at about 44 h. Android push, reminders and the key events
+work at that point.
+Calendar time
+Hours per day Full plan (91 h) Range
+4 about 23 working days (4.5 weeks) 19–27
+6 about 15 working days (3 weeks) 13–18
+8 about 11–12 working days (2.5 weeks) 10–13
+
+Coverage check against the earlier scope
+Section 1 (architecture) → 1.1–1.5
+Section 2 (database) → 2.1–2.7
+Section 3 (engine) → 3.1–3.13
+Section 4 (events) → 4.1.1–4.7
+Sections 5 and 6 (scheduler, cron, queue) → 5.1–5.8
+Section 7 (Android) → 6.1–6.18
+Exported with AI Exporter 168 / 556
+
+Section 8 (iOS) → 7.1–7.13
+Section 9 (web center) → 8.1–8.7
+Section 10 (preferences) → 9.1–9.5
+Section 11 (email) → 10.1–10.4
+Section 12 (reliability) → 11.1–11.10
+Testing and deployment → 12.1–12.17 and 13.1–13.11

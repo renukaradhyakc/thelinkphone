@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class UserNotification extends Model
 {
+    public const SCHEMA_VERSION = 1;
+    
     use GeneratesUuid;
 
     /**

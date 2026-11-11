@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        if ($this->app->environment('local') && (str_contains(request()->server('HTTP_HOST', ''), 'ngrok') || str_contains(request()->server('HTTP_HOST', ''), 'zrok.io') || str_contains(request()->server('HTTP_HOST', ''), 'pinggy-free.link'))) {
+        if ($this->app->environment('local') && (str_contains(request()->server('HTTP_HOST', ''), 'trycloudflare.com'))) {
             URL::forceScheme('https');
         }
 

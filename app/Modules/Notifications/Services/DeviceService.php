@@ -16,9 +16,9 @@ class DeviceService
         return $this->devices->upsert($userId, $platform, $token, $extra);
     }
 
-    public function unregister(int $userId, string $token): bool
+    public function unregister(int $userId, string $token, ?string $deviceId = null): bool
     {
-        return $this->devices->revokeForUser($userId, $token);
+        return $this->devices->revokeForUser($userId, $token, $deviceId);
     }
 
     /** Called by the FCM channel when the provider rejects a token. */

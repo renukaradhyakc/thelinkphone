@@ -84,7 +84,7 @@
                                                             </span>
                                                         @elseif($eventSchedule->event->event_location == \App\Models\Event::PHONE_CALL)
                                                             @php($phoneCallNumber = json_decode($eventSchedule->event->location_meta))
-                                                            @if (count($phoneCallNumber) > 0 && !empty($phoneCallNumber[1]))
+                                                            @if (is_array($phoneCallNumber) && count($phoneCallNumber) > 0 && !empty($phoneCallNumber[1]))
                                                                 @if (!empty($phoneCallNumber[2]) && $phoneCallNumber[1] == 2)
                                                                     <i class="fa-solid fa-phone fs-2 text-black"></i>
                                                                     <span
