@@ -118,15 +118,16 @@
                         @endif
                 
                         <li>
-                            <a class="dropdown-item text-gray-900 d-flex cursor-pointer">
+                            <a class="dropdown-item text-gray-900 d-flex cursor-pointer" href="#" onclick="callalinkLogout(event)">
                                 <span class="dropdown-icon me-4 text-gray-600">
                                     <i class="fa-solid fa-right-from-bracket"></i>
                                 </span>
                                 <form id="logout-form" action="{{ route('logout')}}" method="post">
                                     @csrf
                                 </form>
-                                <span onclick="callalinkLogout(event)">
-                                    {{ __('messages.sign_out') }}</span>
+                                <span>
+                                    {{ __('messages.sign_out') }}
+                                </span>
                             </a>
                         </li>
                     </ul>

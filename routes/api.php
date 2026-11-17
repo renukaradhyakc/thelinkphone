@@ -16,6 +16,7 @@ use App\Modules\Notifications\Controllers\DeviceController;
 use App\Modules\Notifications\Controllers\NotificationController;
 use App\Modules\Notifications\Controllers\PreferenceController;
 use App\Http\Controllers\RevenueCatWebhookController;
+use App\Http\Controllers\WebviewBridgeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,11 +34,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/events',[ScheduleEventController::class, 'index']);
-Route::post('/login',[UserController::class, 'login']);
+Route::post('/login',[UserController::class, 'login'])->middleware('throttle:10,1');
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/qrscan',[UserController::class, 'qrscan']);
 });
-Route::post('/authlogin',[UserController::class, 'authlogin']);
+Route::post('/authlogin',[UserController::class, 'authlogin'])->middleware('throttle:10,1');
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/call-permission',[UserController::class,'checkCallPermission']);
 });
@@ -107,3 +108,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 });
 
 Route::post('/revenuecat/webhook', [RevenueCatWebhookController::class, 'handle'])->middleware('throttle:120,1');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [UserController::class, 'logout']);
+    Route::post('/webview-ticket', [WebviewBridgeController::class, 'issue'])->middleware('throttle:10,1');
+});

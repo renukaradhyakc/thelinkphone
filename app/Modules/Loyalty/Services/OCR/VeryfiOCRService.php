@@ -39,8 +39,7 @@ class VeryfiOCRService implements OCRServiceInterface
             'mime_type' => $mimeType,
         ]);
 
-        $response = Http::withoutVerifying()
-            ->withHeaders($headers)
+        $response = Http::withHeaders($headers)
             ->timeout(60)
             ->post('https://api.veryfi.com/api/v8/partner/documents', [
                 'file_data'          => $fileData,
@@ -61,7 +60,7 @@ class VeryfiOCRService implements OCRServiceInterface
 
         if (!$response->successful()) {
             throw new \Exception(
-                'Veryfi API failed: ' . $response->status() . ' — ' . $response->body()
+                'Veryfi API failed: ' . $response->status()
             );
         }
 
@@ -69,7 +68,7 @@ class VeryfiOCRService implements OCRServiceInterface
 
         // Validate we got a real document back
         if (empty($data['id'])) {
-            throw new \Exception('Veryfi: Response missing document id — ' . json_encode($data));
+            throw new \Exception('Veryfi: Response missing document id');
         }
 
         return $data;

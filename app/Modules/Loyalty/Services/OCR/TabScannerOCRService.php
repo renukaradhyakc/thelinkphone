@@ -18,13 +18,9 @@ class TabScannerOCRService implements OCRServiceInterface
 
         $fileContent = Storage::disk('private')->path($filePath);
 
-        Log::info('TabScanner API KEY', [
-            'key' => config('services.tabscanner.key')
-        ]);
         Log::info('Sending file to OCR', ['path' => $filePath]);
 
-        $response = Http::withoutVerifying()
-        ->withHeaders([
+        $response = Http::withHeaders([
             'apikey' => config('services.tabscanner.key') // ✅ correct place
         ])
         ->attach(
@@ -57,8 +53,7 @@ class TabScannerOCRService implements OCRServiceInterface
 
         sleep(3);
 
-        $result = Http::withoutVerifying()
-        ->withHeaders([
+        $result = Http::withHeaders([
             'apikey' => config('services.tabscanner.key')
         ])
         ->get('https://api.tabscanner.com/api/result/' .$token);

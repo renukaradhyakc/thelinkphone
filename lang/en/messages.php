@@ -300,6 +300,10 @@ return [
         'when_patient_book_an_appointment_with_you_new_appointment_will_created_on_selected_calendars' => 'When patient book an appointment with you, new appointment will created on selected calendars',
         'when_you_book_an_appointment_new_appointment_will_created_on_selected_calendars' => 'When you book an appointment, new appointment will created on selected calendars',
         'time_format' => 'Time Format',
+        'connect_zoom' => 'Connect Zoom',
+        'connect_your_zoom_account' => 'Connect your Zoom account',
+        'zoom_account_connected' => 'Your Zoom account is connected.',
+        'disconnect_your_zoom_account' => 'Disconnect your Zoom account',
     ],
 
     'personal_experience' => [

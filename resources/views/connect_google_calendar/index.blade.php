@@ -68,14 +68,14 @@
                                     </div>
                                 @endforeach
                                 <div class="pt-5 mt-5">
-                                    <div class="d-flex flex-sm-wrap flex-wrap">
-                                        {{ Form::submit(__('messages.common.save'),['class' => 'btn btn-primary me-2 mb-md-0 mb-2','id'=>'googleCalendarSubmitBtn']) }}
+                                    <div class="d-grid gap-2 d-md-flex">
+                                        {{ Form::submit(__('messages.common.save'),['class' => 'btn btn-primary','id'=>'googleCalendarSubmitBtn']) }}
                                         <a id="syncGoogleCalendar"
-                                           class="me-2 btn btn-primary me-2 mb-md-0 mb-2">
+                                           class="btn btn-primary">
                                             {{ __('messages.setting.sync_your_google_calendar') }}
                                         </a>
                                         <a href="{{ route('disconnectCalendar.destroy') }}" data-turbo="false"
-                                           class="btn btn-danger m-0">{{ __('messages.setting.disconnect_your_google_calendar') }}</a>
+                                           class="btn btn-danger">{{ __('messages.setting.disconnect_your_google_calendar') }}</a>
                                     </div>
                                 </div>
                             </div>

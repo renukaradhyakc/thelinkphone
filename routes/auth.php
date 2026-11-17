@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WebviewBridgeController;
 
 //Route::get('/register', [RegisteredUserController::class, 'create'])
 //                ->middleware('guest')
@@ -62,3 +63,6 @@ Route::post('/confirm-password', [ConfirmablePasswordController::class, 'store']
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
+    
+Route::get('/native-bridge', [WebviewBridgeController::class, 'consume'])
+    ->middleware('throttle:20,1')->name('native.bridge');

@@ -38,6 +38,9 @@ class UserController extends Controller
 
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
+                $keep = $user->tokens()->latest('id')->take(4)->pluck('id');
+                $user->tokens()->whereNotIn('id', $keep)->delete();
+
                 $token = $user->createToken('Email Access');
                 
                 $response = [
@@ -70,6 +73,9 @@ class UserController extends Controller
         $user = User::where('email', $request->email)->first();
         if ($user) {
             if (Hash::check($request->password, $user->password)) {
+                $keep = $user->tokens()->latest('id')->take(4)->pluck('id');
+                $user->tokens()->whereNotIn('id', $keep)->delete(); 
+                
                 $token = $user->createToken('Email Access');
                 $events = EventSchedule::where('user_id', $user->id)->get()->toArray();
                 $response = ['token' => $token->plainTextToken,'events'=> $events];
@@ -129,4 +135,9 @@ class UserController extends Controller
         return response()->json($result);
     }
 
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Logged out']);
+    }
 }

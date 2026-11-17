@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laracasts\Flash\Flash;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -76,6 +77,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $tokenId = $request->session()->get('native_token_id');
+        if ($tokenId) {
+            PersonalAccessToken::where('id', $tokenId)->delete();
+        }
+        
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

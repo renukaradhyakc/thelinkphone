@@ -4,8 +4,10 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.thelinkphone.app",
-      "sha256_cert_fingerprints":
-        ["9E:1B:3E:6D:E8:04:4D:9B:15:9D:77:3F:AB:87:C2:14:F8:83:37:AD:59:CC:39:17:78:F9:4A:D3:D8:D7:C7:CE"]
+      "sha256_cert_fingerprints": [
+        "75:C8:63:D2:0D:D0:D7:80:BE:D0:14:2B:0A:F0:1E:2F:81:57:76:42:5C:6E:BF:6A:BD:7D:BA:8B:BB:43:6C:B6",
+        "9E:1B:3E:6D:E8:04:4D:9B:15:9D:77:3F:AB:87:C2:14:F8:83:37:AD:59:CC:39:17:78:F9:4A:D3:D8:D7:C7:CE"
+      ]
     }
   }
 ]
